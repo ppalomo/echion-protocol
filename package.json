@@ -47,5 +47,10 @@
       "last 1 safari version"
     ]
   },
-  "devDependencies": {}
+  "devDependencies": {},
+  "coloredRegions": {
+    "namedColors": {
+      "Imports": "rgba(26, 67, 116, 0.15)"
+    }
+  }
 }

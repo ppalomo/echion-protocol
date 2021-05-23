@@ -20,5 +20,8 @@
     "ethereum-waffle": "^3.3.0",
     "ethers": "^5.1.4",
     "hardhat": "^2.3.0"
+  },
+  "dependencies": {
+    "replace-in-file": "^6.2.0"
   }
 }
