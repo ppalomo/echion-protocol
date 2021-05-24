@@ -49,21 +49,31 @@ export default function Home (props) {
     }
 
     return(
-        <Center mt="10rem">
+        <Center 
+            mt={{
+                base: "4rem",
+                md: "10rem",
+                xl: "10rem"
+            }}
+            >
             <VStack spacing={10}>
                 <Text
                     bgGradient="linear(to-l, #7928CA,#FF0080)"
                     bgClip="text"
-                    fontSize="6xl"
+                    fontSize={{
+                        "base": "5xl",
+                        "md": "6xl",
+                        "xl": "6xl"
+                    }}
                     fontWeight="extrabold">
                     Greeting: {contractGreeting}
                 </Text>
 
-                <Button w="200px" onClick={fetchGreeting}>Fetch Greeting</Button>
+                <Button w="160px" onClick={fetchGreeting}>Fetch Greeting</Button>
 
                 <HStack>
-                    <Input onChange={e => setGreetingValue(e.target.value)} placeholder="Set greeting" />
-                    <Button w={300} onClick={setGreeting}>Set Greeting</Button>
+                    <Input w={160} onChange={e => setGreetingValue(e.target.value)} placeholder="Set greeting" />
+                    <Button w={160} onClick={setGreeting}>Set Greeting</Button>
                 </HStack>
                 
             </VStack>

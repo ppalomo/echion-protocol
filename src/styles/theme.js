@@ -12,6 +12,10 @@ export default extendTheme({
             100: "#EFF2EF",
             900: "#171923"
         },
+        bg: {
+            100: "#FFFFFF",
+            900: "#1A202C"
+        },
         border: {
             100: "#CBD5E0",
             900: "#2D3748",
@@ -42,6 +46,10 @@ export default extendTheme({
                     color: props.colorMode === "light" ? "pink.100" : "pink.900",
                     textDecoration: 'none',
                 }
+            },
+            "a.top-menu-mobile": {
+                color: props.colorMode === "light" ? "text.100" : "text.900",
+                w: "100%"
             }
         }),
     },

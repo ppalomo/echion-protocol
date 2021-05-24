@@ -1,5 +1,8 @@
 import React, {useEffect} from "react";
 import {
+    Center
+  } from '@chakra-ui/react';
+import {
     Switch,
     Route, 
     useLocation   
@@ -19,12 +22,12 @@ export default function Content () {
     }, [location]);
 
     return(
-        <>
+        <Center>
             <Switch>
                 <Route exact path="/" component={Home} />
                 <Route path="/about" component={About} />
             </Switch>
-        </>
+        </Center>
     );
 
 } 
