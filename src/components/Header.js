@@ -219,6 +219,7 @@ export default function Header (props) {
                         aria-label="Options"                        
                         variant="outline">
                             <IconButton
+                                variant="outline"
                                 aria-label="toggle theme"
                                 icon={<FaBars />} />
                         </MenuButton>
