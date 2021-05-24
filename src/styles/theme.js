@@ -1,4 +1,4 @@
-import { extendTheme } from "@chakra-ui/react";
+import { extendTheme, useColorModeValue } from "@chakra-ui/react";
 
 export default extendTheme({
     initialColorMode: "dark",
@@ -16,28 +16,34 @@ export default extendTheme({
             100: "#CBD5E0",
             900: "#2D3748",
         },
-
-        
-        customWhite: {
-            100: "#F7ECF4",
-            200: "#FFFFFF",
-        },
         pink: {
             100: "#E6007A",
         },
-        green: {
-            100: "#2ca58d",
-        },
-        blue: {
-            100: "#4f86c6"
-        }
     },
     styles: {
         global: (props) => ({
             'html, body': {
                 bgColor: props.colorMode === 'dark' ? 'black.200' : 'white.200',
                 color: props.colorMode === 'dark' ? 'white.100' : 'black.100',
+            },
+            a: {
+                color: props.colorMode === "light" ? "text.100" : "text.900",
+                _hover: {
+                    color: "pink.100",
+                    textDecoration: 'none',
+                }
             }
         }),
     },
+    components: {
+        Button: {
+            baseStyle: (props) => ({
+                // color: props.colorMode === "light" ? "text.100" : "text.900",
+                // _hover: {
+                //     color: "pink.100",
+                //     textDecoration: 'none',
+                // }
+            })
+        }
+    }
 });

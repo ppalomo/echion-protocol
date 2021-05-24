@@ -5,16 +5,20 @@ export const useContract = (contractName) => {
     const { isWalletConnected, network, signer } = useStore();
 
     if (isWalletConnected) {
-        // Getting contract's address
-        const uri = `REACT_APP_${contractName.toUpperCase()}_${network.code.toUpperCase()}_ADDRESS`;
-        const address = process.env[uri];
+        try {
+            // Getting contract's address
+            const uri = `REACT_APP_${contractName.toUpperCase()}_${network.code.toUpperCase()}_ADDRESS`;
+            const address = process.env[uri];
 
-        // Getting contract's abi
-        var json = require(`../artifacts/contracts/${contractName}.sol/${contractName}.json`);
+            // Getting contract's abi
+            var json = require(`../artifacts/contracts/${contractName}.sol/${contractName}.json`);
+            // Creating contract's instance
 
-        // Creating contract's instance
-        const instance = new ethers.Contract(address, json.abi, signer);
-        return instance;
+            const instance = new ethers.Contract(address, json.abi, signer);
+            return instance;
+        } catch (error) {
+            return null;
+        }        
     }
     else
         return null;

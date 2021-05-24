@@ -14,10 +14,12 @@ import {
     VStack,
     useColorMode,
     useColorModeValue,
+    ReachLink
   } from '@chakra-ui/react';
 import { ethers } from 'ethers';
 import { FaDiscord, FaMoon, FaSun, FaTwitter } from 'react-icons/fa';
 import { truncate } from '../utils/stringsHelper';
+import TopMenu from './TopMenu';
 import useStore from '../store';
 
 //#endregion
@@ -27,6 +29,9 @@ export default function Header (props) {
     const { isWalletConnected, wallet, signer, network, toggleWalletModal, toggleNetworkModal, networkModalIsOpen } = useStore();
     const borderColor = useColorModeValue("border.100", "border.900");
     const textColor = useColorModeValue("text.100", "text.900");
+
+    console.log("Rendering header");
+    console.log(wallet);
 
     // useEffect(async () => {
     //     if (signer != null) {
@@ -54,6 +59,8 @@ export default function Header (props) {
             </Link>
 
             <ButtonGroup variant="ghost" color="gray.600" mr="1rem">
+
+                <TopMenu />
 
                 {!isWalletConnected ?
                     <Button 
@@ -116,6 +123,8 @@ export default function Header (props) {
                     icon={<FaDiscord fontSize="20px" />} />
 
             </ButtonGroup>
+
+            
 
         </Flex>
     );
