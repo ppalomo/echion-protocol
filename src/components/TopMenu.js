@@ -1,30 +1,26 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
     HStack,
-    ReachLink
   } from '@chakra-ui/react';
 import {
-    Link,  
+    Link,
 } from "react-router-dom";
+import useStore from '../store';
+import { topMenuItems } from '../data/menuItems';
 
-export default function TopMenu (props) {
+export default function TopMenu () {
+    const { pageSelected } = useStore();
 
     return(
         <HStack mr={5} spacing={5}>
-
-            <Link to="/">
-                Home
-            </Link>
-            <Link to="/about">
-                About
-            </Link>
-
-            {/* <Link as={ReachLink} href="/">
-                Pools
-            </Link>
-            <Link as={ReachLink} href="/about">
-                Votes
-            </Link> */}
+            {topMenuItems.map((item, index) => (
+                <Link
+                    key={index}
+                    className={pageSelected == item.id ? "top-menu-link-selected" : "top-menu-link"}
+                    to={item.url} >
+                    {item.title}
+                </Link>
+            ))}
         </HStack>
     );
 

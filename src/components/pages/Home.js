@@ -12,19 +12,24 @@ import useStore from '../../store';
 import { useContract } from '../../hooks/contractHooks';
 
 export default function Home (props) {
+    const { isWalletConnected } = useStore();
     const greeterContract = useContract("Greeter");
     const [greeting, setGreetingValue] = useState();
+    const [contractGreeting, setContractGreeting] = useState();
 
-    useEffect(() => {
-        console.log('greeting changed: ' + greeting);
-    }, [greeting])
+    useEffect(async () => {
+        if (isWalletConnected)
+            await fetchGreeting();
+        else
+            setContractGreeting("Disconnected")
+    }, [isWalletConnected]);
 
     async function fetchGreeting() {
         try {
             if(greeterContract != null) {
                 const data = await greeterContract.greet();                
                 console.log('data: ', data);
-                setGreetingValue(data);
+                setContractGreeting(data);
             }
         } catch (err) {
             console.log("Error: ", err);
@@ -51,7 +56,7 @@ export default function Home (props) {
                     bgClip="text"
                     fontSize="6xl"
                     fontWeight="extrabold">
-                    Welcome to Moriarty
+                    Greeting: {contractGreeting}
                 </Text>
 
                 <Button w="200px" onClick={fetchGreeting}>Fetch Greeting</Button>

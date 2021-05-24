@@ -1,12 +1,22 @@
-import React from "react";
+import React, {useEffect} from "react";
 import {
     Switch,
-    Route,    
+    Route, 
+    useLocation   
 } from "react-router-dom";
+import useStore from '../store';
+import { topMenuItems } from '../data/menuItems';
 import Home from './pages/Home';
 import About from './pages/About';
 
 export default function Content () {
+    let location = useLocation();
+    const { setPageSelected } = useStore();
+
+    useEffect(() => {
+        let item = topMenuItems.find(i => i.url == location.pathname);
+        setPageSelected(item.id);
+    }, [location]);
 
     return(
         <>

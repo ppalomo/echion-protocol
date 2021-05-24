@@ -17,7 +17,8 @@ export default extendTheme({
             900: "#2D3748",
         },
         pink: {
-            100: "#E6007A",
+            100: "#FF048A",
+            900: "#E6007A",
         },
     },
     styles: {
@@ -26,10 +27,19 @@ export default extendTheme({
                 bgColor: props.colorMode === 'dark' ? 'black.200' : 'white.200',
                 color: props.colorMode === 'dark' ? 'white.100' : 'black.100',
             },
-            a: {
+            "a.top-menu-link": {
                 color: props.colorMode === "light" ? "text.100" : "text.900",
+                fontWeight: props.colorMode === "light" ? "500" : "400",
                 _hover: {
-                    color: "pink.100",
+                    color: props.colorMode === "light" ? "gray.500" : "gray.300",
+                    textDecoration: 'none',
+                }
+            },
+            "a.top-menu-link-selected": {
+                color: props.colorMode === "light" ? "pink.900" : "pink.100",
+                fontWeight: props.colorMode === "light" ? "500" : "400",
+                _hover: {
+                    color: props.colorMode === "light" ? "pink.100" : "pink.900",
                     textDecoration: 'none',
                 }
             }
@@ -38,11 +48,6 @@ export default extendTheme({
     components: {
         Button: {
             baseStyle: (props) => ({
-                // color: props.colorMode === "light" ? "text.100" : "text.900",
-                // _hover: {
-                //     color: "pink.100",
-                //     textDecoration: 'none',
-                // }
             })
         }
     }

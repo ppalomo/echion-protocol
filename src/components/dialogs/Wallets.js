@@ -25,36 +25,47 @@ import { FaUserCircle } from 'react-icons/fa';
 import { networks } from '../../data/networks';
 
 export default function Wallets() {
-    const { setProvider, wallet, isWalletConnected, walletModalIsOpen, networkModalIsOpen, toggleWalletModal, toggleNetworkModal } = useStore();
+    // const [isFirstConnection, setstate] = useState(initialState)
+    const { setProvider, wallet, isWalletConnected, walletModalIsOpen, networkModalIsOpen, toggleWalletModal, toggleNetworkModal, setWalletModal, setBalance } = useStore();
 
     // useEffect(() => {
-    //     console.log(toggleNetworkModal);
-    //     // console.log(window.ethereum);
-    // }, [toggleNetworkModal]);
+        
+    // }, []);
 
     async function connectMetamask(net)
     {
-        // console.log(net)
+        // console.log(`Network: ${net}`);
         let provider = null;
         await window.ethereum.enable();
         if (net == "default") {
             provider = new ethers.providers.Web3Provider(window.ethereum, "any");
         } else {
-            provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+            // console.log("connecting")
+            provider = new ethers.providers.Web3Provider(window.ethereum, net);
             //provider = new ethers.providers.Web3Provider(window.ethereum, ethers.providers.networks.ropsten)
             // console.log(ethers.networks)
             // provider = new ethers.providers.Web3Provider(window.ethereum, "ropsten"); 
             //new ethers.providers.Web3Provider(window.ethereum, "rinkeby");
         }
+
         // console.log(provider);
         const signer = provider.getSigner();
         const wallet = await signer.getAddress();
         const network = await provider.getNetwork();
         const networkItem = networks.find(i => i.chainId === network.chainId);
+        const bal = await signer.getBalance();
 
-        // console.log(network);
-        setProvider(provider, signer, wallet, networkItem);
-        toggleWalletModal();
+        setProvider(provider, signer, wallet, networkItem, bal);
+        setWalletModal(false);
+
+        provider.removeAllListeners("network");
+        provider.on("network", (newNetwork, oldNetwork) => {
+            connectMetamask("default");
+        });
+
+        window.ethereum.on('accountsChanged', function (accounts) {
+            connectMetamask("default");
+        });
     }
 
     function disconnectWallet() {
@@ -62,19 +73,8 @@ export default function Wallets() {
         toggleWalletModal();
     }
 
-    function installMetamask()
-    {
-        console.log("Install Metamask clicked");
-    }
-
-    function connectWalletConnect()
-    {
-        console.log("Wallet connect clicked");
-    }
-
     function handleNetworkSelected(network) {
-        // console.log(network);
-        //connectMetamask(network);
+        connectMetamask(network);
         toggleNetworkModal();
     }
 
@@ -93,13 +93,11 @@ export default function Wallets() {
                     <WalletOption 
                         name="Install Metamask"
                         image="images/metamask.svg"
-                        onClick={installMetamask}
                         />
                 }
                 <WalletOption 
                     name="Wallet Connect"
                     image="images/walletconnect.svg"
-                    onClick={connectWalletConnect}
                     />
             </>
         )
@@ -156,6 +154,10 @@ export default function Wallets() {
                             name="Rinkeby Testnet"
                             image="images/eth-icon.svg"
                             onClick={() => handleNetworkSelected("rinkeby")} />
+                        <WalletOption 
+                            name="Ropsten Testnet"
+                            image="images/eth-icon.svg"
+                            onClick={() => handleNetworkSelected("ropsten")} />
                         <WalletOption 
                             name="Polygon"
                             image="images/polygon-icon.svg"
