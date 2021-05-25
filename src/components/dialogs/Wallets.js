@@ -8,11 +8,8 @@ import {
     ModalHeader,
     ModalBody,
     Button,
-    Center,
-    Flex,
     HStack,
     Icon,
-    Image,
     Text,
     VStack
   } from '@chakra-ui/react';
@@ -25,12 +22,7 @@ import { FaUserCircle } from 'react-icons/fa';
 import { networks } from '../../data/networks';
 
 export default function Wallets() {
-    // const [isFirstConnection, setstate] = useState(initialState)
     const { setProvider, wallet, isWalletConnected, walletModalIsOpen, networkModalIsOpen, toggleWalletModal, toggleNetworkModal, setWalletModal, setBalance } = useStore();
-
-    // useEffect(() => {
-        
-    // }, []);
 
     async function connectMetamask(net)
     {
@@ -40,15 +32,9 @@ export default function Wallets() {
         if (net == "default") {
             provider = new ethers.providers.Web3Provider(window.ethereum, "any");
         } else {
-            // console.log("connecting")
             provider = new ethers.providers.Web3Provider(window.ethereum, net);
-            //provider = new ethers.providers.Web3Provider(window.ethereum, ethers.providers.networks.ropsten)
-            // console.log(ethers.networks)
-            // provider = new ethers.providers.Web3Provider(window.ethereum, "ropsten"); 
-            //new ethers.providers.Web3Provider(window.ethereum, "rinkeby");
         }
 
-        // console.log(provider);
         const signer = provider.getSigner();
         const wallet = await signer.getAddress();
         const network = await provider.getNetwork();
@@ -79,9 +65,9 @@ export default function Wallets() {
     }
 
     function getOptions() {
-        //const isMetamask = window.ethereum && MetaMaskOnboarding.isMetaMaskInstalled();
+        const isMetamask = window.ethereum && MetaMaskOnboarding.isMetaMaskInstalled();
         //const { ethereum } = window;
-        const isMetamask = true; //ethereum && ethereum.isMetaMask;
+        //const isMetamask = true; //ethereum && ethereum.isMetaMask;
         
         return (
             <>

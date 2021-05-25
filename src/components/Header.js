@@ -74,7 +74,7 @@ export default function Header (props) {
                 borderBottom="1px"
                 borderColor={borderColor}>
 
-                <Link href="/">
+                <Link to="/">
                     <Image
                         src={useColorModeValue("images/logo-light.png", "images/logo-dark.png")} 
                         w={{
@@ -203,7 +203,7 @@ export default function Header (props) {
                 borderBottom="1px"
                 borderColor={borderColor}>
 
-                <Link href="/">
+                <Link to="/">
                     <Image
                         src={useColorModeValue("images/logo-light.png", "images/logo-dark.png")} 
                         w={{
@@ -215,20 +215,20 @@ export default function Header (props) {
                 </Link>
 
                 <Menu>
-                    <MenuButton                        
-                        aria-label="Options"                        
+                    <MenuButton
+                        aria-label="Options"
                         variant="outline">
-                            <IconButton
+                            <FaBars />
+                            {/* <IconButton
                                 variant="outline"
                                 aria-label="toggle theme"
-                                icon={<FaBars />} />
+                                icon={<FaBars />} /> */}
                         </MenuButton>
                     <MenuList>
                         {topMenuItems.map((item, index) => (
-                            <MenuItem>
+                            <MenuItem key={index}>
                                 <Link
                                     className="top-menu-mobile"
-                                    key={index}
                                     to={item.url} >
                                     {item.title}
                                 </Link>
