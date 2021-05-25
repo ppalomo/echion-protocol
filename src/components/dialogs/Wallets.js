@@ -80,8 +80,8 @@ export default function Wallets() {
 
     function getOptions() {
         //const isMetamask = window.ethereum && MetaMaskOnboarding.isMetaMaskInstalled();
-        const { ethereum } = window;
-        const isMetamask = ethereum && ethereum.isMetaMask;
+        //const { ethereum } = window;
+        const isMetamask = true; //ethereum && ethereum.isMetaMask;
         
         return (
             <>
