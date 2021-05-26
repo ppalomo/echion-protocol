@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import {
     Center,
     HStack,
@@ -31,6 +31,36 @@ import {
 } from "react-router-dom";
 
 export default function NewLottery () {
+    const [nftAddress, setNFTAddress] = useState("0xE1A19Eb074815e4028768182F8971D222416159A");
+    const [nftIndex, setNFTIndex] = useState(0);
+    const [ticketPrice, setTicketPrice] = useState(0);
+    const [nftImage, setNFTImage] = useState(null);
+
+    async function handleValidateNFT() {
+        console.log("handleValidateNFT");
+        console.log(nftAddress);
+        console.log(nftIndex);
+        console.log(ticketPrice);
+
+        // const response = await getERC721ImageURL(nftAddress, nftIndex);
+        // if (response.success) {
+        //     setNFTImage(response.data);
+        // } else {
+        //     setNFTImage(null);
+        // }
+    }
+
+    function handleNFTAddressChange(e) {
+        setNFTAddress(e.target.value);
+    }
+
+    function handleNFTIndexChange(e) {
+        setNFTIndex(e.target.value);
+    }
+
+    function handleTicketPriceChange(e) {
+        setTicketPrice(e.target.value);
+    }
 
     return(
         
@@ -65,8 +95,7 @@ export default function NewLottery () {
                     "base": 5,
                     "md": 10,
                     "xl": 10
-                }}
-                minHeight="100px"
+                }}                
                 bgColor={useColorModeValue("header.100", "header.900")}
                 borderWidth="1px"
                 borderColor={useColorModeValue("gray.200", "gray.700")}
@@ -74,7 +103,8 @@ export default function NewLottery () {
                 position="relative"
                 shadow="lg">
 
-                <Wrap w="100%" 
+                <Wrap
+                    w="100%"
                     spacing={{
                         "base": 4,
                         "md": 0,
@@ -93,8 +123,8 @@ export default function NewLottery () {
                             "xl": "60%"
                         }}>
                         <FormControl>
-                            <FormLabel>NFT contract:</FormLabel>
-                            <Input placeholder="0x..." />
+                            <FormLabel fontSize={14}>NFT contract:</FormLabel>
+                            <Input fontSize={14} placeholder="0x..." value={nftAddress} onChange={handleNFTAddressChange} />
                         </FormControl>
                     </WrapItem>
 
@@ -110,8 +140,8 @@ export default function NewLottery () {
                             "xl": "20%"
                         }}>
                         <FormControl>
-                            <FormLabel>NFT index:</FormLabel>
-                            <Input placeholder="Index" />
+                            <FormLabel fontSize={14}>NFT index:</FormLabel>
+                            <Input fontSize={14} placeholder="Index" value={nftIndex} onChange={handleNFTIndexChange} />
                         </FormControl>
                     </WrapItem>
 
@@ -127,8 +157,8 @@ export default function NewLottery () {
                             "xl": "20%"
                         }}>
                         <FormControl>
-                            <FormLabel>Ticket price:</FormLabel>
-                            <Input placeholder="Price" />
+                            <FormLabel fontSize={14}>Ticket price:</FormLabel>
+                            <Input fontSize={14} placeholder="Price" value={ticketPrice} onChange={handleTicketPriceChange} />
                         </FormControl>
                     </WrapItem>
 
@@ -145,6 +175,7 @@ export default function NewLottery () {
                         }}>
                         <Center>
                             <Button
+                                onClick={handleValidateNFT}
                                 fontSize={14}
                                 bgColor={useColorModeValue("gray.300", "gray.700")}
                                 variant="outline">
@@ -156,21 +187,21 @@ export default function NewLottery () {
                     <WrapItem
                         p={{
                             "base": 0,
-                            "md": 2,
-                            "xl": 2
+                            "md": 0,
+                            "xl": 0
                         }}
                         w={{
                             "base": "100%",
                             "md": "100%",
                             "xl": "100%"
                         }}>
-                        <Center w="100%" mt={2}>
+                        {/* <Center w="100%" mt={2}>
                             <Image
                                 rounded={'xl'}
                                 w="100%"
                                 objectFit="cover"
                                 src="https://lh3.googleusercontent.com/g2k-3oCz6vUm2fzbASRZbyWl5SrdYd9MBp0XmQ3508Nvp_VO8WeZqjXy_ACrajKjIjxSilXCx7vfSCs6exFIGIfVctuhzVXp6_f-PXg=s0" />
-                        </Center>
+                        </Center> */}
 
                     </WrapItem>
 
