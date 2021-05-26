@@ -10,7 +10,7 @@ import {
 import useStore from '../store';
 import { topMenuItems } from '../data/menuItems';
 import Home from './pages/Home';
-import About from './pages/About';
+import NewLottery from './pages/NewLottery';
 
 export default function Content () {
     let location = useLocation();
@@ -18,14 +18,16 @@ export default function Content () {
 
     useEffect(() => {
         let item = topMenuItems.find(i => i.url == location.pathname);
-        setPageSelected(item.id);
+        if (item)
+            setPageSelected(item.id);
     }, [location]);
 
     return(
-        <Center>
+        <Center 
+            w="100%">
             <Switch>
                 <Route exact path="/" component={Home} />
-                <Route path="/about" component={About} />
+                <Route path="/new" component={NewLottery} />
             </Switch>
         </Center>
     );

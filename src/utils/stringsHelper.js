@@ -1,4 +1,4 @@
-export function truncate (fullStr, strLen, separator) {
+export function truncateMiddle (fullStr, strLen, separator) {
     if (fullStr === null) return null;
     if (fullStr.length <= strLen) return fullStr;
 
@@ -12,4 +12,13 @@ export function truncate (fullStr, strLen, separator) {
     return fullStr.substr(0, frontChars) + 
            separator + 
            fullStr.substr(fullStr.length - backChars);
+};
+
+export function truncateRight (fullStr, strLen, separator) {
+    if (fullStr === null) return null;
+    if (fullStr.length <= strLen) return fullStr;
+
+    separator = separator || '...';
+
+    return fullStr.substr(0, strLen) + separator ;
 };

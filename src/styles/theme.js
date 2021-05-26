@@ -9,7 +9,7 @@ export default extendTheme({
             900: "#EFF2EF"
         },
         header: {
-            100: "#EFF2EF",
+            100: "#F7EBF3",
             900: "#171923"
         },
         bg: {
@@ -20,8 +20,9 @@ export default extendTheme({
             100: "#CBD5E0",
             900: "#2D3748",
         },
-        pink: {
+        primary: {
             100: "#FF048A",
+            500: "#E6007A",
             900: "#E6007A",
         },
     },
@@ -40,10 +41,10 @@ export default extendTheme({
                 }
             },
             "a.top-menu-link-selected": {
-                color: props.colorMode === "light" ? "pink.900" : "pink.100",
+                color: props.colorMode === "light" ? "primary.900" : "primary.100",
                 fontWeight: props.colorMode === "light" ? "500" : "400",
                 _hover: {
-                    color: props.colorMode === "light" ? "pink.100" : "pink.900",
+                    color: props.colorMode === "light" ? "primary.100" : "primary.900",
                     textDecoration: 'none',
                 }
             },

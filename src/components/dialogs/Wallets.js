@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { ethers } from 'ethers';
 import {
     Modal,
@@ -16,17 +16,36 @@ import {
 import MetaMaskOnboarding from '@metamask/onboarding';
 import WalletOption from './WalletOption';
 import NetworkOption from './NetworkOption';
+import AlertMessage from './AlertMessage';
 import useStore from '../../store';
-import { truncate } from '../../utils/stringsHelper';
+import { truncateMiddle } from '../../utils/stringsHelper';
 import { FaUserCircle } from 'react-icons/fa';
 import { networks } from '../../data/networks';
+import { coins } from '../../data/coins';
 
 export default function Wallets() {
-    const { setProvider, wallet, isWalletConnected, walletModalIsOpen, networkModalIsOpen, toggleWalletModal, toggleNetworkModal, setWalletModal, setBalance } = useStore();
+    const [isWrongNetworkAlertOpen, setIsWrongNetworkAlertOpen] = useState(false);
+    const { setProvider, network, wallet, isWalletConnected, walletModalIsOpen, networkModalIsOpen, toggleWalletModal, toggleNetworkModal, setWalletModal, setNetwork } = useStore();
+
+    useEffect(async () => {
+        await getDefaultProvider();
+    }, []);
+
+    async function getDefaultProvider() {
+        await window.ethereum.enable();
+        if (network == null || network == undefined) {
+            const networkItem = networks.find(i => i.code === process.env.REACT_APP_DEFAULT_NETWORK);
+            const coinItem = coins.find(c => c.symbol === networkItem.symbol);
+            
+            let provider = null;                        
+            const infuraKey = process.env.REACT_APP_INFURA_API_KEY;
+            provider = new ethers.providers.JsonRpcProvider(networkItem.rpcUrl.replace("[INFURA_KEY]",infuraKey));
+            setProvider(provider, null, null, networkItem, 0, coinItem);
+        }
+    }
 
     async function connectMetamask(net)
     {
-        // console.log(`Network: ${net}`);
         let provider = null;
         await window.ethereum.enable();
         if (net == "default") {
@@ -35,23 +54,28 @@ export default function Wallets() {
             provider = new ethers.providers.Web3Provider(window.ethereum, net);
         }
 
-        const signer = provider.getSigner();
-        const wallet = await signer.getAddress();
         const network = await provider.getNetwork();
         const networkItem = networks.find(i => i.chainId === network.chainId);
-        const bal = await signer.getBalance();
-
-        setProvider(provider, signer, wallet, networkItem, bal);
+        if (networkItem && networkItem.enabled)
+        {
+            const signer = provider.getSigner();
+            const wallet = await signer.getAddress();        
+            const bal = await signer.getBalance();
+            const coinItem = coins.find(c => c.symbol === networkItem.symbol);
+            setProvider(provider, signer, wallet, networkItem, bal, coinItem);            
+    
+            provider.removeAllListeners("network");
+            provider.on("network", (newNetwork, oldNetwork) => {
+                connectMetamask("default");
+            });
+    
+            window.ethereum.on('accountsChanged', function (accounts) {
+                connectMetamask("default");
+            });
+        } else {
+            setIsWrongNetworkAlertOpen(true);
+        }
         setWalletModal(false);
-
-        provider.removeAllListeners("network");
-        provider.on("network", (newNetwork, oldNetwork) => {
-            connectMetamask("default");
-        });
-
-        window.ethereum.on('accountsChanged', function (accounts) {
-            connectMetamask("default");
-        });
     }
 
     function disconnectWallet() {
@@ -97,7 +121,7 @@ export default function Wallets() {
                 <HStack spacing={3}>
                     <Icon w={6} h={6} as={FaUserCircle} />
                     <Text fontSize="md" fontWeight="600" m="0" userSelect="none" ml="1.5rem">
-                        {truncate(wallet, 25, '...')}
+                        {truncateMiddle(wallet, 25, '...')}
                     </Text>
                 </HStack>
                 <Button onClick={disconnectWallet}>
@@ -134,30 +158,14 @@ export default function Wallets() {
                     <ModalHeader>Select a Network</ModalHeader>
                     <ModalCloseButton />
                     <ModalBody>
-                        <WalletOption 
-                            name="Ethereum Mainnet"
-                            image="images/eth-icon.svg"
-                            onClick={() => handleNetworkSelected("mainnet")} />
-                        <WalletOption 
-                            name="Rinkeby Testnet"
-                            image="images/eth-icon.svg"
-                            onClick={() => handleNetworkSelected("rinkeby")} />
-                        <WalletOption 
-                            name="Ropsten Testnet"
-                            image="images/eth-icon.svg"
-                            onClick={() => handleNetworkSelected("ropsten")} />
-                        <WalletOption 
-                            name="Polygon"
-                            image="images/polygon-icon.svg"
-                            onClick={() => handleNetworkSelected("matic")} />
-                        <WalletOption 
-                            name="Mumbai Testnet"
-                            image="images/polygon-icon.svg"
-                            onClick={() => handleNetworkSelected("mumbai")} />
-                        <WalletOption 
-                            name="Binance Smart Chain"
-                            image="images/binance-icon.svg"
-                            onClick={() => handleNetworkSelected("bsc")} />
+                        { networks
+                            .filter(n => n.enabled)
+                            .map((n, index) => (
+                            <WalletOption 
+                                name={n.name}
+                                image={`images/${n.icon}`}
+                                onClick={() => handleNetworkSelected(n.code)} />
+                        )) }
                     </ModalBody>
                 </ModalContent>
             </>
@@ -178,6 +186,13 @@ export default function Wallets() {
                 isCentered>
                     {getWalletModalContent()}
             </Modal>
+            
+            <AlertMessage
+                isOpen={isWrongNetworkAlertOpen}
+                onClose={() => setIsWrongNetworkAlertOpen(false)}
+                title="Wrong Network"
+                message="Please connect to the appropriate Ethereum network." />
+
         </div>
       );
 }
