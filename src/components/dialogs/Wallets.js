@@ -34,12 +34,17 @@ export default function Wallets() {
     async function getDefaultProvider() {
         await window.ethereum.enable();
         if (network == null || network == undefined) {
-            const networkItem = networks.find(i => i.code === process.env.REACT_APP_DEFAULT_NETWORK);
+            const networkItem = networks.find(i => i.code === process.env.REACT_APP_DEFAULT_NETWORK);            
             const coinItem = coins.find(c => c.symbol === networkItem.symbol);
+
+            // Setting infura key
+            const infuraKey = process.env.REACT_APP_INFURA_API_KEY;
+            const rpcUrl = networkItem.rpcUrl.replace("[INFURA_KEY]",infuraKey);
+            networkItem.rpcUrl = rpcUrl;
             
             let provider = null;                        
-            const infuraKey = process.env.REACT_APP_INFURA_API_KEY;
-            provider = new ethers.providers.JsonRpcProvider(networkItem.rpcUrl.replace("[INFURA_KEY]",infuraKey));
+            
+            provider = new ethers.providers.JsonRpcProvider(networkItem.rpcUrl);
             setProvider(provider, null, null, networkItem, 0, coinItem);
         }
     }
@@ -55,9 +60,14 @@ export default function Wallets() {
         }
 
         const network = await provider.getNetwork();
-        const networkItem = networks.find(i => i.chainId === network.chainId);
+        const networkItem = networks.find(i => i.chainId === network.chainId);        
         if (networkItem && networkItem.enabled)
         {
+            // Setting infura key
+            const infuraKey = process.env.REACT_APP_INFURA_API_KEY;
+            const rpcUrl = networkItem.rpcUrl.replace("[INFURA_KEY]",infuraKey);
+            networkItem.rpcUrl = rpcUrl;
+
             const signer = provider.getSigner();
             const wallet = await signer.getAddress();        
             const bal = await signer.getBalance();

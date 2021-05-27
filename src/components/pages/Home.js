@@ -126,7 +126,7 @@ export default function Home (props) {
                     <Tooltip label="Create new lottery" fontSize="0.8em" hasArrow bg="gray.300" color="black">
                         <IconButton
                             onClick={handleCreateLottery}
-                            // isDisabled={!isWalletConnected}
+                            isDisabled={!isWalletConnected}
                             w="33%"
                             fontSize={14}
                             bgColor={useColorModeValue("gray.300", "gray.700")}

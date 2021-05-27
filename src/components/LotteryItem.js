@@ -148,7 +148,7 @@ export default function LotteryItem({lottery}) {
                             Deposit
                         </Button>
                         <Button
-                            isDisabled={!isWalletConnected}
+                            isDisabled={true}
                             w="33%"
                             fontSize={14}
                             bgColor={useColorModeValue("gray.300", "gray.700")}
@@ -156,7 +156,7 @@ export default function LotteryItem({lottery}) {
                             Withdraw
                         </Button>
                         <Button
-                            isDisabled={!isWalletConnected}
+                            isDisabled={true}
                             w="33%"
                             fontSize={14}
                             bgColor={useColorModeValue("gray.300", "gray.700")}
