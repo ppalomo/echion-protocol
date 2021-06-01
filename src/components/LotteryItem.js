@@ -26,27 +26,95 @@ import {
     useColorModeValue,
     useDisclosure,
   } from '@chakra-ui/react';
-import { utils } from 'ethers';
+import { ethers, utils } from 'ethers';
 import useStore from '../store';
 import { truncateRight } from '../utils/stringsHelper';
+import { useContractByAddress, useAdminContract, useAdminContractByAddress } from '../hooks/contractHooks';
 
 export default function LotteryItem({lottery}) {
-    // const { isDepositOpen, onDepositOpen, onDepositClose } = useDisclosure();
+    const lotteryContract = useContractByAddress("Lottery", lottery.address);
+    const factoryAdminContract = useAdminContract("LotteryFactory");    
+    const lotteryAdminContract = useAdminContractByAddress("Lottery", lottery.address);
+    const [numTickets, setNumTickets] = useState(1);
     const [isDepositOpen, setIsDepositOpen] = useState(false);
-    const { isWalletConnected, network, coin } = useStore();
+    const [isCancelTicketOpen, setIsCancelTicketOpen] = useState(false);    
+    const { isWalletConnected, wallet, network, coin, setTotalBalance } = useStore();
+    const [balance, setBalance] = useState(0);
+    const [tickets, setTickets] = useState(0);
+    const [totalTickets, setTotalTickets] = useState(0);
     const hoverColor = useColorModeValue('gray.100', 'gray.800');
 
-    function handleOpenDeposit() {
+    useEffect(async () => {
+        if (factoryAdminContract)
+            await fetchData();
+        else {
+            setTotalBalance(0);
+            setBalance(0);
+            setTickets(0);
+            setTotalTickets(0);
+        }
+    }, [isWalletConnected]);
 
+    function handleOpenDeposit() {
         if (isWalletConnected)
             setIsDepositOpen(true);
     }
 
+    function handleOpenCancelTicket() {
+        if (isWalletConnected)
+            setIsCancelTicketOpen(true);
+    }
+
     async function handleDeposit(e) {
-        //console.log(e);
-        // var kk = await getMaxActiveLotteries();
-        // console.log(kk.toString());
+        try {
+            if(lotteryContract != null) {                
+                const amount = lottery.price * numTickets;
+                const tx = await lotteryContract.buyTickets(numTickets, {value: amount.toString()});
+                await tx.wait();
+                fetchData();
+            }
+        } catch (err) {
+            console.log("Error: ", err);
+        }
         setIsDepositOpen(false);
+    }
+
+    async function handleCancelTickets(e) {
+        try {
+            if(lotteryContract != null) {
+                const tx = await lotteryContract.cancelTickets(numTickets);
+                await tx.wait();
+                fetchData();
+            }
+        } catch (err) {
+            console.log("Error: ", err);
+        }
+        setIsCancelTicketOpen(false);
+    }
+
+    function handleNumTicketsChange(e) {
+        setNumTickets(e.target.value);
+    }
+
+    async function fetchData() {
+        try {
+            if(factoryAdminContract) {
+                const [tbal, bal, ttick, tick] = await Promise.all([
+                    factoryAdminContract.totalBalance(),
+                    lotteryAdminContract.getBalance(),
+                    lotteryAdminContract.numberOfTickets(),
+                    lotteryAdminContract.getAddressTickets(wallet)
+                ]);
+                const tbalFormatted = Math.round(utils.formatEther(tbal) * 1e3) / 1e3;
+                setTotalBalance(tbalFormatted);
+                const balFormatted = Math.round(utils.formatEther(bal) * 1e3) / 1e3;
+                setBalance(balFormatted);
+                setTotalTickets(ttick);
+                setTickets(tick);
+            }
+        } catch (err) {
+            console.log("Error: ", err);
+        }   
     }
 
     return (
@@ -96,7 +164,9 @@ export default function LotteryItem({lottery}) {
                             {truncateRight(lottery.nft.name,28)}
                         </Heading>
                     </Tooltip>
-                    <Text color={'gray.500'}>{lottery.nft.tokenName}</Text>
+                    <Link href={network ? `${network.explorerUrl}/${lottery.address}` : ""} isExternal>
+                        <Text color={'gray.500'}>{lottery.nft.tokenName}</Text>
+                    </Link>
                 </Box>
 
                 <Center
@@ -121,14 +191,15 @@ export default function LotteryItem({lottery}) {
                         <VStack w="33%">
                             <Text fontSize="0.9rem" fontWeight="500" color="primary.500">Balance</Text>
                             <HStack>
-                                <Text fontSize="0.9rem" fontWeight="500" color="white.100">{network ? Math.round(utils.formatEther(lottery.balance) * 1e3) / 1e3 : "" }</Text>
+                                {/* <Text fontSize="0.9rem" fontWeight="500" color="white.100">{network ? Math.round(utils.formatEther(lottery.balance) * 1e3) / 1e3 : "" }</Text> */}
+                                <Text fontSize="0.9rem" fontWeight="500" color="white.100">{network ? balance : "" }</Text>
                                 <Image h={4} src={coin ? coin.image : ""} />
                             </HStack>
                         </VStack>
                         <VStack w="33%">
                             <Text fontSize="0.9rem" fontWeight="500" color="primary.500">Tickets</Text>
                             <HStack>
-                                <Text fontSize="0.9rem" fontWeight="500" color="white.100">{lottery.tickets}</Text>
+                                <Text fontSize="0.9rem" fontWeight="500" color="white.100">{tickets.toString()}/{totalTickets.toString()}</Text>
                             </HStack>
                         </VStack>
                     </HStack>
@@ -148,7 +219,8 @@ export default function LotteryItem({lottery}) {
                             Deposit
                         </Button>
                         <Button
-                            isDisabled={true}
+                            isDisabled={!isWalletConnected || tickets == 0}
+                            onClick={() => handleOpenCancelTicket()}
                             w="33%"
                             fontSize={14}
                             bgColor={useColorModeValue("gray.300", "gray.700")}
@@ -166,6 +238,8 @@ export default function LotteryItem({lottery}) {
                     </ButtonGroup>
                 </Center>
 
+                {/* <h1>{lottery.address}</h1> */}
+
             </Flex>
 
             <Modal
@@ -175,11 +249,19 @@ export default function LotteryItem({lottery}) {
                 <ModalOverlay />
                 <ModalContent>
                 <ModalHeader>Deposit to win</ModalHeader>
-                <ModalBody pb={6}>
-                    <FormControl>
-                        <FormLabel>Tickets amount:</FormLabel>
-                        <Input placeholder="1" />
-                    </FormControl>
+                <ModalBody pb={6}>           
+                    <VStack>
+                        <FormControl>
+                            <FormLabel>Tickets amount:</FormLabel>
+                            <Input fontSize={14} placeholder="0" value={numTickets} onChange={handleNumTicketsChange} />
+                        </FormControl>
+
+                        <HStack pl={2} w="100%">
+                            <Text fontSize="1.2rem" fontWeight="500" color="white.100">{network ? Math.round(utils.formatEther((lottery.price * numTickets).toString()) * 1e3) / 1e3 : "0" }</Text>
+                            <Image h={5} src={coin ? coin.image : ""} />
+                        </HStack>
+                
+                    </VStack>
                 </ModalBody>
                 <ModalFooter>
                     <Button 
@@ -188,6 +270,30 @@ export default function LotteryItem({lottery}) {
                         Deposit
                     </Button>
                     <Button onClick={() => setIsDepositOpen(false)}>Cancel</Button>
+                </ModalFooter>
+                </ModalContent>
+            </Modal>
+
+            <Modal
+                isOpen={isCancelTicketOpen}
+                onClose={() => setIsCancelTicketOpen(false)}
+                isCentered>
+                <ModalOverlay />
+                <ModalContent>
+                <ModalHeader>Cancel bought tickets</ModalHeader>
+                <ModalBody pb={6}>
+                    <FormControl>
+                        <FormLabel>Tickets amount:</FormLabel>
+                        <Input fontSize={14} placeholder="0" value={numTickets} onChange={handleNumTicketsChange} />
+                    </FormControl>
+                </ModalBody>
+                <ModalFooter>
+                    <Button 
+                        onClick={handleCancelTickets}
+                        colorScheme="blue" mr={3}>
+                        Deposit
+                    </Button>
+                    <Button onClick={() => setIsCancelTicketOpen(false)}>Cancel</Button>
                 </ModalFooter>
                 </ModalContent>
             </Modal>

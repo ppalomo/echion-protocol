@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ethers } from 'ethers';
+import { ethers, utils } from 'ethers';
 import {
     Center,
     HStack,
@@ -36,35 +36,42 @@ import { lotteries } from '../../data/lotteries';
 import { FaPlus } from 'react-icons/fa';
 
 export default function Home (props) {
-    const history = useHistory();
-    const { isWalletConnected, coin, setPageSelected } = useStore();
     const factoryAdminContract = useAdminContract("LotteryFactory");
     const factoryContract = useContract("LotteryFactory");
-    const [numberOfActiveLotteries, setNumberOfActiveLotteries] = useState("0");
-    const [maxActiveLotteries, setMaxActiveLotteries] = useState("0");
+    const history = useHistory();
+    const { isWalletConnected, coin, setPageSelected, numberOfActiveLotteries, totalBalance, setNumberOfActiveLotteries, setTotalBalance } = useStore();
+    
+    
+    // const [numberOfActiveLotteries, setNumberOfActiveLotteries] = useState("0");
+    // const [totalBalance, setTotalBalance] = useState("0");
 
     useEffect(async () => {
+        console.log("Home - useEffect[factoryAdminContract]");
         if (factoryAdminContract)
             await fetchData();
         else {
             setNumberOfActiveLotteries("0");
-            setMaxActiveLotteries("0");
+            setTotalBalance("0");
         }
-    }, [factoryAdminContract]);
+    }, [isWalletConnected]);
 
     async function fetchData() {
         try {
             if(factoryAdminContract != null) {
-                const [actives, max] = await Promise.all([
+                const [actives, tbal] = await Promise.all([
                     factoryAdminContract.numberOfActiveLotteries(),
-                    factoryAdminContract.maxActiveLotteries(),
+                    factoryAdminContract.totalBalance(),
                 ]);
                 setNumberOfActiveLotteries(actives.toString());
-                setMaxActiveLotteries(max.toString());
+                const tbalFormatted = Math.round(utils.formatEther(tbal) * 1e3) / 1e3;
+                setTotalBalance(tbalFormatted);
+
+                const kk = await factoryAdminContract.lotteries(2);
+                console.log(kk);
             }
-        } catch (err) {
+        } catch (err) { 
             console.log("Error: ", err);
-        }   
+        }
     }
 
     const handleCreateLottery = () => {
@@ -103,13 +110,13 @@ export default function Home (props) {
                         <VStack w="50%" spacing={0}>
                             <Text fontSize="0.9rem" fontWeight="500" color="primary.500">Total Value Locked</Text>
                             <HStack>
-                                <Text fontSize="1.5rem" fontWeight="500" color="white.100">23.40</Text>
+                                <Text fontSize="1.5rem" fontWeight="500" color="white.100">{totalBalance}</Text>
                                 <Image h={6} src={coin ? coin.image : ""} />
                             </HStack>
                         </VStack>
                         <VStack w="50%" spacing={0}>
                             <Text fontSize="0.9rem" fontWeight="500" color="primary.500">Active Lotteries</Text>
-                            <Text fontSize="1.5rem" fontWeight="500" color="white.100">{numberOfActiveLotteries}/{maxActiveLotteries}</Text>
+                            <Text fontSize="1.5rem" fontWeight="500" color="white.100">{numberOfActiveLotteries}</Text>
                         </VStack>
                     </HStack>
                 </Center>

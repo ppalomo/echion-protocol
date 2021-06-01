@@ -1,5 +1,5 @@
 import React, {useState} from "react";
-import { ethers, Wallet } from 'ethers';
+import { ethers, Wallet, utils } from 'ethers';
 import {
     Center,
     HStack,
@@ -32,9 +32,11 @@ import {
 } from "react-router-dom";
 import useStore from '../../store';
 import ERC721JSON from '../../abis/ERC721.json';
+import { useContract, useAdminContract } from '../../hooks/contractHooks';
 
 export default function NewLottery () {
     const { network, provider, isWalletConnected } = useStore();
+    const factoryContract = useContract("LotteryFactory");
     const [nftAddress, setNFTAddress] = useState("0xE1A19Eb074815e4028768182F8971D222416159A");
     const [nftIndex, setNFTIndex] = useState(0);
     const [ticketPrice, setTicketPrice] = useState(0);
@@ -42,7 +44,7 @@ export default function NewLottery () {
 
     async function handleValidateNFT() {
         const response = await getERC721ImageURL(nftAddress, nftIndex);
-        if (response.success) {
+        if (response && response.success) {
             setNFTImage(response.data);
         } else {
             setNFTImage(null);
@@ -74,6 +76,20 @@ export default function NewLottery () {
         } catch (error) {
             console.log(error);
             return null;
+        }
+    }
+
+    async function handelCreateLottery() {
+        try {
+            if(factoryContract != null) {
+                // utils.parseEther(ticketPrice.toString())
+                const tx = await factoryContract.createLottery(nftAddress, nftIndex, ethers.utils.parseEther('0.1'));
+                await tx.wait();
+                const kk = await factoryContract.maxActiveLotteries();
+                console.log(kk);
+            }
+        } catch (err) {
+            console.log("Error: ", err);
         }
     }
 
@@ -190,6 +206,7 @@ export default function NewLottery () {
                     </WrapItem>
 
                     <WrapItem
+                        alignItems="flex-end"
                         p={{
                             "base": 0,
                             "md": 2,
@@ -200,7 +217,7 @@ export default function NewLottery () {
                             "md": "20%",
                             "xl": "100%"
                         }}>
-                        <Center>
+                        <HStack>
                             <Button
                                 isDisabled={!isWalletConnected}
                                 onClick={handleValidateNFT}
@@ -209,7 +226,15 @@ export default function NewLottery () {
                                 variant="outline">
                                 Validate
                             </Button>
-                        </Center>
+                            <Button
+                                isDisabled={!isWalletConnected}
+                                onClick={handelCreateLottery}
+                                fontSize={14}
+                                bgColor={useColorModeValue("gray.300", "gray.700")}
+                                variant="outline">
+                                Create
+                            </Button>
+                        </HStack>
                     </WrapItem>
 
                     <WrapItem

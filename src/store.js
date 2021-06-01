@@ -16,6 +16,10 @@ const useStore = create(set => ({
     walletModalIsOpen: false,
     networkModalIsOpen: false,
 
+    // App variables
+    numberOfActiveLotteries: 0,
+    totalBalance: 0,
+
     // Methods
     setProvider: (provider, signer, wallet, network, balance, coin) => set(() => ({
         provider: provider,
@@ -32,6 +36,9 @@ const useStore = create(set => ({
     toggleNetworkModal: () => set(state => ({ networkModalIsOpen: !state.networkModalIsOpen })),
     toggleWalletModal: () => set(state => ({ walletModalIsOpen: !state.walletModalIsOpen })),
     setWalletModal: (open) => set(state => ({ walletModalIsOpen: open })),
+
+    setNumberOfActiveLotteries: (num) => set(() => ({ numberOfActiveLotteries: num })),
+    setTotalBalance: (num) => set(() => ({ totalBalance: num })),
 }));
 
 export default useStore;

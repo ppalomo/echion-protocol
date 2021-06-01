@@ -4,6 +4,11 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "hardhat/console.sol";
 
+interface ILotteryFactory {
+    function increaseTotalBalance(uint _lotteryId, uint _amount) external;
+    function decreaseTotalBalance(uint _lotteryId, uint _amount) external;
+}
+
 contract Lottery is Ownable {
   
   // Enums
@@ -21,17 +26,21 @@ contract Lottery is Ownable {
   }
 
   // Variables
+  ILotteryFactory parent;
   uint public lotteryId;
   uint public ticketPrice;
   uint created;
   NFT public nft;
   mapping(address => uint) tickets;
+  uint public numberOfTickets;
   address[] public players;
   State public state;
   address public winner;
 
   // Events
-  event TicketsBought(uint lotteryId, address indexed buyer, uint numberOfTickets);
+  // event LotteryCreated(uint lotteryId, uint ticketPrice, address nftAddress, uint nftIndex, uint created);
+  event TicketsBought(uint lotteryId, address indexed buyer, uint numberOfTickets, uint amount);
+  event TicketsCancelled(uint lotteryId, address indexed buyer, uint numberOfTickets, uint amount);
   // event WinnerDeclared(address indexed winner, uint prize);
 
   /**
@@ -40,14 +49,19 @@ contract Lottery is Ownable {
    @param _nftAddress - NFT contract's address.
    @param _nftIndex - NFT indentifier in its contract.
    @param _ticketPrice - Lottery ticket price.
+   @param _created - Creation timestamp.
    */
-  constructor(uint _lotteryId, address _nftAddress, uint _nftIndex, uint _ticketPrice) {
+  constructor(uint _lotteryId, address _nftAddress, uint _nftIndex, uint _ticketPrice, uint _created) {
+    parent = ILotteryFactory(owner());
     lotteryId = _lotteryId;
     ticketPrice = _ticketPrice;
     nft.addr = _nftAddress;
     nft.index = _nftIndex;
     state = State.OPEN;
-    created = block.timestamp;
+    created = _created;
+    numberOfTickets = 0;
+
+    // emit LotteryCreated(lotteryId, ticketPrice, nft.addr, nft.index, created);
   } 
 
   /**
@@ -58,12 +72,17 @@ contract Lottery is Ownable {
     require(state == State.OPEN, 'The lottery open period was closed');
     require(msg.value == ticketPrice * _numberOfTickets, 'Amount sent is different than price');
 
+    // Creating tickets
     tickets[msg.sender] += _numberOfTickets;
     for (uint i=0; i<_numberOfTickets; i++) {
       players.push(msg.sender);
     }
+    numberOfTickets += _numberOfTickets;
 
-    emit TicketsBought(lotteryId, msg.sender, _numberOfTickets);
+    // Increasing total factory balance
+    parent.increaseTotalBalance(lotteryId, msg.value);
+
+    emit TicketsBought(lotteryId, msg.sender, _numberOfTickets, msg.value);
   }
 
   /**
@@ -80,44 +99,57 @@ contract Lottery is Ownable {
     payable(msg.sender).transfer(amount);
 
     tickets[msg.sender] -= _numberOfTickets;
+    numberOfTickets -= _numberOfTickets;
 
     // Delete items from players array
+    uint deleted = 0;
+    for (uint i=0; i<players.length; i++) {
+      if( players[i] == msg.sender && deleted < _numberOfTickets) {         
+         delete players[i];
+         deleted += 1;
+      }
+    }
+
+    // Decreasing total factory balance
+    parent.decreaseTotalBalance(lotteryId, amount);
+
+    emit TicketsCancelled(lotteryId, msg.sender, _numberOfTickets, amount);
   }
 
-  function redeemTickets() public {
-    require(state == State.CLOSED, 'The lottery is not closed');
+  // function redeemTickets() public {
+  //   require(state == State.CLOSED, 'The lottery is not closed');
 
-    // Tranfering amount to sender
-    require(address(this).balance >= tickets[msg.sender], 'Not enough money in the balance');
-    payable(msg.sender).transfer(tickets[msg.sender]);
+  //   // Tranfering amount to sender
+  //   require(address(this).balance >= tickets[msg.sender], 'Not enough money in the balance');
+  //   payable(msg.sender).transfer(tickets[msg.sender]);
 
-    // Check function !!!!!!!!!!!!!!!!!!!!!!!
-  }
+  //   // Check function !!!!!!!!!!!!!!!!!!!!!!!
+  // }
 
-  /**
-   @notice Changes de lottery state to staking.
-   */
-  function launchStaking() external onlyOwner {
-    require(state == State.OPEN, 'The lottery is not open');
-    state = State.STAKING;
+  // /**
+  //  @notice Changes de lottery state to staking.
+  //  */
+  // function launchStaking() external onlyOwner {
+  //   require(state == State.OPEN, 'The lottery is not open');
+  //   state = State.STAKING;
 
-    // Launch staking!!!!!!!!!
-  }
+  //   // Launch staking!!!!!!!!!
+  // }
 
-  /**
-   @notice Declares a winner and closes the lottery.
-   */
-  function declareWinner() external onlyOwner {
-      require(state != State.CLOSED, 'The lottery is not open');
-      require(players.length > 0, 'At least one player is necessary');
+  // /**
+  //  @notice Declares a winner and closes the lottery.
+  //  */
+  // function declareWinner() external onlyOwner {
+  //     require(state != State.CLOSED, 'The lottery is not open');
+  //     require(players.length > 0, 'At least one player is necessary');
 
-      uint index = uint(keccak256(abi.encodePacked(block.timestamp, block.difficulty))) % players.length;
-      winner = players[index];
+  //     uint index = uint(keccak256(abi.encodePacked(block.timestamp, block.difficulty))) % players.length;
+  //     winner = players[index];
 
-      // Transfer NFT to winner !!!!!!!!!!!!!!!!!!!!!!!!!!!
+  //     // Transfer NFT to winner !!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-      state = State.CLOSED;
-  }
+  //     state = State.CLOSED;
+  // }
 
   /**
    @notice Returns number of tickets for an address.
@@ -125,13 +157,6 @@ contract Lottery is Ownable {
    */
   function getAddressTickets(address _addr) public view returns (uint) {
     return tickets[_addr];
-  }
-
-  /**
-   @notice Returns total number of tickets.
-   */
-  function getTotalTickets() public view returns (uint) {
-    return players.length;
   }
 
   /**

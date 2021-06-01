@@ -1,5 +1,6 @@
 const path = require("path");
 require("@nomiclabs/hardhat-waffle");
+require("@nomiclabs/hardhat-etherscan");
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 // This is a sample Hardhat task. To learn how to create your own go to
@@ -16,9 +17,10 @@ task("accounts", "Prints the list of accounts", async () => {
  * @type import('hardhat/config').HardhatUserConfig
  */
  module.exports = {
-  solidity: "0.8.3",
+  solidity: "0.8.0",
   paths: {
-    artifacts: '../src/artifacts',
+    //artifacts: '../src/artifacts', 
+    artifacts: './artifacts',
   },
   networks: {
     hardhat: {
