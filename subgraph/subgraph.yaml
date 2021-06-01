@@ -1,0 +1,32 @@
+specVersion: 0.0.2
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum/contract
+    name: Contract
+    network: rinkeby
+    source:
+      address: "0xEC458b4CdBAD8095Ba64c0E3137D541F9699782F"
+      abi: Contract
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.4
+      language: wasm/assemblyscript
+      entities:
+        - LotteryCreated
+        - MaxActiveLotteriesChanged
+        - OwnershipTransferred
+        - PeriodsChanged
+      abis:
+        - name: Contract
+          file: ./abis/Contract.json
+      eventHandlers:
+        - event: LotteryCreated(uint256,address,address,uint256,uint256)
+          handler: handleLotteryCreated
+        - event: MaxActiveLotteriesChanged(uint256)
+          handler: handleMaxActiveLotteriesChanged
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: PeriodsChanged(uint256,uint256)
+          handler: handlePeriodsChanged
+      file: ./src/mapping.ts
