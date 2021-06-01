@@ -38,7 +38,6 @@ contract Lottery is Ownable {
   address public winner;
 
   // Events
-  // event LotteryCreated(uint lotteryId, uint ticketPrice, address nftAddress, uint nftIndex, uint created);
   event TicketsBought(uint lotteryId, address indexed buyer, uint numberOfTickets, uint amount);
   event TicketsCancelled(uint lotteryId, address indexed buyer, uint numberOfTickets, uint amount);
   // event WinnerDeclared(address indexed winner, uint prize);
@@ -60,8 +59,6 @@ contract Lottery is Ownable {
     state = State.OPEN;
     created = _created;
     numberOfTickets = 0;
-
-    // emit LotteryCreated(lotteryId, ticketPrice, nft.addr, nft.index, created);
   } 
 
   /**
