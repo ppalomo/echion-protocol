@@ -47,7 +47,9 @@
       "last 1 safari version"
     ]
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "axios": "^0.21.1"
+  },
   "coloredRegions": {
     "namedColors": {
       "Imports": "rgba(26, 67, 116, 0.15)"

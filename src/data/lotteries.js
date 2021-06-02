@@ -28,8 +28,8 @@ export const lotteries = [
       }
     },
     {
-      address: "0xa16E02E87b7454126E5E10d957A927A7F5B5d2be", 
-      price: ethers.utils.parseEther('0.12').toString(),
+      address: "0x18B0c74c2C795ebcA442792f5124aBfC379EA39E", 
+      price: ethers.utils.parseEther('0.2').toString(),
       balance: "213450000000000000000",
       tickets: "1121",
       nft: {

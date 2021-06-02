@@ -14,7 +14,6 @@ import {
     Link,
     Modal,
     ModalBody,
-    ModalCloseButton,
     ModalContent,
     ModalFooter,
     ModalHeader,
@@ -24,36 +23,96 @@ import {
     VStack,
     WrapItem,
     useColorModeValue,
-    useDisclosure,
   } from '@chakra-ui/react';
-import { ethers, utils } from 'ethers';
+import { ethers, Wallet, utils } from 'ethers';
 import useStore from '../store';
 import { truncateRight } from '../utils/stringsHelper';
 import { useContractByAddress, useAdminContract, useAdminContractByAddress } from '../hooks/contractHooks';
+import ERC721JSON from '../abis/ERC721.json';
 
 export default function LotteryItem({lottery}) {
+    const { isWalletConnected, wallet, network, coin, setTotalBalance, provider } = useStore();
     const lotteryContract = useContractByAddress("Lottery", lottery.address);
     const factoryAdminContract = useAdminContract("LotteryFactory");    
     const lotteryAdminContract = useAdminContractByAddress("Lottery", lottery.address);
     const [numTickets, setNumTickets] = useState(1);
     const [isDepositOpen, setIsDepositOpen] = useState(false);
     const [isCancelTicketOpen, setIsCancelTicketOpen] = useState(false);    
-    const { isWalletConnected, wallet, network, coin, setTotalBalance } = useStore();
     const [balance, setBalance] = useState(0);
     const [tickets, setTickets] = useState(0);
     const [totalTickets, setTotalTickets] = useState(0);
     const hoverColor = useColorModeValue('gray.100', 'gray.800');
+    const [imageURI, setImageURI] = useState(null);
+    const [name, setName] = useState(null);
+    const [contractName, setContractName] = useState(null);
 
     useEffect(async () => {
-        if (factoryAdminContract)
             await fetchData();
-        else {
-            setTotalBalance(0);
-            setBalance(0);
-            setTickets(0);
-            setTotalTickets(0);
+    }, [isWalletConnected, wallet]);
+
+    async function fetchData() {
+        try {
+            if(factoryAdminContract) {
+                const response = await getLotteryOnChainData(lottery.nftAddress, lottery.nftIndex);
+                if (response && response.success) {
+                    setImageURI(response.data.imageURI);
+                    setName(response.data.name);
+                    setContractName(response.data.contractName);
+                } else {
+                    console.log("error");
+                }
+                const [tbal, bal, ttick] = await Promise.all([
+                    factoryAdminContract.totalBalance(),
+                    lotteryAdminContract.getBalance(),
+                    lotteryAdminContract.numberOfTickets()
+                ]);
+                setTotalBalance(Math.round(utils.formatEther(tbal) * 1e3) / 1e3);
+                setBalance(Math.round(utils.formatEther(bal) * 1e3) / 1e3);
+                setTotalTickets(ttick);
+
+                if (isWalletConnected)
+                {
+                    const tick = await lotteryAdminContract.getAddressTickets(wallet);
+                    setTickets(tick);
+                }
+            }
+        } catch (error) {
+            
         }
-    }, [isWalletConnected]);
+    }
+
+    const getLotteryOnChainData = async (addr, index) => {
+        try {
+            const wallet = new Wallet(process.env.REACT_APP_DEPLOYER_PRIVATE_KEY, provider);
+            const contract = new ethers.Contract(addr, ERC721JSON.abi, wallet);
+
+            const contractName = await contract.name();
+            const tokenURI = await contract.tokenURI(index);
+
+            var response = fetch(tokenURI)
+                .then(response => response.json())
+                .then((jsonData) => {
+                    const response = { 
+                        success: true, 
+                        data:  { 
+                            name: jsonData.name,
+                            contractName: contractName,
+                            imageURI: jsonData.image 
+                        }
+                    };
+                    return response;
+                })
+                .catch((error) => {
+                    console.warn('fetch error:', error);
+                    return { success: false, data: null };
+                });
+            return response;
+
+        } catch (error) {
+            console.log(error);
+            return null;
+        }
+    }
 
     function handleOpenDeposit() {
         if (isWalletConnected)
@@ -67,8 +126,11 @@ export default function LotteryItem({lottery}) {
 
     async function handleDeposit(e) {
         try {
+            console.log("handleDeposit");
             if(lotteryContract != null) {                
-                const amount = lottery.price * numTickets;
+                const amount = lottery.ticketPrice * numTickets;
+                console.log(amount);
+                console.log(lotteryContract);
                 const tx = await lotteryContract.buyTickets(numTickets, {value: amount.toString()});
                 await tx.wait();
                 fetchData();
@@ -94,27 +156,6 @@ export default function LotteryItem({lottery}) {
 
     function handleNumTicketsChange(e) {
         setNumTickets(e.target.value);
-    }
-
-    async function fetchData() {
-        try {
-            if(factoryAdminContract) {
-                const [tbal, bal, ttick, tick] = await Promise.all([
-                    factoryAdminContract.totalBalance(),
-                    lotteryAdminContract.getBalance(),
-                    lotteryAdminContract.numberOfTickets(),
-                    lotteryAdminContract.getAddressTickets(wallet)
-                ]);
-                const tbalFormatted = Math.round(utils.formatEther(tbal) * 1e3) / 1e3;
-                setTotalBalance(tbalFormatted);
-                const balFormatted = Math.round(utils.formatEther(bal) * 1e3) / 1e3;
-                setBalance(balFormatted);
-                setTotalTickets(ttick);
-                setTickets(tick);
-            }
-        } catch (err) {
-            console.log("Error: ", err);
-        }   
     }
 
     return (
@@ -146,26 +187,28 @@ export default function LotteryItem({lottery}) {
                 alignItems="center"
                 flexDirection="column">
 
+                {/* <Text>{lottery.address}</Text> */}
+
                 <Center>
                     <Link 
                         isExternal
-                        href={lottery.nft.imageURI}>
+                        href={imageURI}>
                         <Image                        
                             rounded={'xl'}
                             h="230px"
                             objectFit="cover"
-                            src={lottery.nft.imageURI} />
+                            src={imageURI} />
                     </Link>
                 </Center>
 
                 <Box pt="6">
-                    <Tooltip label={lottery.nft.name} fontSize="0.8em" hasArrow bg="gray.300" color="black">
+                    <Tooltip label={name} fontSize="0.8em" hasArrow bg="gray.300" color="black">
                         <Heading fontSize="xl" fontWeight={500} fontFamily={'body'}>
-                            {truncateRight(lottery.nft.name,28)}
+                            {truncateRight(name ? name: "",28)}
                         </Heading>
                     </Tooltip>
-                    <Link href={network ? `${network.explorerUrl}/${lottery.address}` : ""} isExternal>
-                        <Text color={'gray.500'}>{lottery.nft.tokenName}</Text>
+                    <Link href={network ? `${network.explorerUrl}/address/${lottery.address}` : ""} isExternal>
+                        <Text color={'gray.500'}>{contractName}</Text>
                     </Link>
                 </Box>
 
@@ -184,14 +227,13 @@ export default function LotteryItem({lottery}) {
                         <VStack w="33%">
                             <Text fontSize="0.9rem" fontWeight="500" color="primary.500">Ticket Price</Text>
                             <HStack>
-                                <Text fontSize="0.9rem" fontWeight="500" color="white.100">{network ? Math.round(utils.formatEther(lottery.price) * 1e3) / 1e3 : "" }</Text>
+                                <Text fontSize="0.9rem" fontWeight="500" color="white.100">{network ? Math.round(utils.formatEther(lottery.ticketPrice) * 1e3) / 1e3 : "" }</Text>
                                 <Image h={4} src={coin ? coin.image : ""} />
                             </HStack>
                         </VStack>
                         <VStack w="33%">
                             <Text fontSize="0.9rem" fontWeight="500" color="primary.500">Balance</Text>
                             <HStack>
-                                {/* <Text fontSize="0.9rem" fontWeight="500" color="white.100">{network ? Math.round(utils.formatEther(lottery.balance) * 1e3) / 1e3 : "" }</Text> */}
                                 <Text fontSize="0.9rem" fontWeight="500" color="white.100">{network ? balance : "" }</Text>
                                 <Image h={4} src={coin ? coin.image : ""} />
                             </HStack>
@@ -257,7 +299,7 @@ export default function LotteryItem({lottery}) {
                         </FormControl>
 
                         <HStack pl={2} w="100%">
-                            <Text fontSize="1.2rem" fontWeight="500" color="white.100">{network ? Math.round(utils.formatEther((lottery.price * numTickets).toString()) * 1e3) / 1e3 : "0" }</Text>
+                            <Text fontSize="1.2rem" fontWeight="500" color="white.100">{network ? Math.round(utils.formatEther((lottery.ticketPrice * numTickets).toString()) * 1e3) / 1e3 : "0" }</Text>
                             <Image h={5} src={coin ? coin.image : ""} />
                         </HStack>
                 

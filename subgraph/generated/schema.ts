@@ -12,7 +12,7 @@ import {
   BigDecimal
 } from "@graphprotocol/graph-ts";
 
-export class ExampleEntity extends Entity {
+export class Lottery extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
@@ -20,17 +20,17 @@ export class ExampleEntity extends Entity {
 
   save(): void {
     let id = this.get("id");
-    assert(id !== null, "Cannot save ExampleEntity entity without an ID");
+    assert(id !== null, "Cannot save Lottery entity without an ID");
     assert(
       id.kind == ValueKind.STRING,
-      "Cannot save ExampleEntity entity with non-string ID. " +
+      "Cannot save Lottery entity with non-string ID. " +
         'Considering using .toHex() to convert the "id" to a string.'
     );
-    store.set("ExampleEntity", id.toString(), this);
+    store.set("Lottery", id.toString(), this);
   }
 
-  static load(id: string): ExampleEntity | null {
-    return store.get("ExampleEntity", id) as ExampleEntity | null;
+  static load(id: string): Lottery | null {
+    return store.get("Lottery", id) as Lottery | null;
   }
 
   get id(): string {
@@ -42,30 +42,88 @@ export class ExampleEntity extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get count(): BigInt {
-    let value = this.get("count");
-    return value.toBigInt();
+  get address(): Bytes | null {
+    let value = this.get("address");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
   }
 
-  set count(value: BigInt) {
-    this.set("count", Value.fromBigInt(value));
+  set address(value: Bytes | null) {
+    if (value === null) {
+      this.unset("address");
+    } else {
+      this.set("address", Value.fromBytes(value as Bytes));
+    }
   }
 
-  get lotteryId(): BigInt {
-    let value = this.get("lotteryId");
-    return value.toBigInt();
+  get nftAddress(): Bytes | null {
+    let value = this.get("nftAddress");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
   }
 
-  set lotteryId(value: BigInt) {
-    this.set("lotteryId", Value.fromBigInt(value));
+  set nftAddress(value: Bytes | null) {
+    if (value === null) {
+      this.unset("nftAddress");
+    } else {
+      this.set("nftAddress", Value.fromBytes(value as Bytes));
+    }
   }
 
-  get lotteryAddress(): Bytes {
-    let value = this.get("lotteryAddress");
-    return value.toBytes();
+  get nftIndex(): BigInt | null {
+    let value = this.get("nftIndex");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
   }
 
-  set lotteryAddress(value: Bytes) {
-    this.set("lotteryAddress", Value.fromBytes(value));
+  set nftIndex(value: BigInt | null) {
+    if (value === null) {
+      this.unset("nftIndex");
+    } else {
+      this.set("nftIndex", Value.fromBigInt(value as BigInt));
+    }
+  }
+
+  get ticketPrice(): BigInt | null {
+    let value = this.get("ticketPrice");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set ticketPrice(value: BigInt | null) {
+    if (value === null) {
+      this.unset("ticketPrice");
+    } else {
+      this.set("ticketPrice", Value.fromBigInt(value as BigInt));
+    }
+  }
+
+  get created(): BigInt | null {
+    let value = this.get("created");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set created(value: BigInt | null) {
+    if (value === null) {
+      this.unset("created");
+    } else {
+      this.set("created", Value.fromBigInt(value as BigInt));
+    }
   }
 }

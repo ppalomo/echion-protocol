@@ -25,6 +25,7 @@ import {
     FormLabel,
     Input,
     useColorModeValue,
+    WrapItem,
   } from '@chakra-ui/react';
 import {
     useHistory
@@ -32,18 +33,27 @@ import {
 import useStore from '../../store';
 import { useContract, useAdminContract } from '../../hooks/contractHooks';
 import LotteryItem from '../LotteryItem';
-import { lotteries } from '../../data/lotteries';
-import { FaPlus } from 'react-icons/fa';
+// import { localLotteries } from '../../data/lotteries';
+import { FaNetworkWired, FaPlus } from 'react-icons/fa';
+
+const axios = require('axios');
 
 export default function Home (props) {
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [lotteries, setLotteries] = useState([]);
     const factoryAdminContract = useAdminContract("LotteryFactory");
     const factoryContract = useContract("LotteryFactory");
     const history = useHistory();
-    const { isWalletConnected, coin, setPageSelected, numberOfActiveLotteries, totalBalance, setNumberOfActiveLotteries, setTotalBalance } = useStore();
+    const { isWalletConnected, wallet, network, coin, setPageSelected, numberOfActiveLotteries, totalBalance, setNumberOfActiveLotteries, setTotalBalance } = useStore();
     
     
     // const [numberOfActiveLotteries, setNumberOfActiveLotteries] = useState("0");
     // const [totalBalance, setTotalBalance] = useState("0");
+
+    useEffect(async () => {
+        if (factoryAdminContract)
+            setIsLoaded(true);
+    }, [factoryAdminContract]);
 
     useEffect(async () => {
         console.log("Home - useEffect[factoryAdminContract]");
@@ -53,25 +63,59 @@ export default function Home (props) {
             setNumberOfActiveLotteries("0");
             setTotalBalance("0");
         }
-    }, [isWalletConnected]);
+    }, [isLoaded, wallet, network]);
 
     async function fetchData() {
         try {
+            console.log("home - fetchdata")
             if(factoryAdminContract != null) {
-                const [actives, tbal] = await Promise.all([
+                console.log("home - inside")
+                const [actives, tbal, lot] = await Promise.all([
                     factoryAdminContract.numberOfActiveLotteries(),
                     factoryAdminContract.totalBalance(),
+                    getLotteries()
                 ]);
+                console.log(lot);
                 setNumberOfActiveLotteries(actives.toString());
                 const tbalFormatted = Math.round(utils.formatEther(tbal) * 1e3) / 1e3;
                 setTotalBalance(tbalFormatted);
 
-                const kk = await factoryAdminContract.lotteries(2);
-                console.log(kk);
+                // const kk = await factoryAdminContract.lotteries(0);
+                // console.log(kk);
             }
         } catch (err) { 
             console.log("Error: ", err);
         }
+    }
+
+    async function getLotteries(){
+        console.log("getlotteries");
+        axios.post(`https://api.thegraph.com/subgraphs/name/ppalomo/echion-${network.code}`, {
+            query: `
+                {
+                    lotteries(first: 5) {
+                        id
+                        address
+                        nftAddress
+                        nftIndex
+                        ticketPrice
+                        created
+                    }
+                }
+            `
+            })
+            .then((res) => {
+                // for (const flashsloan of res.data.data.flashLoans) {
+                //     console.log(flashsloan)
+                // }
+                console.log(res);
+                setLotteries(res.data.data.lotteries);
+                return res;
+            })
+            .catch((error) => {
+                console.error(error);
+                return [];
+            })
     }
 
     const handleCreateLottery = () => {
@@ -81,7 +125,7 @@ export default function Home (props) {
 
     return(
         
-        <VStack>
+        <VStack w="100%">
 
             <HStack
                 w={{
@@ -152,6 +196,7 @@ export default function Home (props) {
                     xl: "50%"
                 }}>
                 <Wrap 
+                    w="100%"
                     mt={{
                         base: "0.5rem",
                         md: "0.5rem",
@@ -161,9 +206,17 @@ export default function Home (props) {
                     p={0}
                     justify="center"
                     align="center">
-                    {lotteries.map((l, index) => (
-                        <LotteryItem key={index} lottery={l} />
-                    ))}
+                    {lotteries && lotteries.length > 0 ?
+                        lotteries.map((l, index) => (
+                            <LotteryItem key={index} lottery={l} />
+                        ))
+                    :
+                        <WrapItem>
+                            <Text p={3} color={'gray.500'}>
+                                No elements. Would you like to create the first lottery?
+                            </Text>
+                        </WrapItem>
+                    }
                 </Wrap>
             </Center>
 

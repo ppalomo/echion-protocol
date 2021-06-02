@@ -1,6 +1,8 @@
-type ExampleEntity @entity {
+type Lottery @entity {
   id: ID!
-  count: BigInt!
-  lotteryId: BigInt! # uint256
-  lotteryAddress: Bytes! # address
+  address: Bytes
+  nftAddress: Bytes
+  nftIndex: BigInt
+  ticketPrice: BigInt
+  created: BigInt
 }

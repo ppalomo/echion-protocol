@@ -83,7 +83,8 @@ export default function NewLottery () {
         try {
             if(factoryContract != null) {
                 // utils.parseEther(ticketPrice.toString())
-                const tx = await factoryContract.createLottery(nftAddress, nftIndex, ethers.utils.parseEther('0.1'));
+                // const tx = await factoryContract.createLottery(nftAddress, nftIndex, ethers.utils.parseEther('0.1'));
+                const tx = await factoryContract.createLottery(nftAddress, nftIndex, ethers.utils.parseEther(ticketPrice.toString()));                
                 await tx.wait();
                 const kk = await factoryContract.maxActiveLotteries();
                 console.log(kk);
