@@ -42,21 +42,31 @@ export class Lottery extends Entity {
     this.set("id", Value.fromString(value));
   }
 
-  get address(): Bytes | null {
+  get address(): Bytes {
     let value = this.get("address");
-    if (value === null || value.kind == ValueKind.NULL) {
-      return null;
-    } else {
-      return value.toBytes();
-    }
+    return value.toBytes();
   }
 
-  set address(value: Bytes | null) {
-    if (value === null) {
-      this.unset("address");
-    } else {
-      this.set("address", Value.fromBytes(value as Bytes));
-    }
+  set address(value: Bytes) {
+    this.set("address", Value.fromBytes(value));
+  }
+
+  get creator(): Bytes {
+    let value = this.get("creator");
+    return value.toBytes();
+  }
+
+  set creator(value: Bytes) {
+    this.set("creator", Value.fromBytes(value));
+  }
+
+  get status(): string {
+    let value = this.get("status");
+    return value.toString();
+  }
+
+  set status(value: string) {
+    this.set("status", Value.fromString(value));
   }
 
   get nftAddress(): Bytes | null {

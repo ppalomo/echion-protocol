@@ -44,12 +44,18 @@ describe("NFT Lottery Tests", function () {
   it("Should create a new lottery", async function () {
     // Act
     await expect(
-      lotteryFactory.createLottery(nfts[0].address, nfts[0].index, nfts[0].ticketPrice)
+      lotteryFactory.connect(addr1).createLottery(nfts[0].address, nfts[0].index, nfts[0].ticketPrice)
     ).to.emit(lotteryFactory, 'LotteryCreated');
-    await lotteryFactory.createLottery(nfts[1].address, nfts[1].index, nfts[1].ticketPrice);
+    await lotteryFactory.connect(addr2).createLottery(nfts[1].address, nfts[1].index, nfts[1].ticketPrice);
     
+    lottery = await getLottery(0);
+    let lottery2 = await getLottery(1);
+
     // Assert
     expect(await lotteryFactory.numberOfActiveLotteries()).to.equal(2);
+    expect(await lottery.status()).to.equal(0);
+    expect(await lottery.creator()).to.equal(addr1.address);
+    expect(await lottery2.creator()).to.equal(addr2.address);
   });
 
   it("Should buy lottery tickets", async function () {
@@ -122,6 +128,31 @@ describe("NFT Lottery Tests", function () {
     
     // Assert
     expect(await lotteryFactory.totalBalance()).to.equal(ethers.utils.parseEther('0.6'));
+  });
+
+  it("Should stake a lottery", async function () {
+    // Arrange
+    await lotteryFactory.connect(addr1).createLottery(nfts[0].address, nfts[0].index, nfts[0].ticketPrice);
+    lottery = await getLottery(0);
+
+    // Act
+    await expect(
+      lotteryFactory.connect(addr1).launchStaking(0)
+    ).to.emit(lottery, 'LotteryStaked');
+    
+    // Assert
+    expect(await lottery.status()).to.equal(1);
+  });
+
+  it("Shouldn't stake a lottery if sender isn't the creator", async function () {
+    // Arrange
+    await lotteryFactory.connect(addr1).createLottery(nfts[0].address, nfts[0].index, nfts[0].ticketPrice);
+    lottery = await getLottery(0);
+
+    // Act
+    await expect(
+      lotteryFactory.connect(addr2).launchStaking(0)
+    ).to.be.revertedWith('You are not the owner of the lottery');
   });
 
   // it("Should close a lottery", async function () {

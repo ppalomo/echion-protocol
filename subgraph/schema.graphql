@@ -1,6 +1,15 @@
+enum LotteryStatus {
+  OPEN
+  STAKING
+  CLOSED
+  CANCELLED
+}
+
 type Lottery @entity {
   id: ID!
-  address: Bytes
+  address: Bytes!
+  creator: Bytes!
+  status: LotteryStatus!
   nftAddress: Bytes
   nftIndex: BigInt
   ticketPrice: BigInt

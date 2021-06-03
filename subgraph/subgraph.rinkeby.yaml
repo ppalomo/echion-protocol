@@ -4,9 +4,9 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: LotteryFactory
-    network: mumbai
+    network: rinkeby
     source:
-      address: "0x6A31bb6Ea99aA90CcFb652C1Cd0Cd6b6EFcDf3a8"
+      address: "0x760A8D550A1Ed68206391A6df0149bA8113606Be"
       abi: LotteryFactory
     mapping:
       kind: ethereum/events

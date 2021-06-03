@@ -109,7 +109,7 @@ export default function LotteryItem({lottery}) {
             return response;
 
         } catch (error) {
-            console.log(error);
+            console.log("error getLotteryOnChainData: ", error);
             return null;
         }
     }

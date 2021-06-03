@@ -56,7 +56,7 @@ export default function Home (props) {
     }, [factoryAdminContract]);
 
     useEffect(async () => {
-        console.log("Home - useEffect[factoryAdminContract]");
+        console.log("home - useEffect")
         if (factoryAdminContract)
             await fetchData();
         else {
@@ -67,15 +67,12 @@ export default function Home (props) {
 
     async function fetchData() {
         try {
-            console.log("home - fetchdata")
             if(factoryAdminContract != null) {
-                console.log("home - inside")
                 const [actives, tbal, lot] = await Promise.all([
                     factoryAdminContract.numberOfActiveLotteries(),
                     factoryAdminContract.totalBalance(),
                     getLotteries()
                 ]);
-                console.log(lot);
                 setNumberOfActiveLotteries(actives.toString());
                 const tbalFormatted = Math.round(utils.formatEther(tbal) * 1e3) / 1e3;
                 setTotalBalance(tbalFormatted);
@@ -90,25 +87,22 @@ export default function Home (props) {
 
     async function getLotteries(){
         console.log("getlotteries");
+        setLotteries([]);
         axios.post(`https://api.thegraph.com/subgraphs/name/ppalomo/echion-${network.code}`, {
             query: `
                 {
-                    lotteries(first: 5) {
-                        id
-                        address
-                        nftAddress
-                        nftIndex
-                        ticketPrice
-                        created
+                    lotteries(first: 10, orderBy: created, orderDirection: desc) {
+                    id
+                    address
+                    nftAddress
+                    nftIndex
+                    ticketPrice
+                    created
                     }
                 }
             `
             })
             .then((res) => {
-                // for (const flashsloan of res.data.data.flashLoans) {
-                //     console.log(flashsloan)
-                // }
-                console.log(res);
                 setLotteries(res.data.data.lotteries);
                 return res;
             })

@@ -9,6 +9,8 @@ export function handleLotteryCreated(event: LotteryCreated): void {
   }
 
   lottery.address = event.params.lotteryAddress
+  lottery.creator = event.params.creator
+  lottery.status = "OPEN"
   lottery.nftAddress = event.params.nftAddress
   lottery.nftIndex = event.params.nftIndex
   lottery.ticketPrice = event.params.ticketPrice

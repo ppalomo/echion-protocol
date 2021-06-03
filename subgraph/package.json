@@ -1,5 +1,5 @@
 {
-  "name": "echion-rinkeby",
+  "name": "echion-mumbai",
   "license": "UNLICENSED",
   "scripts": {
     "codegen": "graph codegen",

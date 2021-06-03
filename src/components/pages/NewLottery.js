@@ -56,21 +56,33 @@ export default function NewLottery () {
             //const p = new ethers.providers.JsonRpcProvider(network.rpcUrl);
             const wallet = new Wallet(process.env.REACT_APP_DEPLOYER_PRIVATE_KEY, provider);
             const contract = new ethers.Contract(addr, ERC721JSON.abi, wallet);
-        
             const tokenURI = await contract.tokenURI(index);
             console.log(tokenURI);
 
             var response = fetch(tokenURI)
-                .then(response => response.json())
+                .then(response => {
+                    // console.log("eeeeeeeeeeee")
+                    // console.log(response)
+                    // const q = await response.text()
+                    // console.log(q);
+                    return response.json();
+                    // return response.text();
+                })
                 .then((jsonData) => {
-                    // console.log(jsonData.image);
+                    // const kk = JSON.parse(jsonData);
+                    // console.log(kk);
+                    // console.log("theeeen")
+                    // console.log(jsonData);
                     // return jsonData.image;
                     return { success: true, data:  jsonData.image}
                 })
                 .catch((error) => {
+                    console.log("catch")
+                    console.log(error)
                     console.warn('fetch error:', error);
                     return { success: false, data: error };
                 });
+            console.log("fin")
             return response;
 
         } catch (error) {
