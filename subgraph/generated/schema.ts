@@ -12,7 +12,7 @@ import {
   BigDecimal
 } from "@graphprotocol/graph-ts";
 
-export class Lottery extends Entity {
+export class LotteryPool extends Entity {
   constructor(id: string) {
     super();
     this.set("id", Value.fromString(id));
@@ -20,17 +20,17 @@ export class Lottery extends Entity {
 
   save(): void {
     let id = this.get("id");
-    assert(id !== null, "Cannot save Lottery entity without an ID");
+    assert(id !== null, "Cannot save LotteryPool entity without an ID");
     assert(
       id.kind == ValueKind.STRING,
-      "Cannot save Lottery entity with non-string ID. " +
+      "Cannot save LotteryPool entity with non-string ID. " +
         'Considering using .toHex() to convert the "id" to a string.'
     );
-    store.set("Lottery", id.toString(), this);
+    store.set("LotteryPool", id.toString(), this);
   }
 
-  static load(id: string): Lottery | null {
-    return store.get("Lottery", id) as Lottery | null;
+  static load(id: string): LotteryPool | null {
+    return store.get("LotteryPool", id) as LotteryPool | null;
   }
 
   get id(): string {
@@ -67,6 +67,15 @@ export class Lottery extends Entity {
 
   set status(value: string) {
     this.set("status", Value.fromString(value));
+  }
+
+  get lotteryPoolType(): string {
+    let value = this.get("lotteryPoolType");
+    return value.toString();
+  }
+
+  set lotteryPoolType(value: string) {
+    this.set("lotteryPoolType", Value.fromString(value));
   }
 
   get nftAddress(): Bytes | null {
@@ -120,6 +129,23 @@ export class Lottery extends Entity {
     }
   }
 
+  get minAmount(): BigInt | null {
+    let value = this.get("minAmount");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set minAmount(value: BigInt | null) {
+    if (value === null) {
+      this.unset("minAmount");
+    } else {
+      this.set("minAmount", Value.fromBigInt(value as BigInt));
+    }
+  }
+
   get created(): BigInt | null {
     let value = this.get("created");
     if (value === null || value.kind == ValueKind.NULL) {
@@ -134,6 +160,23 @@ export class Lottery extends Entity {
       this.unset("created");
     } else {
       this.set("created", Value.fromBigInt(value as BigInt));
+    }
+  }
+
+  get winner(): Bytes | null {
+    let value = this.get("winner");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set winner(value: Bytes | null) {
+    if (value === null) {
+      this.unset("winner");
+    } else {
+      this.set("winner", Value.fromBytes(value as Bytes));
     }
   }
 }

@@ -1,0 +1,12 @@
+//SPDX-License-Identifier: MIT
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "hardhat/console.sol";
+
+contract EchionToken is ERC20 {
+
+    /// @notice Contract constructor
+    constructor() ERC20("Echion Token", "ECHION") {}
+
+}

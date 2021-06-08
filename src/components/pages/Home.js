@@ -5,25 +5,10 @@ import {
     HStack,
     IconButton,
     Image,
-    Modal,
-    ModalBody,
-    ModalCloseButton,
-    ModalContent,
-    ModalFooter,
-    ModalHeader,
-    ModalOverlay,
-    Stat,
-    StatLabel,
-    StatNumber,
-    StatHelpText,
     VStack,
     Text,
     Tooltip,
     Wrap,
-    Button,
-    FormControl,
-    FormLabel,
-    Input,
     useColorModeValue,
     WrapItem,
   } from '@chakra-ui/react';
@@ -41,8 +26,8 @@ const axios = require('axios');
 export default function Home (props) {
     const [isLoaded, setIsLoaded] = useState(false);
     const [lotteries, setLotteries] = useState([]);
-    const factoryAdminContract = useAdminContract("LotteryFactory");
-    const factoryContract = useContract("LotteryFactory");
+    const factoryAdminContract = useAdminContract("LotteryPoolFactory");
+    const factoryContract = useContract("LotteryPoolFactory");
     const history = useHistory();
     const { isWalletConnected, wallet, network, coin, setPageSelected, numberOfActiveLotteries, totalBalance, setNumberOfActiveLotteries, setTotalBalance } = useStore();
     

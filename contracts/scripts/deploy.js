@@ -8,11 +8,11 @@ require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 
 async function main() {
   // Deploying Greeter.sol
-  const LotteryFactory = await hre.ethers.getContractFactory("LotteryFactory");
-  const lotteryFactory = await LotteryFactory.deploy();
-  await lotteryFactory.deployed();
-  await replaceContractAddress("LotteryFactory", lotteryFactory.address);
-  console.log("LotteryFactory deployed to:", lotteryFactory.address);
+  const LotteryPoolFactory = await hre.ethers.getContractFactory("LotteryPoolFactory");
+  const lotteryPoolFactory = await LotteryPoolFactory.deploy();
+  await lotteryPoolFactory.deployed();
+  await replaceContractAddress("LotteryPoolFactory", lotteryPoolFactory.address);
+  console.log("LotteryPoolFactory deployed to:", lotteryPoolFactory.address);
 }
 
 // Replacing contract's address in .env file

@@ -5,13 +5,21 @@ enum LotteryStatus {
   CANCELLED
 }
 
-type Lottery @entity {
+enum LotteryPoolType {
+  DIRECT
+  STAKING
+}
+
+type LotteryPool @entity {
   id: ID!
   address: Bytes!
   creator: Bytes!
   status: LotteryStatus!
+  lotteryPoolType: LotteryPoolType!
   nftAddress: Bytes
   nftIndex: BigInt
   ticketPrice: BigInt
+  minAmount: BigInt
   created: BigInt
+  winner: Bytes
 }

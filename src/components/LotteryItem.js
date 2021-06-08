@@ -187,8 +187,6 @@ export default function LotteryItem({lottery}) {
                 alignItems="center"
                 flexDirection="column">
 
-                {/* <Text>{lottery.address}</Text> */}
-
                 <Center>
                     <Link 
                         isExternal
@@ -197,18 +195,18 @@ export default function LotteryItem({lottery}) {
                             rounded={'xl'}
                             h="230px"
                             objectFit="cover"
-                            src={imageURI} />
+                            src={imageURI ? imageURI : 'images/default-no-image.png'} />
                     </Link>
                 </Center>
 
                 <Box pt="6">
                     <Tooltip label={name} fontSize="0.8em" hasArrow bg="gray.300" color="black">
                         <Heading fontSize="xl" fontWeight={500} fontFamily={'body'}>
-                            {truncateRight(name ? name: "",28)}
+                            {name ? truncateRight(name ? name: "",28) : "No title"}
                         </Heading>
                     </Tooltip>
                     <Link href={network ? `${network.explorerUrl}/address/${lottery.address}` : ""} isExternal>
-                        <Text color={'gray.500'}>{contractName}</Text>
+                        <Text color={'gray.500'}>{contractName ? contractName : "No contract name"}</Text>
                     </Link>
                 </Box>
 

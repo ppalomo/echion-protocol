@@ -3,11 +3,11 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum/contract
-    name: LotteryFactory
-    network: mumbai
+    name: LotteryPoolFactory
+    network: rinkeby
     source:
-      address: "0x6A31bb6Ea99aA90CcFb652C1Cd0Cd6b6EFcDf3a8"
-      abi: LotteryFactory
+      address: "0x072132FEC25fD856d6CF272C9F421a761fCA3ef0"
+      abi: LotteryPoolFactory
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
@@ -15,9 +15,15 @@ dataSources:
       entities:
         - Lottery
       abis:
-        - name: LotteryFactory
-          file: ./abis/LotteryFactory.json
+        - name: LotteryPoolFactory
+          file: ./abis/LotteryPoolFactory.json
       eventHandlers:
-        - event: LotteryCreated(uint256,address,address,address,uint256,uint256,uint256)
+        - event: LotteryCreated(uint256,address,address,address,uint256,uint256,uint256,uint8,uint256)
           handler: handleLotteryCreated
+        - event: LotteryStaked(uint256)
+          handler: handleLotteryStaked
+        - event: LotteryClosed(uint256,address)
+          handler: handleLotteryClosed
+        - event: LotteryCancelled(uint256)
+          handler: handleLotteryCancelled
       file: ./src/mapping.ts
