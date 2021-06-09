@@ -20,6 +20,7 @@ contract LotteryPoolFactory is Ownable {
 
     // Variables
     LotteryPool[] public lotteries;
+    uint public numberOfActiveLotteries;
     uint public totalBalance;
     uint feePercent;
     address payable wallet;

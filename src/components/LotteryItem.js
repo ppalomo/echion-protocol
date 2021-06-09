@@ -9,6 +9,7 @@ import {
     FormLabel,
     Heading,
     HStack,
+    IconButton,
     Image,
     Input,
     Link,
@@ -25,6 +26,7 @@ import {
     useColorModeValue,
   } from '@chakra-ui/react';
 import { ethers, Wallet, utils } from 'ethers';
+import { FaUserAstronaut, FaLockOpen, FaLock, FaCircle } from 'react-icons/fa';
 import useStore from '../store';
 import { truncateRight } from '../utils/stringsHelper';
 import { useContractByAddress, useAdminContract, useAdminContractByAddress } from '../hooks/contractHooks';
@@ -32,9 +34,9 @@ import ERC721JSON from '../abis/ERC721.json';
 
 export default function LotteryItem({lottery}) {
     const { isWalletConnected, wallet, network, coin, setTotalBalance, provider } = useStore();
-    const lotteryContract = useContractByAddress("Lottery", lottery.address);
-    const factoryAdminContract = useAdminContract("LotteryFactory");    
-    const lotteryAdminContract = useAdminContractByAddress("Lottery", lottery.address);
+    const lotteryContract = useContractByAddress("LotteryPool", lottery.address);
+    const factoryAdminContract = useAdminContract("LotteryPoolFactory");    
+    const lotteryAdminContract = useAdminContractByAddress("LotteryPool", lottery.address);
     const [numTickets, setNumTickets] = useState(1);
     const [isDepositOpen, setIsDepositOpen] = useState(false);
     const [isCancelTicketOpen, setIsCancelTicketOpen] = useState(false);    
@@ -72,7 +74,7 @@ export default function LotteryItem({lottery}) {
 
                 if (isWalletConnected)
                 {
-                    const tick = await lotteryAdminContract.getAddressTickets(wallet);
+                    const tick = await lotteryAdminContract.ticketsOf(wallet);
                     setTickets(tick);
                 }
             }
@@ -126,11 +128,8 @@ export default function LotteryItem({lottery}) {
 
     async function handleDeposit(e) {
         try {
-            console.log("handleDeposit");
             if(lotteryContract != null) {                
                 const amount = lottery.ticketPrice * numTickets;
-                console.log(amount);
-                console.log(lotteryContract);
                 const tx = await lotteryContract.buyTickets(numTickets, {value: amount.toString()});
                 await tx.wait();
                 fetchData();
@@ -267,18 +266,43 @@ export default function LotteryItem({lottery}) {
                             variant="outline">
                             Withdraw
                         </Button>
-                        <Button
+                        {/* <Button
                             isDisabled={true}
                             w="33%"
                             fontSize={14}
                             bgColor={useColorModeValue("gray.300", "gray.700")}
                             variant="outline">
                             Redeem
-                        </Button>
+                        </Button> */}
+
+                        <Tooltip label={`Author: ${lottery.address}`} fontSize="0.8em" hasArrow bg="gray.300" color="black">
+                            <IconButton
+                                bgColor="transparent"
+                                variant="solid"
+                                as="a"
+                                href="#"
+                                aria-label="Twitter"
+                                icon={<FaUserAstronaut fontSize="15px" />} />
+                        </Tooltip>
+                        
+                        <IconButton
+                            bgColor="transparent"
+                            variant="solid"
+                            as="a"
+                            href="#"
+                            aria-label="Twitter"
+                            icon={<FaLockOpen fontSize="15px" />} />
+
+                        <IconButton
+                            bgColor="transparent"
+                            variant="solid"
+                            as="a"
+                            href="#"
+                            aria-label="Twitter"
+                            icon={<FaCircle fontSize="15px" />} />
+
                     </ButtonGroup>
                 </Center>
-
-                {/* <h1>{lottery.address}</h1> */}
 
             </Flex>
 

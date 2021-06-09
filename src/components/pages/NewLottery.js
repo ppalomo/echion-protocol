@@ -36,7 +36,7 @@ import { useContract, useAdminContract } from '../../hooks/contractHooks';
 
 export default function NewLottery () {
     const { network, provider, isWalletConnected } = useStore();
-    const factoryContract = useContract("LotteryFactory");
+    const factoryContract = useContract("LotteryPoolFactory");
     const [nftAddress, setNFTAddress] = useState("0xE1A19Eb074815e4028768182F8971D222416159A");
     const [nftIndex, setNFTIndex] = useState(0);
     const [ticketPrice, setTicketPrice] = useState(0);
@@ -91,15 +91,15 @@ export default function NewLottery () {
         }
     }
 
-    async function handelCreateLottery() {
+    async function handleCreateLottery() {
         try {
             if(factoryContract != null) {
                 // utils.parseEther(ticketPrice.toString())
                 // const tx = await factoryContract.createLottery(nftAddress, nftIndex, ethers.utils.parseEther('0.1'));
-                const tx = await factoryContract.createLottery(nftAddress, nftIndex, ethers.utils.parseEther(ticketPrice.toString()));                
+                const tx = await factoryContract.createLottery(nftAddress, nftIndex, ethers.utils.parseEther(ticketPrice.toString()), 0, 0);                
                 await tx.wait();
-                const kk = await factoryContract.maxActiveLotteries();
-                console.log(kk);
+                // const kk = await factoryContract.maxActiveLotteries();
+                // console.log(kk);
             }
         } catch (err) {
             console.log("Error: ", err);
@@ -241,7 +241,7 @@ export default function NewLottery () {
                             </Button>
                             <Button
                                 isDisabled={!isWalletConnected}
-                                onClick={handelCreateLottery}
+                                onClick={handleCreateLottery}
                                 fontSize={14}
                                 bgColor={useColorModeValue("gray.300", "gray.700")}
                                 variant="outline">
@@ -261,13 +261,6 @@ export default function NewLottery () {
                             "md": "100%",
                             "xl": "100%"
                         }}>
-                        {/* <Center w="100%" mt={2}>
-                            <Image
-                                rounded={'xl'}
-                                w="100%"
-                                objectFit="cover"
-                                src="https://lh3.googleusercontent.com/g2k-3oCz6vUm2fzbASRZbyWl5SrdYd9MBp0XmQ3508Nvp_VO8WeZqjXy_ACrajKjIjxSilXCx7vfSCs6exFIGIfVctuhzVXp6_f-PXg=s0" />
-                        </Center> */}
                         <Center w="100%" mt={2}>
                             <Image
                                 rounded={'xl'}

@@ -76,19 +76,24 @@ export default function Home (props) {
         axios.post(`https://api.thegraph.com/subgraphs/name/ppalomo/echion-${network.code}`, {
             query: `
                 {
-                    lotteries(first: 10, orderBy: created, orderDirection: desc) {
-                    id
-                    address
-                    nftAddress
-                    nftIndex
-                    ticketPrice
-                    created
+                    lotteryPools(first: 10, orderBy: created, orderDirection: desc) {
+                        id
+                        address
+                        creator
+                        status
+                        lotteryPoolType
+                        nftAddress
+                        nftIndex
+                        ticketPrice
+                        minAmount
+                        created
+                        winner
                     }
                 }
             `
             })
             .then((res) => {
-                setLotteries(res.data.data.lotteries);
+                setLotteries(res.data.data.lotteryPools);
                 return res;
             })
             .catch((error) => {
