@@ -2,145 +2,161 @@ import React, {useState, useRef} from "react";
 import {
     Button,
     Center,
+    IconButton,
+    Input,            
+InputGroup,
+InputLeftElement,
+    Link,
     HStack,
     VStack,
+    Text,
     useColorModeValue
   } from '@chakra-ui/react';
-import {
-    Link,
-} from "react-router-dom";
 import useStore from '../store';
 import CanvasDraw from "react-canvas-draw";
 // import { SketchPicker } from 'react-color';
 import { HexColorPicker } from "react-colorful";
+import { FaUndo, FaBroom, FaFileImage } from 'react-icons/fa';
 // import "react-colorful/dist/index.css";
 // import axios from 'axios';
 // import FormData from 'form-data';
+// const pinataSDK = require('@pinata/sdk');
+// const pinata = pinataSDK(process.env.REACT_APP_PINATA_API_KEY, process.env.REACT_APP_PINATA_API_SECRET);
 // const fs = require('fs');
-const pinataSDK = require('@pinata/sdk');
-const pinata = pinataSDK(process.env.REACT_APP_PINATA_API_KEY, process.env.REACT_APP_PINATA_API_SECRET);
-const fs = require('fs');
+
+const IPFS = require('ipfs-api');
+const ipfs = new IPFS({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' });
+
 
 export default function DrawCanvas () {
     const saveableCanvas = useRef(null);
-    const [color, setColor] = useState("#000")
+    const [color, setColor] = useState("#000");
+    // const [buffer, setBuffer] = useState(null);
+    const [bgImage, setBgImage] = useState('images/canvasBackround.jpg');
+    
+    const [hash, setHash] = useState(null);
 
     function handleSave() {
-        const img = saveableCanvas.current.getSaveData();
-        console.log(img);
-        const d = saveableCanvas.current.canvasContainer.children[1].toDataURL();
-        console.log(d);
-    }
-
-    function handleChangeBackgroundImage() {
-        //saveableCanvas.current.imgSrc=`d:\4785389.jpg`;
-        testAuthentication();
+        let baseCanvas = saveableCanvas.current.canvasContainer.children[3];
+        let baseCanvasContex = baseCanvas.getContext('2d');
+        baseCanvasContex.drawImage(saveableCanvas.current.canvasContainer.children[1], 0, 0);
+        const data = baseCanvas.toDataURL();
+        var imageBuffer = decodeBase64Image(data);                
         
+        // Uploading image to IPFS
+        ipfs.files.add(imageBuffer.data, (error, result) => {
+            if(error) {
+                console.error(error)
+                return
+            }
+            setHash(result[0].hash);
+        });
     }
 
-    const testAuthentication = () => {
-        const readableStreamForFile = fs.createReadStream('./rKa8aNNp_400x400.jpg');
-        // const options = {
-        //     pinataMetadata: {
-        //         name: 'My Awesome Website',
-        //         keyvalues: {
-        //             customKey: 'customValue',
-        //             customKey2: 'customValue2'
-        //         }
-        //     },
-        //     pinataOptions: {
-        //         cidVersion: 0
-        //     }
-        // };
-        // pinata.pinFromFS("./rKa8aNNp_400x400.jpg", options).then((result) => {
-        //     //handle results here
-        //     console.log(result);
-        // }).catch((err) => {
-        //     //handle error here
-        //     console.log(err);
-        // });
-
-
-        // pinata.testAuthentication().then((result) => {
-        //     //handle successful authentication here
-        //     console.log(result);
-        // }).catch((err) => {
-        //     //handle error here
-        //     console.log(err);
-        // });
-        // const url = `https://api.pinata.cloud/pinning/pinJSONToIPFS`;
-        // let data = new FormData();
-        // //data.append('file', fs.createReadStream('./rKa8aNNp_400x400.jpg'));
-
-        // var readStream = fs.createReadStream('./rKa8aNNp_400x400.jpg');
-        // console.log(readStream);
-
-        // return axios
-        //     .get(url,
-        //         data, 
-        //         {
-        //             headers: {
-        //                 'Content-Type': `multipart/form-data; boundary= ${data._boundary}`,
-        //                 'pinata_api_key': process.env.REACT_APP_PINATA_API_KEY,
-        //                 'pinata_secret_api_key': process.env.REACT_APP_PINATA_API_SECRET
-        //         }
-        //     })
-        //     .then(function (response) {
-        //         //handle your response here
-        //         console.log(response)
-        //     })
-        //     .catch(function (error) {
-        //         //handle error here
-        //         console.log("error")
-        //     });
-    };
-
-    function onChangeHandler(event){
-
-        console.log(event.target.files[0])
+    async function handleChangeBackgroundImage() {
     
     }
+
+    // function onChangeHandler(event){
+    //     event.preventDefault();
+    //     const file = event.target.files[0];
+    //     setBgImage(file);
+    // }
+
+    function decodeBase64Image(dataString) {
+        var matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/),
+          response = {};
+      
+        if (matches.length !== 3) {
+          return new Error('Invalid input string');
+        }
+      
+        response.type = matches[1];
+        response.data = new Buffer(matches[2], 'base64');
+      
+        return response;
+      }
+    
+      function handleChangeBackground(e) {
+        var input = document.createElement('input');
+        input.type = 'file';
+
+        input.onchange = e => { 
+            e.preventDefault();
+            var file = URL.createObjectURL(e.target.files[0]);
+            setBgImage(file);
+            saveableCanvas.current.drawImage();
+        }
+
+        input.click();
+      }
 
     return(
         <VStack>
 
+            {/* <h1>{bgImage}</h1> */}
+
             <HStack w="100%">
-                <Button 
+                <IconButton
+                    onClick={() => saveableCanvas.current.undo()}
+                    as="a"
+                    href="#"
+                    aria-label="Undo"
+                    icon={<FaUndo fontSize="20px" />} />
+                <IconButton
+                    onClick={() => saveableCanvas.current.clear()}
+                    as="a"
+                    href="#"
+                    aria-label="Clear"
+                    icon={<FaBroom fontSize="20px" />} />
+                <IconButton
+                    type="file"
+                    onClick={handleChangeBackground}
+                    as="a"
+                    href="#"
+                    aria-label="Clear"
+                    icon={<FaFileImage fontSize="20px" />} />
+                    
+                {/* <Button 
                     onClick={() => saveableCanvas.current.undo()}>
                     Undo
-                </Button>
-                <Button 
+                </Button> */}
+                {/* <Button 
                     onClick={() => saveableCanvas.current.clear()}>
                     Clear
-                </Button>
-                <Button 
+                </Button> */}
+                {/* <Button 
                     onClick={() => handleChangeBackgroundImage()}>
                     Background
-                </Button>
+                </Button> */}
                 <Button 
                     onClick={() => handleSave()}>
-                    Mint Drawing
+                    Mint
                 </Button>
-                <input type="file" name="file" onChange={onChangeHandler}/>
+                {/* <input type="file" name="file" onChange={onChangeHandler}/> */}
                 {/* <SketchPicker /> */}
                 
             </HStack>
             
             <CanvasDraw
                 ref={saveableCanvas}            
-                hideGrid="True"
+                hideGrid={true}
                 canvasWidth="500px"
                 canvasHeight="500px"
-                lazyRadius="0"
-                brushRadius="2"
+                lazyRadius={0}
+                brushRadius={2}
                 brushColor={color}
-                />
+                imgSrc={bgImage} />
+
             {/* <CanvasDraw
                 brushColor="rgba(155,12,60,0.3)"
                 imgSrc="https://upload.wikimedia.org/wikipedia/commons/a/a1/Nepalese_Mhapuja_Mandala.jpg"
                 /> */}
 
             <HexColorPicker color={color} onChange={setColor} />
+            <Link href={`https://ipfs.io/ipfs/${hash}`} isExternal>
+                <Text color={'gray.500'}>{hash}</Text>
+            </Link>
         </VStack>
     );
 
