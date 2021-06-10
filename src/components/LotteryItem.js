@@ -22,20 +22,23 @@ import {
     Text,
     Tooltip,
     VStack,
+    Wrap,
     WrapItem,
     useColorModeValue,
   } from '@chakra-ui/react';
 import { ethers, Wallet, utils } from 'ethers';
 import { FaUserAstronaut, FaLockOpen, FaLock, FaCircle } from 'react-icons/fa';
 import useStore from '../store';
-import { truncateRight } from '../utils/stringsHelper';
-import { useContractByAddress, useAdminContract, useAdminContractByAddress } from '../hooks/contractHooks';
+import { truncateRight, truncateMiddle, capitalize } from '../utils/stringsHelper';
+import { useContract, useContractByAddress, useAdminContract, useAdminContractByAddress } from '../hooks/contractHooks';
 import ERC721JSON from '../abis/ERC721.json';
 
 export default function LotteryItem({lottery}) {
+    const buttonColor = useColorModeValue("gray.300", "gray.700");
     const { isWalletConnected, wallet, network, coin, setTotalBalance, provider } = useStore();
     const lotteryContract = useContractByAddress("LotteryPool", lottery.address);
-    const factoryAdminContract = useAdminContract("LotteryPoolFactory");    
+    const factoryContract = useContract("LotteryPoolFactory");
+    const factoryAdminContract = useAdminContract("LotteryPoolFactory");
     const lotteryAdminContract = useAdminContractByAddress("LotteryPool", lottery.address);
     const [numTickets, setNumTickets] = useState(1);
     const [isDepositOpen, setIsDepositOpen] = useState(false);
@@ -157,6 +160,30 @@ export default function LotteryItem({lottery}) {
         setNumTickets(e.target.value);
     }
 
+    async function handleCloseLottery() {
+        try {
+            if(factoryContract != null) {
+                const tx = await factoryContract.declareWinner(lottery.id);
+                await tx.wait();
+                fetchData();
+            }
+        } catch (err) {
+            console.log("Error: ", err);
+        }
+    }
+
+    async function handleCancelLottery() {
+        try {
+            if(factoryContract != null) {
+                const tx = await factoryContract.cancelLottery(lottery.id);
+                await tx.wait();
+                fetchData();
+            }
+        } catch (err) {
+            console.log("Error: ", err);
+        }
+    }
+
     return (
         <WrapItem
             p="6"
@@ -186,19 +213,7 @@ export default function LotteryItem({lottery}) {
                 alignItems="center"
                 flexDirection="column">
 
-                <Center>
-                    <Link 
-                        isExternal
-                        href={imageURI}>
-                        <Image                        
-                            rounded={'xl'}
-                            h="230px"
-                            objectFit="cover"
-                            src={imageURI ? imageURI : 'images/default-no-image.png'} />
-                    </Link>
-                </Center>
-
-                <Box pt="6">
+                <Box pb="4">
                     <Tooltip label={name} fontSize="0.8em" hasArrow bg="gray.300" color="black">
                         <Heading fontSize="xl" fontWeight={500} fontFamily={'body'}>
                             {name ? truncateRight(name ? name: "",28) : "No title"}
@@ -209,6 +224,64 @@ export default function LotteryItem({lottery}) {
                     </Link>
                 </Box>
 
+                <Center>
+                    <Link 
+                        isExternal
+                        href={imageURI}>
+                        <Image 
+                            rounded={'xl'}
+                            h="230px"
+                            objectFit="cover"
+                            src={imageURI ? imageURI : 'images/default-no-image.png'} />
+                    </Link>
+                </Center>
+                
+                <Center
+                    w="100%"
+                    mt={5}
+                    p={3}
+                    bgColor={useColorModeValue("bg.100", "bg.900")}
+                    borderWidth="1px"
+                    borderColor={useColorModeValue("gray.200", "gray.700")}
+                    rounded="xl"
+                    position="relative">
+                    <Wrap
+                        spacing={2} 
+                        w="100%">
+                        
+                        <WrapItem w="30%">
+                            <VStack w="100%">
+                                <Text fontSize="0.9rem" fontWeight="500" color="primary.500">Ticket Price</Text>
+                                <HStack>
+                                    <Text fontSize="0.9rem" fontWeight="500" color="white.100">{network ? Math.round(utils.formatEther(lottery.ticketPrice) * 1e3) / 1e3 : "" }</Text>
+                                    <Image h={4} src={coin ? coin.image : ""} />
+                                </HStack>
+                            </VStack>
+                        </WrapItem>
+
+                        <WrapItem w="30%">
+                            <VStack w="100%">
+                                <Text fontSize="0.9rem" fontWeight="500" color="primary.500">Balance</Text>
+                                <HStack>
+                                    <Text fontSize="0.9rem" fontWeight="500" color="white.100">{network ? balance : "" }</Text>
+                                    <Image h={4} src={coin ? coin.image : ""} />
+                                </HStack>
+                            </VStack>
+                        </WrapItem>
+
+                        <WrapItem w="30%">
+                            <VStack w="100%">
+                                <Text fontSize="0.9rem" fontWeight="500" color="primary.500">Tickets</Text>
+                                <HStack>
+                                    <Text fontSize="0.9rem" fontWeight="500" color="white.100">{tickets.toString()}/{totalTickets.toString()}</Text>
+                                </HStack>
+                            </VStack>
+                        </WrapItem>
+
+                    </Wrap>
+                    
+                </Center>
+
                 <Center
                     w="100%"
                     mt={3}
@@ -218,88 +291,118 @@ export default function LotteryItem({lottery}) {
                     borderColor={useColorModeValue("gray.200", "gray.700")}
                     rounded="xl"
                     position="relative">
-                    <HStack
-                        spacing={5} 
+                    <Wrap
+                        spacing={2} 
                         w="100%">
-                        <VStack w="33%">
-                            <Text fontSize="0.9rem" fontWeight="500" color="primary.500">Ticket Price</Text>
-                            <HStack>
-                                <Text fontSize="0.9rem" fontWeight="500" color="white.100">{network ? Math.round(utils.formatEther(lottery.ticketPrice) * 1e3) / 1e3 : "" }</Text>
-                                <Image h={4} src={coin ? coin.image : ""} />
-                            </HStack>
-                        </VStack>
-                        <VStack w="33%">
-                            <Text fontSize="0.9rem" fontWeight="500" color="primary.500">Balance</Text>
-                            <HStack>
-                                <Text fontSize="0.9rem" fontWeight="500" color="white.100">{network ? balance : "" }</Text>
-                                <Image h={4} src={coin ? coin.image : ""} />
-                            </HStack>
-                        </VStack>
-                        <VStack w="33%">
-                            <Text fontSize="0.9rem" fontWeight="500" color="primary.500">Tickets</Text>
-                            <HStack>
-                                <Text fontSize="0.9rem" fontWeight="500" color="white.100">{tickets.toString()}/{totalTickets.toString()}</Text>
-                            </HStack>
-                        </VStack>
-                    </HStack>
+                        <WrapItem w="30%">
+                            <VStack w="100%">
+                                <Text fontSize="0.9rem" fontWeight="500" color="primary.500">Author</Text>
+                                <HStack>
+                                    <Tooltip label={`Author: ${lottery.address}`} fontSize="0.8em" hasArrow bg="gray.300" color="black">
+                                        <Text fontSize="0.9rem" fontWeight="500" color="white.100">
+                                            {truncateMiddle(lottery.creator, 11, '...')}
+                                        </Text>
+                                    </Tooltip>
+                                </HStack>
+                            </VStack>
+                        </WrapItem>
+                        <WrapItem w="30%">
+                            <VStack w="100%">
+                                <Text fontSize="0.9rem" fontWeight="500" color="primary.500">Pool Type</Text>
+                                <HStack>
+                                    <FaCircle fontSize="15px" color={lottery.lotteryPoolType == "DIRECT" ? "#00C48E" : "#1A94DA" } />
+                                    <Text fontSize="0.9rem" fontWeight="500" color="white.100">
+                                        { lottery.lotteryPoolType == "DIRECT" ? "Direct" : "Staking" }
+                                    </Text>
+                                </HStack>
+                            </VStack>
+                        </WrapItem>
+                        <WrapItem w="30%">
+                            <VStack w="100%">
+                                <Text fontSize="0.9rem" fontWeight="500" color="primary.500">Tickets</Text>
+                                <HStack>
+                                    { lottery.status == "OPEN" ?
+                                        <FaLockOpen fontSize="15px" />
+                                    :
+                                    <FaLock
+                                        fontSize="15px"
+                                        color={lottery.status == "CLOSED" ? "#00C48E" : "white.100" } />
+                                    }
+                                    <Text 
+                                        fontSize="0.9rem" 
+                                        fontWeight="500" 
+                                        color={lottery.status == "CLOSED" ? "#00C48E" : "white.100" }>
+                                        { capitalize(lottery.status, true) }
+                                    </Text>
+                                </HStack>
+                            </VStack>
+                        </WrapItem>
+                    </Wrap>
                 </Center>
 
                 <Center
                     w="100%"
                     mt={4}>
                     <ButtonGroup variant="outline" spacing="2" w="100%">
-                        <Button
-                            isDisabled={!isWalletConnected}
-                            onClick={() => handleOpenDeposit()}
-                            w="33%"
-                            fontSize={14}
-                            bgColor={useColorModeValue("gray.300", "gray.700")}
-                            variant="outline">
-                            Deposit
-                        </Button>
-                        <Button
-                            isDisabled={!isWalletConnected || tickets == 0}
-                            onClick={() => handleOpenCancelTicket()}
-                            w="33%"
-                            fontSize={14}
-                            bgColor={useColorModeValue("gray.300", "gray.700")}
-                            variant="outline">
-                            Withdraw
-                        </Button>
-                        {/* <Button
-                            isDisabled={true}
-                            w="33%"
-                            fontSize={14}
-                            bgColor={useColorModeValue("gray.300", "gray.700")}
-                            variant="outline">
-                            Redeem
-                        </Button> */}
-
-                        <Tooltip label={`Author: ${lottery.address}`} fontSize="0.8em" hasArrow bg="gray.300" color="black">
-                            <IconButton
-                                bgColor="transparent"
-                                variant="solid"
-                                as="a"
-                                href="#"
-                                aria-label="Twitter"
-                                icon={<FaUserAstronaut fontSize="15px" />} />
-                        </Tooltip>
-                        
-                        <IconButton
-                            bgColor="transparent"
-                            variant="solid"
-                            as="a"
-                            href="#"
-                            aria-label="Twitter"
-                            icon={<FaLockOpen fontSize="15px" />} />
-
-                        <IconButton
-                            bgColor="transparent"
-                            variant="solid"
-                            as="a"
-                            href="#"
-                            aria-label="Twitter"
-                            icon={<FaCircle fontSize="15px" />} />
+                        {window.location.pathname == "/" ?
+                            <>
+                            <Button
+                                isDisabled={!isWalletConnected}
+                                onClick={() => handleOpenDeposit()}
+                                w="33%"
+                                fontSize={14}
+                                bgColor={buttonColor}
+                                variant="outline">
+                                Deposit
+                            </Button>
+                            <Button
+                                isDisabled={!isWalletConnected || tickets == 0}
+                                onClick={() => handleOpenCancelTicket()}
+                                w="33%"
+                                fontSize={14}
+                                bgColor={buttonColor}
+                                variant="outline">
+                                Withdraw
+                            </Button>
+                            <Button
+                                isDisabled={true}
+                                w="33%"
+                                fontSize={14}
+                                bgColor={buttonColor}
+                                variant="outline">
+                                Redeem
+                            </Button>
+                            </>
+                        :
+                            <>
+                            <Button
+                                isDisabled={true}
+                                w="33%"
+                                fontSize={14}
+                                bgColor={buttonColor}
+                                variant="outline">
+                                Stake
+                            </Button>
+                            <Button
+                                onClick={() => handleCloseLottery()}
+                                isDisabled={!isWalletConnected}
+                                w="33%"
+                                fontSize={14}
+                                bgColor={buttonColor}
+                                variant="outline">
+                                Close
+                            </Button>
+                            <Button
+                                onClick={() => handleCancelLottery()}
+                                isDisabled={!isWalletConnected}
+                                w="33%"
+                                fontSize={14}
+                                bgColor={buttonColor}
+                                variant="outline">
+                                Cancel
+                            </Button>
+                            </>
+                        }
 
                     </ButtonGroup>
                 </Center>

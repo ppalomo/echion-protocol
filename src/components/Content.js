@@ -11,6 +11,7 @@ import useStore from '../store';
 import { topMenuItems } from '../data/menuItems';
 import Home from './pages/Home';
 import NewLottery from './pages/NewLottery';
+import Dashboard from './pages/Dashboard';
 
 export default function Content () {
     let location = useLocation();
@@ -28,6 +29,7 @@ export default function Content () {
             <Switch>
                 <Route exact path="/" component={Home} />
                 <Route path="/new" component={NewLottery} />
+                <Route path="/dashboard" component={Dashboard} />
             </Switch>
         </Center>
     );

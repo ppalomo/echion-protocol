@@ -48,6 +48,8 @@ contract LotteryPool is ReentrancyGuard, Ownable {
     mapping(address => uint) tickets;    
     address[] public players;
     address public winner;
+    uint public finalPrice;
+    uint public fees;
 
     // Events
     event TicketsBought(uint lotteryId, address indexed buyer, uint numberOfTickets, uint amount);
@@ -82,6 +84,8 @@ contract LotteryPool is ReentrancyGuard, Ownable {
         status = LotteryStatus.OPEN;
         created = _created;
         numberOfTickets = 0;
+        finalPrice = 0;
+        fees = 0;
     }
 
     /// @notice Method used to buy a lottery ticket
@@ -182,7 +186,7 @@ contract LotteryPool is ReentrancyGuard, Ownable {
         winner = _calculateWinner();
 
         if (lotteryPoolType == ILotteryFactory.LotteryPoolType.DIRECT) {
-            _transferDirectPayments();
+            (finalPrice, fees) = _transferDirectPayments();
         }
 
         // Transfer NFT to winner
@@ -198,7 +202,8 @@ contract LotteryPool is ReentrancyGuard, Ownable {
     
         // If staking!!!
         // Recover balance in staking!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
+        
+        finalPrice = address(this).balance;
         status = LotteryStatus.CANCELLED;
     }
 
@@ -223,10 +228,11 @@ contract LotteryPool is ReentrancyGuard, Ownable {
     }
 
     /// @notice Method used to transfer fees and payment if it's a direct lottery pool
-    function _transferDirectPayments() private {
+    /// @return Payment amount sent to creator and fees
+    function _transferDirectPayments() private returns (uint, uint) {
         // Calculating payment and transfering fees
         uint fee = address(this).balance * parent.getFeePercent() / 100;
-        uint payment = address(this).balance - fee;        
+        uint payment = address(this).balance - fee;
         
         // Transfering fees to owner wallet
         address payable wallet = payable(parent.getWallet());
@@ -235,6 +241,8 @@ contract LotteryPool is ReentrancyGuard, Ownable {
         // Transfering balance to creator
         address payable addr = payable(creator);
         addr.transfer(payment);
+
+        return (payment, fee);
     }
 
     // /// @notice Transfer NFT to winner

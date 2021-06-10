@@ -22,3 +22,8 @@ export function truncateRight (fullStr, strLen, separator) {
 
     return fullStr.substr(0, strLen) + separator ;
 };
+
+export const capitalize = (str, lower = false) =>
+  (lower ? str.toLowerCase() : str)
+    .replace(/(?:^|\s|["'([{])+\S/g, match => match.toUpperCase());
+;

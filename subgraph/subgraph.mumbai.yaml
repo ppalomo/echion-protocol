@@ -22,8 +22,8 @@ dataSources:
           handler: handleLotteryCreated
         - event: LotteryStaked(uint256)
           handler: handleLotteryStaked
-        - event: LotteryClosed(uint256,address)
+        - event: LotteryClosed(uint256,address,uint256,uint256)
           handler: handleLotteryClosed
-        - event: LotteryCancelled(uint256)
+        - event: LotteryCancelled(uint256,uint256)
           handler: handleLotteryCancelled
       file: ./src/mapping.ts

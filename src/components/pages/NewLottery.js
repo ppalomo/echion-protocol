@@ -33,6 +33,8 @@ import {
 import useStore from '../../store';
 import ERC721JSON from '../../abis/ERC721.json';
 import { useContract, useAdminContract } from '../../hooks/contractHooks';
+// import CanvasDraw from "react-canvas-draw";
+import DrawCanvas from '../DrawCanvas';
 
 export default function NewLottery () {
     const { network, provider, isWalletConnected } = useStore();
@@ -61,19 +63,10 @@ export default function NewLottery () {
 
             var response = fetch(tokenURI)
                 .then(response => {
-                    // console.log("eeeeeeeeeeee")
-                    // console.log(response)
-                    // const q = await response.text()
-                    // console.log(q);
                     return response.json();
                     // return response.text();
                 })
                 .then((jsonData) => {
-                    // const kk = JSON.parse(jsonData);
-                    // console.log(kk);
-                    // console.log("theeeen")
-                    // console.log(jsonData);
-                    // return jsonData.image;
                     return { success: true, data:  jsonData.image}
                 })
                 .catch((error) => {
@@ -94,12 +87,8 @@ export default function NewLottery () {
     async function handleCreateLottery() {
         try {
             if(factoryContract != null) {
-                // utils.parseEther(ticketPrice.toString())
-                // const tx = await factoryContract.createLottery(nftAddress, nftIndex, ethers.utils.parseEther('0.1'));
                 const tx = await factoryContract.createLottery(nftAddress, nftIndex, ethers.utils.parseEther(ticketPrice.toString()), 0, 0);                
                 await tx.wait();
-                // const kk = await factoryContract.maxActiveLotteries();
-                // console.log(kk);
             }
         } catch (err) {
             console.log("Error: ", err);
@@ -142,10 +131,48 @@ export default function NewLottery () {
                     "xl": "3xl"
                 }}
                 fontWeight="extrabold">
-                Create new NFT lottery
+                New NFT Lottery Pool
             </Text>
 
-            <VStack
+            <HStack
+                w="100%" 
+                minW="350px"
+                h="auto"
+                color="white"
+                alignItems="center"
+                borderColor={useColorModeValue("gray.200", "gray.700")}>
+                <Button
+                    variant="outline">
+                    Mint
+                </Button>
+                <Button
+                    variant="outline">
+                    Import
+                </Button>
+
+            </HStack>
+
+            <Center 
+                w="100%"
+                mt={3}
+                p={{
+                    base: "3",
+                    md: "8",
+                    xl: "10"
+                }}
+                bgColor={useColorModeValue("bg.100", "bg.900")}
+                borderWidth="1px"
+                borderColor={useColorModeValue("gray.200", "gray.700")}
+                rounded="xl"
+                position="relative">
+                <DrawCanvas />
+                {/* <CanvasDraw
+                    brushColor="rgba(155,12,60,0.3)"
+                    imgSrc="https://upload.wikimedia.org/wikipedia/commons/a/a1/Nepalese_Mhapuja_Mandala.jpg"
+                    /> */}
+            </Center>
+
+            {/* <VStack
                 w="100%"
                 p={{
                     "base": 5,
@@ -273,7 +300,7 @@ export default function NewLottery () {
 
                 </Wrap>
 
-            </VStack>
+            </VStack> */}
 
         </VStack>
 

@@ -231,6 +231,8 @@ describe("LotteryPoolFactory", function () {
     expect([addr1.address, addr2.address, addrs[0].address]).to.include(await lotteries[0].winner());
     expect(await lotteries[0].status()).to.equal(LotteryStatus.CLOSED);
     expect(await lotteryPoolFactory.numberOfActiveLotteries()).to.equal(numberOfActiveLotteries - 1);
+    expect(await lotteries[0].finalPrice()).to.be.above(0);
+    expect(await lotteries[0].fees()).to.be.above(0);
   });
 
   it("Should declare a winner in a staking lottery pool", async function () {

@@ -22,4 +22,6 @@ type LotteryPool @entity {
   minAmount: BigInt
   created: BigInt
   winner: Bytes
+  finalPrice: BigInt
+  fees: BigInt
 }

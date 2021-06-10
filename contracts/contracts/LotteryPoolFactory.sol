@@ -28,8 +28,8 @@ contract LotteryPoolFactory is Ownable {
     // Events
     event LotteryCreated(uint lotteryId, address creator, address lotteryAddress, address nftAddress, uint nftIndex, uint ticketPrice, uint created, LotteryPoolType lotteryPoolType, uint minAmount);
     event LotteryStaked(uint lotteryId);
-    event LotteryClosed(uint lotteryId, address winner);
-    event LotteryCancelled(uint lotteryId);
+    event LotteryClosed(uint lotteryId, address winner, uint finalPrice, uint fees);
+    event LotteryCancelled(uint lotteryId, uint finalPrice);
     event FeePercentChanged(uint feePercent);
     event WalletChanged(address indexed addr);
 
@@ -98,10 +98,12 @@ contract LotteryPoolFactory is Ownable {
 
         // Launching winner declaration process
         address winner = lottery.declareWinner();
+        uint finalPrice = lottery.finalPrice();
+        uint fees = lottery.fees();
         numberOfActiveLotteries--;
 
         // Emiting event
-        emit LotteryClosed(_lotteryId, winner);
+        emit LotteryClosed(_lotteryId, winner, finalPrice, fees);
     }
 
     /// @notice Method used to cancel a lottery pool
@@ -115,10 +117,11 @@ contract LotteryPoolFactory is Ownable {
         
         // Cancelling lottery pool
         lottery.cancelLottery();
+        uint finalPrice = lottery.finalPrice();
         numberOfActiveLotteries--;
 
         // Emiting event
-        emit LotteryCancelled(_lotteryId);
+        emit LotteryCancelled(_lotteryId, finalPrice);
     }
 
     /// @notice Increases the total balance
