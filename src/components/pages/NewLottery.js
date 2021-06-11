@@ -28,21 +28,25 @@ import {
     useColorModeValue,
   } from '@chakra-ui/react';
 import {
+    BrowserRouter as Router,
+    Switch,
+    Route,
     useHistory
 } from "react-router-dom";
 import useStore from '../../store';
 import ERC721JSON from '../../abis/ERC721.json';
 import { useContract, useAdminContract } from '../../hooks/contractHooks';
-// import CanvasDraw from "react-canvas-draw";
 import DrawCanvas from '../DrawCanvas';
 
 export default function NewLottery () {
+    const history = useHistory();
     const { network, provider, isWalletConnected } = useStore();
     const factoryContract = useContract("LotteryPoolFactory");
     const [nftAddress, setNFTAddress] = useState("0xE1A19Eb074815e4028768182F8971D222416159A");
     const [nftIndex, setNFTIndex] = useState(0);
     const [ticketPrice, setTicketPrice] = useState(0);
     const [nftImage, setNFTImage] = useState(null);
+    const [page, setPage] = useState(0)
 
     async function handleValidateNFT() {
         const response = await getERC721ImageURL(nftAddress, nftIndex);
@@ -87,7 +91,7 @@ export default function NewLottery () {
     async function handleCreateLottery() {
         try {
             if(factoryContract != null) {
-                const tx = await factoryContract.createLottery(nftAddress, nftIndex, ethers.utils.parseEther(ticketPrice.toString()), 0, 0);                
+                const tx = await factoryContract.createLottery(nftAddress, nftIndex, ethers.utils.parseEther(ticketPrice.toString()), 0, 0);
                 await tx.wait();
             }
         } catch (err) {
@@ -105,6 +109,16 @@ export default function NewLottery () {
 
     function handleTicketPriceChange(e) {
         setTicketPrice(e.target.value);
+    }
+
+    function handleCreateButtonClick(){
+        history.push('/new');
+        setPage(0);
+    }
+
+    function handleImportButtonClick(){
+        history.push('/import');
+        setPage(1);
     }
 
     return(
@@ -142,35 +156,45 @@ export default function NewLottery () {
                 alignItems="center"
                 borderColor={useColorModeValue("gray.200", "gray.700")}>
                 <Button
+                    bg={page === 0 ? "primary.500" : "transparent"}
+                    onClick={handleCreateButtonClick}
                     variant="outline">
-                    Mint
+                    Create NFT
                 </Button>
                 <Button
+                    bg={page === 1 ? "primary.500" : "transparent"}
+                    onClick={handleImportButtonClick}
                     variant="outline">
-                    Import
+                    Import NFT
                 </Button>
 
             </HStack>
 
-            <Center 
-                w="100%"
-                mt={3}
-                p={{
-                    base: "3",
-                    md: "8",
-                    xl: "10"
-                }}
-                bgColor={useColorModeValue("bg.100", "bg.900")}
-                borderWidth="1px"
-                borderColor={useColorModeValue("gray.200", "gray.700")}
-                rounded="xl"
-                position="relative">
-                <DrawCanvas />
-                {/* <CanvasDraw
-                    brushColor="rgba(155,12,60,0.3)"
-                    imgSrc="https://upload.wikimedia.org/wikipedia/commons/a/a1/Nepalese_Mhapuja_Mandala.jpg"
-                    /> */}
-            </Center>
+            <Switch>
+
+                <Route path="/new">
+                    <Center 
+                        w="100%"
+                        mt={3}
+                        p={{
+                            base: "2",
+                            md: "4",
+                            xl: "4"
+                        }}
+                        bgColor={useColorModeValue("bg.100", "bg.900")}
+                        borderWidth="1px"
+                        borderColor={useColorModeValue("gray.200", "gray.700")}
+                        rounded="xl"
+                        position="relative">
+                        <DrawCanvas />
+                    </Center>
+                </Route>
+
+                <Route path="/import">
+                    <h1>Import</h1>
+                </Route>
+
+            </Switch>
 
             {/* <VStack
                 w="100%"

@@ -29,6 +29,7 @@ export default function Content () {
             <Switch>
                 <Route exact path="/" component={Home} />
                 <Route path="/new" component={NewLottery} />
+                <Route path="/import" component={NewLottery} />
                 <Route path="/dashboard" component={Dashboard} />
             </Switch>
         </Center>
