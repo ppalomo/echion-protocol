@@ -24,6 +24,7 @@ contract LotteryPoolFactory is Ownable {
     uint public totalBalance;
     uint feePercent;
     address payable wallet;
+    uint minDaysOpen; 
 
     // Events
     event LotteryCreated(uint lotteryId, address creator, address lotteryAddress, address nftAddress, uint nftIndex, uint ticketPrice, uint created, LotteryPoolType lotteryPoolType, uint minAmount);
@@ -32,6 +33,7 @@ contract LotteryPoolFactory is Ownable {
     event LotteryCancelled(uint lotteryId, uint finalPrice);
     event FeePercentChanged(uint feePercent);
     event WalletChanged(address indexed addr);
+    event MinDaysOpenChanged(uint minDaysOpen);
 
     /// @notice Contract constructor method
     constructor() {
@@ -39,6 +41,7 @@ contract LotteryPoolFactory is Ownable {
         feePercent = 10; // %
         numberOfActiveLotteries = 0;
         totalBalance = 0;
+        minDaysOpen = 7;
     }
 
     /// @notice Creates a new NFT lottery
@@ -164,6 +167,18 @@ contract LotteryPoolFactory is Ownable {
     function setWallet(address payable _addr) public onlyOwner {
         wallet = _addr;
         emit WalletChanged(wallet);
+    }
+
+    /// @notice Returns the minimum days open parameter
+    function getMinDaysOpen() public view returns(uint) {
+        return minDaysOpen;
+    }
+    
+    /// @notice Sets the minimum days open parameter
+    /// @param _minDaysOpen New minimum
+    function setMinDaysOpen(uint _minDaysOpen) public onlyOwner {
+        minDaysOpen = _minDaysOpen;
+        emit MinDaysOpenChanged(minDaysOpen);
     }
 
 }

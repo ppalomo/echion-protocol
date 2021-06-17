@@ -53,6 +53,8 @@ describe("LotteryPoolFactory", function () {
     lotteryPoolFactory = await LotteryPoolFactory.deploy();
     expect(lotteryPoolFactory.address).to.properAddress;
 
+    await lotteryPoolFactory.setMinDaysOpen(0);
+
     // Getting test accounts
     [owner, addr1, addr2, ...addrs] = await ethers.getSigners();
   });
@@ -93,7 +95,7 @@ describe("LotteryPoolFactory", function () {
     expect(await lotteries[0].getBalance()).to.equal(ethers.utils.parseEther('0.3'));
   });
 
-  it("Shouldn't buy a ticket if the lottery is not open", async function () {
+  it("Shouldn't buy a ticket if the lottery is not open", async function () {    
     await lotteryPoolFactory.createLottery(nfts[0].address, nfts[0].index, nfts[0].ticketPrice, LotteryPoolType.STAKING, nfts[0].minAmount);
     await lotteryPoolFactory.launchStaking(0);
 
@@ -207,6 +209,17 @@ describe("LotteryPoolFactory", function () {
     ).to.be.revertedWith('You are not the owner of the lottery');
   });
 
+  it("Shouldn't stake a lottery if minimum days open hasn't been reached", async function () {
+    // Arrange
+    await lotteryPoolFactory.setMinDaysOpen(7);
+    await lotteryPoolFactory.connect(addr1).createLottery(nfts[0].address, nfts[0].index, nfts[0].ticketPrice, LotteryPoolType.STAKING, nfts[0].minAmount);
+
+    // Act
+    await expect(
+      lotteryPoolFactory.connect(addr1).launchStaking(0)
+    ).to.be.revertedWith('You must wait the minimum open days');
+  });
+
   it("Shouldn't stake a lottery if pool type isn't compatible", async function () {
     // Arrange
     await lotteryPoolFactory.createLottery(nfts[0].address, nfts[0].index, nfts[0].ticketPrice, LotteryPoolType.DIRECT, nfts[0].minAmount);
@@ -281,6 +294,17 @@ describe("LotteryPoolFactory", function () {
     await expect(
       lotteryPoolFactory.connect(addr2).declareWinner(0)
     ).to.be.revertedWith('You are not the owner of the lottery');
+  });
+
+  it("Shouldn't close a lottery if minimum days open hasn't been reached", async function () {
+    // Arrange
+    await lotteryPoolFactory.setMinDaysOpen(7);
+    await lotteryPoolFactory.connect(addr1).createLottery(nfts[0].address, nfts[0].index, nfts[0].ticketPrice, LotteryPoolType.DIRECT, nfts[0].minAmount);
+
+    // Act
+    await expect(
+      lotteryPoolFactory.connect(addr1).declareWinner(0)
+    ).to.be.revertedWith('You must wait the minimum open days');
   });
 
   it("Shouldn't close a staking lottery if is not staking", async function () {
@@ -432,6 +456,19 @@ describe("LotteryPoolFactory", function () {
   it("Shouldn't be able to update the wallet address if not the owner", async function () {   
       await expect(
         lotteryPoolFactory.connect(addr2).setWallet(addrs[3].address)
+      ).to.be.reverted;
+  });
+
+  it("Should be able to update the minimum days open", async function () {
+    await expect(
+      lotteryPoolFactory.connect(owner).setMinDaysOpen(2)
+    ).to.emit(lotteryPoolFactory, 'MinDaysOpenChanged');
+    expect(await lotteryPoolFactory.getMinDaysOpen()).to.equal(2);
+  });
+
+  it("Shouldn't be able to update the minimum days open if not the owner", async function () {   
+      await expect(
+        lotteryPoolFactory.connect(addr2).setMinDaysOpen(3)
       ).to.be.reverted;
   });
 

@@ -12,6 +12,7 @@ interface ILotteryFactory {
     function decreaseTotalBalance(uint _lotteryId, uint _amount) external;
     function getFeePercent() external returns(uint);
     function getWallet() external returns(address);
+    function getMinDaysOpen() external view returns(uint);
 }
 
 /// @title Echion Protocol Staking Lottery Pool contract
@@ -164,8 +165,10 @@ contract LotteryPool is ReentrancyGuard, Ownable {
 
     /// @notice Changes de lottery state to staking
     function launchStaking() external onlyOwner {
+        
         require(lotteryPoolType == ILotteryFactory.LotteryPoolType.STAKING, 'Lottery pool type is not compatible with staking');
         require(status == LotteryStatus.OPEN, 'The lottery is not open');
+        require(block.timestamp >= created + (parent.getMinDaysOpen() * 1 days), 'You must wait the minimum open days');
 
         // Launch staking!!!!!!!!!
     
@@ -176,6 +179,7 @@ contract LotteryPool is ReentrancyGuard, Ownable {
     /// @return Winner address
     function declareWinner() external onlyOwner nonReentrant returns (address) {
         require(status != LotteryStatus.CLOSED && status != LotteryStatus.CANCELLED, 'The lottery pool is already closed');
+        require(block.timestamp >= created + (parent.getMinDaysOpen() * 1 days), 'You must wait the minimum open days');
         if (lotteryPoolType == ILotteryFactory.LotteryPoolType.STAKING) {
             require(status == LotteryStatus.STAKING, 'The lottery pool is not staking');
         }
@@ -199,6 +203,7 @@ contract LotteryPool is ReentrancyGuard, Ownable {
     function cancelLottery() external onlyOwner {
         require(status != LotteryStatus.CLOSED && status != LotteryStatus.CANCELLED, 'The lottery pool is already closed');
         require(minAmount > address(this).balance, 'Cannot cancel lottery. The minimum amount has been reached');
+        require(block.timestamp >= created + (parent.getMinDaysOpen() * 1 days), 'You must wait the minimum open days');
     
         // If staking!!!
         // Recover balance in staking!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
