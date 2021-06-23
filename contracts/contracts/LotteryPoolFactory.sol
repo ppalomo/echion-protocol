@@ -21,6 +21,7 @@ contract LotteryPoolFactory is Ownable, ReentrancyGuard {
     }
 
     // Variables
+    address lotteryPoolStaking;
     LotteryPool[] public lotteries;
     uint public numberOfActiveLotteries;
     uint public totalBalance;
@@ -38,7 +39,8 @@ contract LotteryPoolFactory is Ownable, ReentrancyGuard {
     event MinDaysOpenChanged(uint minDaysOpen);
 
     /// @notice Contract constructor method
-    constructor() {
+    constructor(address _lotteryPoolStaking) {
+        lotteryPoolStaking = _lotteryPoolStaking;
         wallet = payable(owner());
         feePercent = 10; // %
         numberOfActiveLotteries = 0;
@@ -185,6 +187,11 @@ contract LotteryPoolFactory is Ownable, ReentrancyGuard {
     function setMinDaysOpen(uint _minDaysOpen) public onlyOwner {
         minDaysOpen = _minDaysOpen;
         emit MinDaysOpenChanged(minDaysOpen);
+    }
+
+    /// @notice Sets the minimum days open parameter
+    function getLotteryPoolStaking() external view returns(address) {
+        return lotteryPoolStaking;
     }
 
 }

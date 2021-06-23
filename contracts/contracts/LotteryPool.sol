@@ -5,17 +5,14 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./interfaces/ILotteryPoolFactory.sol";
+// import "./LotteryPoolStaking.sol";
 import "hardhat/console.sol";
 
-// /// @title LotteryFactory interface
-// interface ILotteryPoolFactory {
-//     enum LotteryPoolType { DIRECT, STAKING }
-//     function increaseTotalBalance(uint _lotteryId, uint _amount) external;
-//     function decreaseTotalBalance(uint _lotteryId, uint _amount) external;
-//     function getFeePercent() external returns(uint);
-//     function getWallet() external returns(address);
-//     function getMinDaysOpen() external view returns(uint);
-// }
+interface ILotteryPoolStaking {
+    function depositETH() external payable;
+    function withdrawETH() external;
+    function getAWETHBalance() external view returns(uint);
+}
 
 /// @title Echion Protocol Staking Lottery Pool contract
 /// @author Pablo Palomo
@@ -172,7 +169,9 @@ contract LotteryPool is ReentrancyGuard, Ownable {
         require(status == LotteryStatus.OPEN, 'The lottery is not open');
         require(block.timestamp >= created + (parent.getMinDaysOpen() * 1 days), 'You must wait the minimum open days');
 
-        // Launch staking!!!!!!!!!
+        // Launching Staking
+        address lotteryPoolStaking = parent.getLotteryPoolStaking();
+        ILotteryPoolStaking(lotteryPoolStaking).depositETH{ value: address(this).balance }();
     
         status = LotteryStatus.STAKING;
     }
@@ -184,6 +183,10 @@ contract LotteryPool is ReentrancyGuard, Ownable {
         require(block.timestamp >= created + (parent.getMinDaysOpen() * 1 days), 'You must wait the minimum open days');
         if (lotteryPoolType == ILotteryPoolFactory.LotteryPoolType.STAKING) {
             require(status == LotteryStatus.STAKING, 'The lottery pool is not staking');
+
+            // Recovering staked amount
+            address lotteryPoolStaking = parent.getLotteryPoolStaking();
+            ILotteryPoolStaking(lotteryPoolStaking).withdrawETH();
         }
         require(IERC721(nft.addr).getApproved(nft.index) == address(this), 'Contract is not approved to transfer NFT');        
 
@@ -226,6 +229,11 @@ contract LotteryPool is ReentrancyGuard, Ownable {
     /// @return Current contract balance
     function getBalance() public view returns (uint) {
         return address(this).balance;
+    }
+
+    function getStakingBalance() public view returns (uint) {
+        address lotteryPoolStaking = parent.getLotteryPoolStaking();
+        return ILotteryPoolStaking(lotteryPoolStaking).getAWETHBalance();
     }
 
     /// @notice Calculating lottery pool winner

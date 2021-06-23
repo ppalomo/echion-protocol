@@ -34,7 +34,7 @@ task("accounts", "Prints the list of accounts", async () => {
     hardhat: {
       chainId: 31337,
       allowUnlimitedContractSize: false,
-      gasPrice: 110000000000
+      gasPrice: 300000000000
     },
     mainnet: {
       url: `https://mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,

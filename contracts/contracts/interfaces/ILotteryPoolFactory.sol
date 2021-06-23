@@ -18,5 +18,6 @@ interface ILotteryPoolFactory {
     function setWallet(address payable _addr) external;
     function getMinDaysOpen() external view returns(uint);
     function setMinDaysOpen(uint _minDaysOpen) external;
-
+    function getLotteryPoolStaking() external view returns(address);
+    
 }
