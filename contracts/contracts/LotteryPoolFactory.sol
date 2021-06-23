@@ -2,6 +2,8 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./LotteryPool.sol";
 import "hardhat/console.sol";
 
@@ -9,7 +11,7 @@ import "hardhat/console.sol";
 /// @title Echion lotteries factory contract
 /// @author Pablo Palomo
 /// @notice Contract used for maintaining the list of lotteries and interact with them
-contract LotteryPoolFactory is Ownable {
+contract LotteryPoolFactory is Ownable, ReentrancyGuard {
 
     // Enums
     enum LotteryPoolType
@@ -52,8 +54,7 @@ contract LotteryPoolFactory is Ownable {
     function createLottery(address _nftAddress, uint _nftIndex, uint _ticketPrice, LotteryPoolType _lotteryPoolType, uint _minAmount) public {
         require(_nftAddress != address(0), 'A valid address is required');
         require(_ticketPrice > 0, 'A valid ticket price is required');
-
-        // Check if nft transfer is approved !!!!!!!!!!!!!!!!!!!!!!!!!!
+        require(IERC721(_nftAddress).isApprovedForAll(msg.sender, address(this)), 'Contract is not approved to transfer NFT');
 
         // Creating new lottery pool
         uint created = block.timestamp;
@@ -90,15 +91,20 @@ contract LotteryPoolFactory is Ownable {
 
     /// @notice Declares a winner and closes the lottery
     /// @param _lotteryId - Lottery identifier
-    function declareWinner(uint _lotteryId) public {
+    function declareWinner(uint _lotteryId) public nonReentrant {
         LotteryPool lottery = lotteries[_lotteryId];
         require(lottery.creator() == msg.sender, 'You are not the owner of the lottery');
         require(lottery.status() != LotteryPool.LotteryStatus.CLOSED && lottery.status() != LotteryPool.LotteryStatus.CANCELLED, 
             'The lottery pool is already closed');
-        if (lottery.lotteryPoolType() == ILotteryFactory.LotteryPoolType.STAKING) {
+        if (lottery.lotteryPoolType() == ILotteryPoolFactory.LotteryPoolType.STAKING) {
             require(lottery.status() == LotteryPool.LotteryStatus.STAKING, 'The lottery pool is not staking');
         }
 
+        // Check approval to transfer NFT
+        (address nftAddress, uint nftIndex) = lottery.nft();
+        require(IERC721(nftAddress).isApprovedForAll(msg.sender, address(this)), 'Contract is not approved to transfer NFT');
+        IERC721(nftAddress).approve(address(lottery), nftIndex);
+        
         // Launching winner declaration process
         address winner = lottery.declareWinner();
         uint finalPrice = lottery.finalPrice();

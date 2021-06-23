@@ -1,19 +1,21 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import "./interfaces/ILotteryPoolFactory.sol";
 import "hardhat/console.sol";
 
-/// @title LotteryFactory interface
-interface ILotteryFactory {
-    enum LotteryPoolType { DIRECT, STAKING }
-    function increaseTotalBalance(uint _lotteryId, uint _amount) external;
-    function decreaseTotalBalance(uint _lotteryId, uint _amount) external;
-    function getFeePercent() external returns(uint);
-    function getWallet() external returns(address);
-    function getMinDaysOpen() external view returns(uint);
-}
+// /// @title LotteryFactory interface
+// interface ILotteryPoolFactory {
+//     enum LotteryPoolType { DIRECT, STAKING }
+//     function increaseTotalBalance(uint _lotteryId, uint _amount) external;
+//     function decreaseTotalBalance(uint _lotteryId, uint _amount) external;
+//     function getFeePercent() external returns(uint);
+//     function getWallet() external returns(address);
+//     function getMinDaysOpen() external view returns(uint);
+// }
 
 /// @title Echion Protocol Staking Lottery Pool contract
 /// @author Pablo Palomo
@@ -36,7 +38,7 @@ contract LotteryPool is ReentrancyGuard, Ownable {
     }
 
     // Variables
-    ILotteryFactory parent;
+    ILotteryPoolFactory parent;
     uint public lotteryId;
     uint public ticketPrice;
     uint public minAmount;
@@ -44,7 +46,7 @@ contract LotteryPool is ReentrancyGuard, Ownable {
     uint created;
     NFT public nft;
     LotteryStatus public status;
-    ILotteryFactory.LotteryPoolType public lotteryPoolType;
+    ILotteryPoolFactory.LotteryPoolType public lotteryPoolType;
     uint public numberOfTickets;
     mapping(address => uint) tickets;    
     address[] public players;
@@ -74,9 +76,9 @@ contract LotteryPool is ReentrancyGuard, Ownable {
         uint _minAmount,
         uint _created
     ) {
-        parent = ILotteryFactory(owner());
+        parent = ILotteryPoolFactory(owner());
         lotteryId = _lotteryId;
-        lotteryPoolType = ILotteryFactory.LotteryPoolType(_lotteryPoolType);
+        lotteryPoolType = ILotteryPoolFactory.LotteryPoolType(_lotteryPoolType);
         creator = _creator;
         ticketPrice = _ticketPrice;
         minAmount = _minAmount;
@@ -141,7 +143,7 @@ contract LotteryPool is ReentrancyGuard, Ownable {
 
     /// @notice Method used to redeem bought tickets once the pool is closed
     function redeemTickets() public nonReentrant {
-        require(lotteryPoolType == ILotteryFactory.LotteryPoolType.STAKING, 'Tickets can only be redeemed in staking lottery pools');
+        require(lotteryPoolType == ILotteryPoolFactory.LotteryPoolType.STAKING, 'Tickets can only be redeemed in staking lottery pools');
         require(status == LotteryStatus.CLOSED || status == LotteryStatus.CANCELLED, 'The lottery pool is not closed');
         
         // Tranfering amount to sender
@@ -166,7 +168,7 @@ contract LotteryPool is ReentrancyGuard, Ownable {
     /// @notice Changes de lottery state to staking
     function launchStaking() external onlyOwner {
         
-        require(lotteryPoolType == ILotteryFactory.LotteryPoolType.STAKING, 'Lottery pool type is not compatible with staking');
+        require(lotteryPoolType == ILotteryPoolFactory.LotteryPoolType.STAKING, 'Lottery pool type is not compatible with staking');
         require(status == LotteryStatus.OPEN, 'The lottery is not open');
         require(block.timestamp >= created + (parent.getMinDaysOpen() * 1 days), 'You must wait the minimum open days');
 
@@ -180,21 +182,22 @@ contract LotteryPool is ReentrancyGuard, Ownable {
     function declareWinner() external onlyOwner nonReentrant returns (address) {
         require(status != LotteryStatus.CLOSED && status != LotteryStatus.CANCELLED, 'The lottery pool is already closed');
         require(block.timestamp >= created + (parent.getMinDaysOpen() * 1 days), 'You must wait the minimum open days');
-        if (lotteryPoolType == ILotteryFactory.LotteryPoolType.STAKING) {
+        if (lotteryPoolType == ILotteryPoolFactory.LotteryPoolType.STAKING) {
             require(status == LotteryStatus.STAKING, 'The lottery pool is not staking');
         }
+        require(IERC721(nft.addr).getApproved(nft.index) == address(this), 'Contract is not approved to transfer NFT');        
 
         status = LotteryStatus.CLOSED;
         
         // Declaring winner
         winner = _calculateWinner();
 
-        if (lotteryPoolType == ILotteryFactory.LotteryPoolType.DIRECT) {
+        if (lotteryPoolType == ILotteryPoolFactory.LotteryPoolType.DIRECT) {
             (finalPrice, fees) = _transferDirectPayments();
         }
 
-        // Transfer NFT to winner
-        // _transferPrizeToWinner(); !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // Transfering NFT prize to winner        
+        IERC721(nft.addr).transferFrom(creator, winner, nft.index);
         
         return winner;
     }
@@ -249,10 +252,5 @@ contract LotteryPool is ReentrancyGuard, Ownable {
 
         return (payment, fee);
     }
-
-    // /// @notice Transfer NFT to winner
-    // function _transferPrizeToWinner() private {
-        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // }
 
 }

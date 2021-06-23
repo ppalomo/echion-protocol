@@ -17,7 +17,15 @@ task("accounts", "Prints the list of accounts", async () => {
  * @type import('hardhat/config').HardhatUserConfig
  */
  module.exports = {
-  solidity: "0.8.0",
+  solidity: {
+    version: "0.8.0",
+    settings: {
+      optimizer: {
+        enabled: true,
+        runs: 200
+      }
+    }
+  },
   paths: {
     //artifacts: '../src/artifacts', 
     artifacts: './artifacts',
@@ -25,7 +33,8 @@ task("accounts", "Prints the list of accounts", async () => {
   networks: {
     hardhat: {
       chainId: 31337,
-      allowUnlimitedContractSize: true
+      allowUnlimitedContractSize: false,
+      gasPrice: 110000000000
     },
     mainnet: {
       url: `https://mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
