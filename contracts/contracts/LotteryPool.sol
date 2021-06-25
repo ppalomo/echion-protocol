@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./interfaces/ILotteryPoolFactory.sol";
@@ -10,8 +11,11 @@ import "hardhat/console.sol";
 
 interface ILotteryPoolStaking {
     function depositETH() external payable;
-    function withdrawETH() external;
-    function getAWETHBalance() external view returns(uint);
+    function withdrawETH(address _to) external returns(uint);
+    function getAWETHBalance(address _to) external view returns(uint);
+    function getAWETHAddress() external view returns(address);
+    function getWETHGateway() external view returns(address);
+    // function approveAWETH() external;
 }
 
 /// @title Echion Protocol Staking Lottery Pool contract
@@ -163,14 +167,18 @@ contract LotteryPool is ReentrancyGuard, Ownable {
     }
 
     /// @notice Changes de lottery state to staking
-    function launchStaking() external onlyOwner {
-        
+    function launchStaking() external onlyOwner {        
         require(lotteryPoolType == ILotteryPoolFactory.LotteryPoolType.STAKING, 'Lottery pool type is not compatible with staking');
         require(status == LotteryStatus.OPEN, 'The lottery is not open');
         require(block.timestamp >= created + (parent.getMinDaysOpen() * 1 days), 'You must wait the minimum open days');
 
-        // Launching Staking
+        // Approving aWETH spending
         address lotteryPoolStaking = parent.getLotteryPoolStaking();
+        address aWeth = ILotteryPoolStaking(lotteryPoolStaking).getAWETHAddress();
+        address wethGateway = ILotteryPoolStaking(lotteryPoolStaking).getWETHGateway();        
+        IERC20(aWeth).approve(wethGateway, type(uint256).max);
+
+        // Launching Staking
         ILotteryPoolStaking(lotteryPoolStaking).depositETH{ value: address(this).balance }();
     
         status = LotteryStatus.STAKING;
@@ -186,14 +194,13 @@ contract LotteryPool is ReentrancyGuard, Ownable {
 
             // Recovering staked amount
             address lotteryPoolStaking = parent.getLotteryPoolStaking();
-            ILotteryPoolStaking(lotteryPoolStaking).withdrawETH();
+            finalPrice = ILotteryPoolStaking(lotteryPoolStaking).withdrawETH(address(this));
         }
         require(IERC721(nft.addr).getApproved(nft.index) == address(this), 'Contract is not approved to transfer NFT');        
-
-        status = LotteryStatus.CLOSED;
         
         // Declaring winner
         winner = _calculateWinner();
+        status = LotteryStatus.CLOSED;
 
         if (lotteryPoolType == ILotteryPoolFactory.LotteryPoolType.DIRECT) {
             (finalPrice, fees) = _transferDirectPayments();
@@ -233,7 +240,7 @@ contract LotteryPool is ReentrancyGuard, Ownable {
 
     function getStakingBalance() public view returns (uint) {
         address lotteryPoolStaking = parent.getLotteryPoolStaking();
-        return ILotteryPoolStaking(lotteryPoolStaking).getAWETHBalance();
+        return ILotteryPoolStaking(lotteryPoolStaking).getAWETHBalance(address(this));
     }
 
     /// @notice Calculating lottery pool winner
@@ -259,6 +266,10 @@ contract LotteryPool is ReentrancyGuard, Ownable {
         addr.transfer(payment);
 
         return (payment, fee);
+    }
+
+    function getFinalPrice() public view returns(uint) {
+        return finalPrice;
     }
 
 }

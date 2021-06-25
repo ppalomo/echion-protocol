@@ -42,8 +42,8 @@ contract LotteryPoolStaking {
         wethGateway = IWETHGateway(_wethGateway);
         aWeth = IERC20(_aWethAddress);
 
-        // Approving aWETH spending
-        IERC20(aWeth).approve(address(wethGateway), type(uint256).max);
+        // // Approving aWETH spending
+        // IERC20(aWeth).approve(address(wethGateway), type(uint256).max);
     }
 
     function depositETH() external payable {
@@ -51,20 +51,56 @@ contract LotteryPoolStaking {
         wethGateway.depositETH{ value: msg.value }(lpool, msg.sender, 0);
     }
 
-    function withdrawETH() external {
+    function withdrawETH(address _to) external returns(uint) {
         address lpool = _getProvider();        
-        uint aWethBalance = getAWETHBalance();
+        uint aWethBalance = getAWETHBalance(_to);
 
         // Approving aWETH spending
-        aWeth.approve(address(wethGateway), aWethBalance);
+        //aWeth.approve(address(wethGateway), aWethBalance);
 
         wethGateway.withdrawETH(lpool, aWethBalance, msg.sender);
-        //wethGateway.withdrawETH(lpool, type(uint256).max, address(this));
-
+        //wethGateway.withdrawETH(lpool, type(uint256).max, _to);
+        return aWethBalance;
+        
     }
 
+    function getAWETHBalance(address _addr) public view returns(uint){
+        return aWeth.balanceOf(_addr);
+    }
+
+    function getBalance() public view returns (uint) {
+        return address(this).balance;
+    }
+
+    function getAWETHAllowance(address _addr) public view returns (uint) {
+        uint allowance = aWeth.allowance(_addr, address(wethGateway));
+        return allowance;
+    }
+
+    function getAWETHAddress() external view returns(address) {
+        return address(aWeth);
+    }
+
+    function getWETHGateway() external view returns(address) {
+        return address(wethGateway);
+    }
+
+    function _getProvider() private view returns(address) {
+        address lpool = provider.getLendingPool();
+        return(lpool);
+    }
+
+    // // Approving aWETH spending
+    // function approveAWETH() external {        
+    //     IERC20(aWeth).approve(address(wethGateway), type(uint256).max);
+    // }
+
+    // function getWETHAddress() public view returns(address){
+    //     address weth = wethGateway.getWETHAddress();
+    //     return weth;
+    // }
+
     // function getUserAccountData() external view returns(uint256, uint256, uint256, uint256, uint256, uint256) {
-        
     //     address lpool = provider.getLendingPool();
     //     (uint256 totalCollateralETH,
     //     uint256 totalDebtETH,
@@ -84,34 +120,10 @@ contract LotteryPoolStaking {
     // }
 
     // function getTotalCollateralETH() external view returns(uint) {
-        
     //     address lpool = provider.getLendingPool();
     //     (uint totalCollateralETH,,,,,) = ILendingPool(lpool).getUserAccountData(address(this));
     //     return totalCollateralETH;
     // }
-
-    function _getProvider() private view returns(address) {
-        address lpool = provider.getLendingPool();
-        return(lpool);
-    }
-
-    // function getWETHAddress() public view returns(address){
-    //     address weth = wethGateway.getWETHAddress();
-    //     return weth;
-    // }
-
-    function getAWETHBalance() public view returns(uint){
-        return aWeth.balanceOf(msg.sender);
-    }
-
-    function getBalance() public view returns (uint) {
-        return address(this).balance;
-    }
-
-    function getAWETHAllowance() public view returns (uint) {
-        uint allowance = aWeth.allowance(address(this), address(wethGateway));
-        return allowance;
-    }
 
 }
 

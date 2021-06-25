@@ -522,11 +522,30 @@ describe("LotteryPoolFactory", function () {
     await lotteries[0].connect(addr1).buyTickets(2, {value: ethers.utils.parseEther('0.2')});
     await lotteries[0].connect(addr2).buyTickets(1, {value: ethers.utils.parseEther('0.1')});
     await lotteryPoolFactory.connect(addrs[1]).launchStaking(0);
+
+    /*********************************/
+
+    let stakingBalance = await lotteries[0].getStakingBalance();
+    console.log("Staking Balance = ", stakingBalance.toString());
+
+    allowance = await lotteryPoolStaking.getAWETHAllowance(lotteries[0].address);
+    console.log("aWETH Allowance = ", allowance.toString());
+
+    /*********************************/
+
     await lotteryPoolFactory.connect(addrs[1]).declareWinner(0);
+
+    /*********************************/
+    
+    
+    let finalPrice = await lotteries[0].getFinalPrice();
+    console.log("Final Price = ", finalPrice.toString());
+
+    /*********************************/
     
     // Assert
     expect(await lotteries[0].getBalance()).to.be.above(ethers.utils.parseEther('0.3'));
-    
+
     // expect(await lotteries[0].getBalance()).to.equal(0);
     
     // const stakingBalance = await lotteries[0].getStakingBalance();
