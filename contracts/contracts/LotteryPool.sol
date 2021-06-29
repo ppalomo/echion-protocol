@@ -15,7 +15,6 @@ interface ILotteryPoolStaking {
     function getAWETHBalance(address _to) external view returns(uint);
     function getAWETHAddress() external view returns(address);
     function getWETHGateway() external view returns(address);
-    // function approveAWETH() external;
 }
 
 /// @title Echion Protocol Staking Lottery Pool contract
@@ -193,7 +192,7 @@ contract LotteryPool is ReentrancyGuard, Ownable {
             require(status == LotteryStatus.STAKING, 'The lottery pool is not staking');
 
             // Recovering staked amount
-            address lotteryPoolStaking = parent.getLotteryPoolStaking();
+            address lotteryPoolStaking = parent.getLotteryPoolStaking();            
             finalPrice = ILotteryPoolStaking(lotteryPoolStaking).withdrawETH(address(this));
         }
         require(IERC721(nft.addr).getApproved(nft.index) == address(this), 'Contract is not approved to transfer NFT');        
@@ -240,7 +239,18 @@ contract LotteryPool is ReentrancyGuard, Ownable {
 
     function getStakingBalance() public view returns (uint) {
         address lotteryPoolStaking = parent.getLotteryPoolStaking();
-        return ILotteryPoolStaking(lotteryPoolStaking).getAWETHBalance(address(this));
+        // return ILotteryPoolStaking(lotteryPoolStaking).getAWETHBalance(address(this));
+        address aWeth = ILotteryPoolStaking(lotteryPoolStaking).getAWETHAddress();
+        uint amount = IERC20(aWeth).balanceOf(address(this));
+        return amount;
+    }
+
+    function getStakingAllowance() public view returns (uint) {
+        address lotteryPoolStaking = parent.getLotteryPoolStaking();
+        address aWeth = ILotteryPoolStaking(lotteryPoolStaking).getAWETHAddress();
+        address wethGateway = ILotteryPoolStaking(lotteryPoolStaking).getWETHGateway();
+        uint allowance = IERC20(aWeth).allowance(address(this), address(wethGateway));
+        return allowance;
     }
 
     /// @notice Calculating lottery pool winner
@@ -270,6 +280,13 @@ contract LotteryPool is ReentrancyGuard, Ownable {
 
     function getFinalPrice() public view returns(uint) {
         return finalPrice;
+    }
+
+    function kk() returns (address) {
+        address lotteryPoolStaking = parent.getLotteryPoolStaking();
+        //address aWeth = ILotteryPoolStaking(lotteryPoolStaking).getAWETHAddress();
+        address wethGateway = ILotteryPoolStaking(lotteryPoolStaking).getWETHGateway();        
+        return wethGateway;
     }
 
 }

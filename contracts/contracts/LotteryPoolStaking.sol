@@ -57,11 +57,10 @@ contract LotteryPoolStaking {
 
         // Approving aWETH spending
         //aWeth.approve(address(wethGateway), aWethBalance);
-
-        wethGateway.withdrawETH(lpool, aWethBalance, msg.sender);
+        //wethGateway.withdrawETH(lpool, aWethBalance, msg.sender);
         //wethGateway.withdrawETH(lpool, type(uint256).max, _to);
+        //return aWethBalance;
         return aWethBalance;
-        
     }
 
     function getAWETHBalance(address _addr) public view returns(uint){

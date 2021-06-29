@@ -35,7 +35,7 @@ task("accounts", "Prints the list of accounts", async () => {
       chainId: 31337,
       allowUnlimitedContractSize: false,
       gasPrice: 300000000000,
-      timeout: 200000
+      timeout: 1000000
     },
     mainnet: {
       url: `https://mainnet.infura.io/v3/${process.env.INFURA_API_KEY}`,
