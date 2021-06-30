@@ -36,9 +36,9 @@ describe("LotteryPoolFactory", function () {
   beforeEach(async function () {
     
     // Deploying contracts
-    // EchionNFT = await ethers.getContractFactory("EchionNFT");
-    // nft = await EchionNFT.deploy();
-    // expect(nft.address).to.properAddress;
+    EchionNFT = await ethers.getContractFactory("EchionNFT");
+    nft = await EchionNFT.deploy();
+    expect(nft.address).to.properAddress;
 
     LotteryPoolStaking = await ethers.getContractFactory("LotteryPoolStaking");
     lotteryPoolStaking = await LotteryPoolStaking.deploy(
@@ -51,19 +51,19 @@ describe("LotteryPoolFactory", function () {
     lotteryPoolFactory = await LotteryPoolFactory.deploy(lotteryPoolStaking.address);
     expect(lotteryPoolFactory.address).to.properAddress;
 
-    // await lotteryPoolFactory.setMinDaysOpen(0);    
+    await lotteryPoolFactory.setMinDaysOpen(0);    
 
     // Getting test accounts
     [owner, addr1, addr2, ...addrs] = await ethers.getSigners();
 
-    // // NFT approvals
-    // await nft.connect(addrs[1]).mint(imageURI, metadataURI);
-    // await nft.connect(addrs[1]).setApprovalForAll(lotteryPoolFactory.address, true);
-    // expect(await nft.ownerOf(0)).to.equal(addrs[1].address);
+    // NFT approvals
+    await nft.connect(addrs[1]).mint(imageURI, metadataURI);
+    await nft.connect(addrs[1]).setApprovalForAll(lotteryPoolFactory.address, true);
+    expect(await nft.ownerOf(0)).to.equal(addrs[1].address);
 
-    // await nft.connect(addrs[2]).mint(imageURI, metadataURI);
-    // await nft.connect(addrs[2]).setApprovalForAll(lotteryPoolFactory.address, true);
-    // expect(await nft.ownerOf(1)).to.equal(addrs[2].address);
+    await nft.connect(addrs[2]).mint(imageURI, metadataURI);
+    await nft.connect(addrs[2]).setApprovalForAll(lotteryPoolFactory.address, true);
+    expect(await nft.ownerOf(1)).to.equal(addrs[2].address);
   });
 
   // it("Should create a new lottery", async function () {
@@ -540,7 +540,6 @@ describe("LotteryPoolFactory", function () {
 
     /*********************************/
 
-
     await lotteryPoolFactory.connect(addrs[1]).declareWinner(0);
 
     /*********************************/
@@ -553,6 +552,9 @@ describe("LotteryPoolFactory", function () {
 
     stakingBalance = await lotteries[0].getStakingBalance();
     console.log("Staking Balance = ", stakingBalance.toString());
+
+    let balance = await lotteries[0].getBalance();
+    console.log("Contract Balance = ", balance.toString());
 
     /*********************************/
     

@@ -37,13 +37,29 @@ contract LotteryPoolStaking {
     IWETHGateway wethGateway;
     IERC20 aWeth;
 
+    // address a;
+    // address b;
+    // address c;
+
     constructor(address _lendingPoolAddressesProvider, address _wethGateway, address _aWethAddress) {
         provider = ILendingPoolAddressesProvider(_lendingPoolAddressesProvider);
         wethGateway = IWETHGateway(_wethGateway);
         aWeth = IERC20(_aWethAddress);
 
-        // // Approving aWETH spending
-        // IERC20(aWeth).approve(address(wethGateway), type(uint256).max);
+        // a = _lendingPoolAddressesProvider;
+        // b = _aWethAddress;
+        // c = _wethGateway;
+
+        // Approving aWETH spending
+        IERC20(aWeth).approve(address(wethGateway), type(uint256).max);
+    }
+
+    function getAddresses() external view returns(address, address, address) {
+        return (
+            address(provider),
+            address(wethGateway),
+            address(aWeth)
+        );
     }
 
     function depositETH() external payable {
@@ -51,23 +67,41 @@ contract LotteryPoolStaking {
         wethGateway.depositETH{ value: msg.value }(lpool, msg.sender, 0);
     }
 
-    function withdrawETH(address _to) external returns(uint) {
-        address lpool = _getProvider();        
-        uint aWethBalance = getAWETHBalance(_to);
+    // function withdrawETH(address _to) external returns(uint) {
+    //     address lpool = _getProvider();
+    //     uint aWethBalance = getAWETHBalance(_to);
 
-        // Approving aWETH spending
-        //aWeth.approve(address(wethGateway), aWethBalance);
-        uint allowance = getAWETHAllowance(_to);
+    //     // Approving aWETH spending
+    //     wethGateway.withdrawETH(lpool, aWethBalance, _to);
+    //     return aWethBalance;
+    // }
 
-        if (aWethBalance > 0 && allowance >= aWethBalance) {
-            wethGateway.withdrawETH(lpool, 1, address(0x736249C396CC3e76a639D5B82ed55cC4eC02D992));
-        }
-        
-        //wethGateway.withdrawETH(lpool, type(uint256).max, _to);
-        //return aWethBalance;
+    function withdrawETH(address _lendingPoolAddressesProvider, address _wethGateway, address _aWethAddress) public returns(uint) {
+        address pool = ILendingPoolAddressesProvider(_lendingPoolAddressesProvider).getLendingPool();
+        uint aWethBalance = IERC20(_aWethAddress).balanceOf(address(this));
+
+        IWETHGateway(_wethGateway).withdrawETH(pool, aWethBalance, address(this));
 
         return aWethBalance;
     }
+
+    // function withdrawETH(address _to) external returns(uint) {
+    //     address lpool = _getProvider();        
+    //     uint aWethBalance = getAWETHBalance(_to);
+
+    //     // Approving aWETH spending
+    //     //aWeth.approve(address(wethGateway), aWethBalance);
+    //     uint allowance = getAWETHAllowance(_to);
+
+    //     if (aWethBalance > 0 && allowance >= aWethBalance) {
+    //         wethGateway.withdrawETH(lpool, 1, address(0x736249C396CC3e76a639D5B82ed55cC4eC02D992));
+    //     }
+        
+    //     //wethGateway.withdrawETH(lpool, type(uint256).max, _to);
+    //     //return aWethBalance;
+
+    //     return aWethBalance;
+    // }
 
     function getAWETHBalance(address _addr) public view returns(uint){
         return aWeth.balanceOf(_addr);
