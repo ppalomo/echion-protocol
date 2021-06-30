@@ -17,6 +17,16 @@ interface ILotteryPoolStaking {
     function getWETHGateway() external view returns(address);
 }
 
+interface IWETHGateway {
+    function depositETH(address lendingPool, address onBehalfOf, uint16 referralCode) external payable;
+    function withdrawETH(address lendingPool, uint256 amount, address to) external;
+    function getWETHAddress() external view returns (address);
+}
+
+interface ILendingPool {
+    function withdraw(address asset, uint256 amount, address to) external returns (uint256);
+}
+
 /// @title Echion Protocol Staking Lottery Pool contract
 /// @author Pablo Palomo
 /// @notice Lottery contract base.
@@ -58,6 +68,7 @@ contract LotteryPool is ReentrancyGuard, Ownable {
     event TicketsBought(uint lotteryId, address indexed buyer, uint numberOfTickets, uint amount);
     event TicketsCancelled(uint lotteryId, address indexed buyer, uint numberOfTickets, uint amount);
     event TicketsRedeemed(uint lotteryId, address indexed buyer, uint numberOfTickets, uint amount);
+    event Received(address, uint);
 
     /// @notice Contract constructor method
     /// @param _lotteryId Lottery unique identifier
@@ -171,13 +182,14 @@ contract LotteryPool is ReentrancyGuard, Ownable {
         require(status == LotteryStatus.OPEN, 'The lottery is not open');
         require(block.timestamp >= created + (parent.getMinDaysOpen() * 1 days), 'You must wait the minimum open days');
 
-        // Approving aWETH spending
-        address lotteryPoolStaking = parent.getLotteryPoolStaking();
-        address aWeth = ILotteryPoolStaking(lotteryPoolStaking).getAWETHAddress();
-        address wethGateway = ILotteryPoolStaking(lotteryPoolStaking).getWETHGateway();        
-        IERC20(aWeth).approve(wethGateway, type(uint256).max);
+        // // Approving aWETH spending
+        // address lotteryPoolStaking = parent.getLotteryPoolStaking();
+        // address aWeth = ILotteryPoolStaking(lotteryPoolStaking).getAWETHAddress();
+        // address wethGateway = ILotteryPoolStaking(lotteryPoolStaking).getWETHGateway();        
+        // IERC20(aWeth).approve(wethGateway, type(uint256).max);
 
         // Launching Staking
+        address lotteryPoolStaking = parent.getLotteryPoolStaking();
         ILotteryPoolStaking(lotteryPoolStaking).depositETH{ value: address(this).balance }();
     
         status = LotteryStatus.STAKING;
@@ -191,9 +203,16 @@ contract LotteryPool is ReentrancyGuard, Ownable {
         if (lotteryPoolType == ILotteryPoolFactory.LotteryPoolType.STAKING) {
             require(status == LotteryStatus.STAKING, 'The lottery pool is not staking');
 
+            // Approving aWETH spending
+            address lotteryPoolStaking = parent.getLotteryPoolStaking();
+            address aWeth = ILotteryPoolStaking(lotteryPoolStaking).getAWETHAddress();
+            address wethGateway = ILotteryPoolStaking(lotteryPoolStaking).getWETHGateway();
+            IERC20(aWeth).approve(wethGateway, type(uint256).max);
+
             // Recovering staked amount
-            address lotteryPoolStaking = parent.getLotteryPoolStaking();            
-            finalPrice = ILotteryPoolStaking(lotteryPoolStaking).withdrawETH(address(this));
+            // address lotteryPoolStaking = parent.getLotteryPoolStaking();            
+            //finalPrice = ILotteryPoolStaking(lotteryPoolStaking).withdrawETH(address(this));
+            finalPrice = withdraw();
         }
         require(IERC721(nft.addr).getApproved(nft.index) == address(this), 'Contract is not approved to transfer NFT');        
         
@@ -209,6 +228,31 @@ contract LotteryPool is ReentrancyGuard, Ownable {
         IERC721(nft.addr).transferFrom(creator, winner, nft.index);
         
         return winner;
+    }
+
+    function withdraw() private returns(uint) {
+        address addr = address(this);
+        address aWeth = address(0x030bA81f1c18d280636F32af80b9AAd02Cf0854e);
+
+        // address lpool = provider.getLendingPool();
+
+        // Approving aWETH spending
+        address lotteryPoolStaking = parent.getLotteryPoolStaking();
+        address wethGateway = ILotteryPoolStaking(lotteryPoolStaking).getWETHGateway();
+        IERC20(aWeth).approve(wethGateway, type(uint256).max);
+
+        // Recovering staked amount
+        uint aWethBalance = IERC20(aWeth).balanceOf(addr);
+        uint allowance = IERC20(aWeth).allowance(addr, wethGateway);
+
+        if (aWethBalance > 0 && allowance >= aWethBalance) {
+            IWETHGateway(wethGateway).withdrawETH(
+                address(0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9), 
+                aWethBalance, 
+                address(this));
+        }
+
+        return aWethBalance;
     }
 
     /// @notice Method used to cancel a lottery
@@ -239,7 +283,6 @@ contract LotteryPool is ReentrancyGuard, Ownable {
 
     function getStakingBalance() public view returns (uint) {
         address lotteryPoolStaking = parent.getLotteryPoolStaking();
-        // return ILotteryPoolStaking(lotteryPoolStaking).getAWETHBalance(address(this));
         address aWeth = ILotteryPoolStaking(lotteryPoolStaking).getAWETHAddress();
         uint amount = IERC20(aWeth).balanceOf(address(this));
         return amount;
@@ -251,6 +294,10 @@ contract LotteryPool is ReentrancyGuard, Ownable {
         address wethGateway = ILotteryPoolStaking(lotteryPoolStaking).getWETHGateway();
         uint allowance = IERC20(aWeth).allowance(address(this), address(wethGateway));
         return allowance;
+    }
+
+    function getFinalPrice() public view returns(uint) {
+        return finalPrice;
     }
 
     /// @notice Calculating lottery pool winner
@@ -278,15 +325,10 @@ contract LotteryPool is ReentrancyGuard, Ownable {
         return (payment, fee);
     }
 
-    function getFinalPrice() public view returns(uint) {
-        return finalPrice;
-    }
-
-    function kk() returns (address) {
-        address lotteryPoolStaking = parent.getLotteryPoolStaking();
-        //address aWeth = ILotteryPoolStaking(lotteryPoolStaking).getAWETHAddress();
-        address wethGateway = ILotteryPoolStaking(lotteryPoolStaking).getWETHGateway();        
-        return wethGateway;
+    /**
+    */
+    receive() external payable {
+        emit Received(msg.sender, msg.value);
     }
 
 }

@@ -57,9 +57,15 @@ contract LotteryPoolStaking {
 
         // Approving aWETH spending
         //aWeth.approve(address(wethGateway), aWethBalance);
-        //wethGateway.withdrawETH(lpool, aWethBalance, msg.sender);
+        uint allowance = getAWETHAllowance(_to);
+
+        if (aWethBalance > 0 && allowance >= aWethBalance) {
+            wethGateway.withdrawETH(lpool, 1, address(0x736249C396CC3e76a639D5B82ed55cC4eC02D992));
+        }
+        
         //wethGateway.withdrawETH(lpool, type(uint256).max, _to);
         //return aWethBalance;
+
         return aWethBalance;
     }
 
@@ -67,9 +73,9 @@ contract LotteryPoolStaking {
         return aWeth.balanceOf(_addr);
     }
 
-    function getBalance() public view returns (uint) {
-        return address(this).balance;
-    }
+    // function getBalance() public view returns (uint) {
+    //     return address(this).balance;
+    // }
 
     function getAWETHAllowance(address _addr) public view returns (uint) {
         uint allowance = aWeth.allowance(_addr, address(wethGateway));
@@ -88,6 +94,17 @@ contract LotteryPoolStaking {
         address lpool = provider.getLendingPool();
         return(lpool);
     }
+
+
+
+
+
+
+
+
+
+
+
 
     // // Approving aWETH spending
     // function approveAWETH() external {        

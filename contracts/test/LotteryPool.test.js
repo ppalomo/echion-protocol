@@ -36,31 +36,34 @@ describe("LotteryPoolFactory", function () {
   beforeEach(async function () {
     
     // Deploying contracts
-    EchionNFT = await ethers.getContractFactory("EchionNFT");
-    nft = await EchionNFT.deploy();
-    expect(nft.address).to.properAddress;
+    // EchionNFT = await ethers.getContractFactory("EchionNFT");
+    // nft = await EchionNFT.deploy();
+    // expect(nft.address).to.properAddress;
 
     LotteryPoolStaking = await ethers.getContractFactory("LotteryPoolStaking");
-    lotteryPoolStaking = await LotteryPoolStaking.deploy("0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5", "0xcc9a0B7c43DC2a5F023Bb9b738E45B0Ef6B06E04", "0x030bA81f1c18d280636F32af80b9AAd02Cf0854e");
+    lotteryPoolStaking = await LotteryPoolStaking.deploy(
+      "0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5", // _lendingPoolAddressesProvider
+      "0xcc9a0B7c43DC2a5F023Bb9b738E45B0Ef6B06E04",  // _wethGateway
+      "0x030bA81f1c18d280636F32af80b9AAd02Cf0854e"); // _aWethAddress
     expect(lotteryPoolStaking.address).to.properAddress;
 
     LotteryPoolFactory = await ethers.getContractFactory("LotteryPoolFactory");
     lotteryPoolFactory = await LotteryPoolFactory.deploy(lotteryPoolStaking.address);
     expect(lotteryPoolFactory.address).to.properAddress;
 
-    await lotteryPoolFactory.setMinDaysOpen(0);    
+    // await lotteryPoolFactory.setMinDaysOpen(0);    
 
     // Getting test accounts
     [owner, addr1, addr2, ...addrs] = await ethers.getSigners();
 
-    // NFT approvals
-    await nft.connect(addrs[1]).mint(imageURI, metadataURI);
-    await nft.connect(addrs[1]).setApprovalForAll(lotteryPoolFactory.address, true);
-    expect(await nft.ownerOf(0)).to.equal(addrs[1].address);
+    // // NFT approvals
+    // await nft.connect(addrs[1]).mint(imageURI, metadataURI);
+    // await nft.connect(addrs[1]).setApprovalForAll(lotteryPoolFactory.address, true);
+    // expect(await nft.ownerOf(0)).to.equal(addrs[1].address);
 
-    await nft.connect(addrs[2]).mint(imageURI, metadataURI);
-    await nft.connect(addrs[2]).setApprovalForAll(lotteryPoolFactory.address, true);
-    expect(await nft.ownerOf(1)).to.equal(addrs[2].address);
+    // await nft.connect(addrs[2]).mint(imageURI, metadataURI);
+    // await nft.connect(addrs[2]).setApprovalForAll(lotteryPoolFactory.address, true);
+    // expect(await nft.ownerOf(1)).to.equal(addrs[2].address);
   });
 
   // it("Should create a new lottery", async function () {
@@ -529,27 +532,34 @@ describe("LotteryPoolFactory", function () {
     let stakingBalance = await lotteries[0].getStakingBalance();
     console.log("Staking Balance = ", stakingBalance.toString());
 
-    allowance = await lotteries[0].getStakingAllowance();
-    console.log("Staking Allowance = ", allowance.toString());
+    // allowance = await lotteries[0].getStakingAllowance();
+    // console.log("Staking Allowance = ", allowance.toString());
 
-    const gateway = await lotteries[0].kk();
-    console.log("Gateway = ", gateway);    
+    // const gateway = await lotteries[0].kk();
+    // console.log("Gateway = ", gateway);    
 
     /*********************************/
 
 
-    // await lotteryPoolFactory.connect(addrs[1]).declareWinner(0);
+    await lotteryPoolFactory.connect(addrs[1]).declareWinner(0);
 
-    // /*********************************/
+    /*********************************/
+
+    let allowance = await lotteries[0].getStakingAllowance();
+    console.log("Staking Allowance = ", allowance.toString());
     
     let finalPrice = await lotteries[0].getFinalPrice();
     console.log("Final Price = ", finalPrice.toString());
 
-    // /*********************************/
+    stakingBalance = await lotteries[0].getStakingBalance();
+    console.log("Staking Balance = ", stakingBalance.toString());
+
+    /*********************************/
     
     // // Assert
     // expect(await lotteries[0].getBalance()).to.be.above(ethers.utils.parseEther('0.3'));    
-  }).timeout(100000);
+    expect(1).to.equal(1);
+  }).timeout(3000000);
 
   // it("Aave test", async function() {
   //   // const pool = await aaveAdapter.getProvider();    
