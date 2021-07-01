@@ -31,17 +31,19 @@ interface IWETHGateway {
     function getWETHAddress() external view returns (address);
 }
 
-// @title aaaaaaaaaaaaaa
+/// @title Echion Protocol Staking contract
+/// @author Pablo Palomo
+/// @notice Echion Protocol Staking contract
 contract LotteryPoolStaking {
 
     ILendingPoolAddressesProvider provider;
     IWETHGateway wethGateway;
     IERC20 aWeth;
 
-    // @notice aaaaaaaaaaaaaa
-    // @param _lendingPoolAddressesProvider - aaaaaaaaaaaa
-    // @param _wethGateway - aaaaaaaaaaaa
-    // @param _aWethAddress - aaaaaaaaaaaa
+    /// @notice Contract constructor method
+    /// @param _lendingPoolAddressesProvider - Lending pool addresses provider AAVE
+    /// @param _wethGateway - WETH Gateway address
+    /// @param _aWethAddress - aWETH contract's address
     constructor(address _lendingPoolAddressesProvider, address _wethGateway, address _aWethAddress) {
         provider = ILendingPoolAddressesProvider(_lendingPoolAddressesProvider);
         wethGateway = IWETHGateway(_wethGateway);
@@ -51,6 +53,24 @@ contract LotteryPoolStaking {
         IERC20(aWeth).approve(address(wethGateway), type(uint256).max);
     }
 
+    /// @notice Method used to deposit staking
+    function depositETH() external payable {
+        address lpool = _getProvider();
+        wethGateway.depositETH{ value: msg.value }(lpool, msg.sender, 0);
+    }
+
+    /// @notice Method used to withdraw deposited staking
+    /// @param _lendingPoolAddressesProvider - Lending pool addresses provider AAVE
+    /// @param _wethGateway - WETH Gateway address
+    /// @param _aWethAddress - aWETH contract's address
+    function withdrawETH(address _lendingPoolAddressesProvider, address _wethGateway, address _aWethAddress) public returns(uint) {
+        address pool = ILendingPoolAddressesProvider(_lendingPoolAddressesProvider).getLendingPool();
+        uint aWethBalance = IERC20(_aWethAddress).balanceOf(address(this));
+        IWETHGateway(_wethGateway).withdrawETH(pool, aWethBalance, address(this));
+        return aWethBalance;
+    }
+
+    /// @notice Method used to retrieve AAVE's addresses to integrate with
     function getAddresses() external view returns(address, address, address) {
         return (
             address(provider),
@@ -59,37 +79,22 @@ contract LotteryPoolStaking {
         );
     }
 
-    function depositETH() external payable {
-        address lpool = _getProvider();
-        wethGateway.depositETH{ value: msg.value }(lpool, msg.sender, 0);
-    }
-
-    function withdrawETH(address _lendingPoolAddressesProvider, address _wethGateway, address _aWethAddress) public returns(uint) {
-        address pool = ILendingPoolAddressesProvider(_lendingPoolAddressesProvider).getLendingPool();
-        uint aWethBalance = IERC20(_aWethAddress).balanceOf(address(this));
-
-        IWETHGateway(_wethGateway).withdrawETH(pool, aWethBalance, address(this));
-
-        return aWethBalance;
-    }
-
+    /// @notice Returns aWETH address balance
+    /// @param _addr - Address parameter
+    /// @return Token balance
     function getAWETHBalance(address _addr) public view returns(uint){
         return aWeth.balanceOf(_addr);
     }
 
+    /// @notice Returns aWETH address allowance
+    /// @param _addr - Address parameter
+    /// @return Token allowance
     function getAWETHAllowance(address _addr) public view returns (uint) {
         uint allowance = aWeth.allowance(_addr, address(wethGateway));
         return allowance;
     }
 
-    function getAWETHAddress() external view returns(address) {
-        return address(aWeth);
-    }
-
-    function getWETHGateway() external view returns(address) {
-        return address(wethGateway);
-    }
-
+    /// @notice Get AAVE's user account data
     function getUserAccountData() external view returns(uint256, uint256, uint256, uint256, uint256, uint256) {
         address lpool = provider.getLendingPool();
         (uint256 totalCollateralETH,
@@ -109,10 +114,10 @@ contract LotteryPoolStaking {
         );
     }
 
+    /// @notice Gets provider contract address
     function _getProvider() private view returns(address) {
         address lpool = provider.getLendingPool();
         return(lpool);
     }
 
 }
-

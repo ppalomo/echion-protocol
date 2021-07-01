@@ -6,15 +6,12 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "./interfaces/ILotteryPoolFactory.sol";
-// import "./LotteryPoolStaking.sol";
 import "hardhat/console.sol";
 
 interface ILotteryPoolStaking {
     function depositETH() external payable;
     function withdrawETH(address _to) external returns(uint);
     function getAWETHBalance(address _to) external view returns(uint);
-    function getAWETHAddress() external view returns(address);
-    function getWETHGateway() external view returns(address);
     function getAddresses() external view returns(address, address, address);
 }
 
@@ -252,17 +249,18 @@ contract LotteryPool is ReentrancyGuard, Ownable {
         return address(this).balance;
     }
 
+    /// @notice Returns staked balance
     function getStakingBalance() public view returns (uint) {
         address lotteryPoolStaking = parent.getLotteryPoolStaking();
-        address aWeth = ILotteryPoolStaking(lotteryPoolStaking).getAWETHAddress();
+        (,,address aWeth) = ILotteryPoolStaking(lotteryPoolStaking).getAddresses();
         uint amount = IERC20(aWeth).balanceOf(address(this));
         return amount;
     }
 
+    /// @notice Returns Gateway aWETH allowance
     function getStakingAllowance() public view returns (uint) {
         address lotteryPoolStaking = parent.getLotteryPoolStaking();
-        address aWeth = ILotteryPoolStaking(lotteryPoolStaking).getAWETHAddress();
-        address wethGateway = ILotteryPoolStaking(lotteryPoolStaking).getWETHGateway();
+        (,address wethGateway, address aWeth) = ILotteryPoolStaking(lotteryPoolStaking).getAddresses();
         uint allowance = IERC20(aWeth).allowance(address(this), address(wethGateway));
         return allowance;
     }
@@ -284,11 +282,11 @@ contract LotteryPool is ReentrancyGuard, Ownable {
         return players[index];
     }
 
+    /// @notice Method used to deposit staking
     function _depositStaking() private {
         // Approving aWETH spending
         address lotteryPoolStaking = parent.getLotteryPoolStaking();
-        address aWeth = ILotteryPoolStaking(lotteryPoolStaking).getAWETHAddress();
-        address wethGateway = ILotteryPoolStaking(lotteryPoolStaking).getWETHGateway();        
+        (,address wethGateway, address aWeth) = ILotteryPoolStaking(lotteryPoolStaking).getAddresses();
         IERC20(aWeth).approve(wethGateway, type(uint256).max);
 
         // Launching Staking
