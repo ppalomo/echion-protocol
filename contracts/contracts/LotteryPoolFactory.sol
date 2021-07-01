@@ -32,8 +32,8 @@ contract LotteryPoolFactory is Ownable, ReentrancyGuard {
     // Events
     event LotteryCreated(uint lotteryId, address creator, address lotteryAddress, address nftAddress, uint nftIndex, uint ticketPrice, uint created, LotteryPoolType lotteryPoolType, uint minAmount);
     event LotteryStaked(uint lotteryId);
-    event LotteryClosed(uint lotteryId, address winner, uint finalPrice, uint fees);
-    event LotteryCancelled(uint lotteryId, uint finalPrice);
+    event LotteryClosed(uint lotteryId, address winner, uint paymentToCreator, uint fees);
+    event LotteryCancelled(uint lotteryId, uint paymentToCreator);
     event FeePercentChanged(uint feePercent);
     event WalletChanged(address indexed addr);
     event MinDaysOpenChanged(uint minDaysOpen);
@@ -109,12 +109,12 @@ contract LotteryPoolFactory is Ownable, ReentrancyGuard {
         
         // Launching winner declaration process
         address winner = lottery.declareWinner();
-        uint finalPrice = lottery.finalPrice();
+        uint paymentToCreator = lottery.getPaymentToCreator();
         uint fees = lottery.fees();
         numberOfActiveLotteries--;
 
         // Emiting event
-        emit LotteryClosed(_lotteryId, winner, finalPrice, fees);
+        emit LotteryClosed(_lotteryId, winner, paymentToCreator, fees);
     }
 
     /// @notice Method used to cancel a lottery pool
@@ -128,11 +128,11 @@ contract LotteryPoolFactory is Ownable, ReentrancyGuard {
         
         // Cancelling lottery pool
         lottery.cancelLottery();
-        uint finalPrice = lottery.finalPrice();
+        uint paymentToCreator = lottery.getPaymentToCreator();
         numberOfActiveLotteries--;
 
         // Emiting event
-        emit LotteryCancelled(_lotteryId, finalPrice);
+        emit LotteryCancelled(_lotteryId, paymentToCreator);
     }
 
     /// @notice Increases the total balance

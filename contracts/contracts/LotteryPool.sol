@@ -62,7 +62,8 @@ contract LotteryPool is ReentrancyGuard, Ownable {
     mapping(address => uint) tickets;    
     address[] public players;
     address public winner;
-    uint public finalPrice;
+    uint public stakedAmount;
+    uint public paymentToCreator;
     uint public fees;
 
     // Events
@@ -70,6 +71,7 @@ contract LotteryPool is ReentrancyGuard, Ownable {
     event TicketsCancelled(uint lotteryId, address indexed buyer, uint numberOfTickets, uint amount);
     event TicketsRedeemed(uint lotteryId, address indexed buyer, uint numberOfTickets, uint amount);
     event Received(address, uint);
+    event StakingWithdrawal(uint);
 
     /// @notice Contract constructor method
     /// @param _lotteryId Lottery unique identifier
@@ -99,7 +101,8 @@ contract LotteryPool is ReentrancyGuard, Ownable {
         status = LotteryStatus.OPEN;
         created = _created;
         numberOfTickets = 0;
-        finalPrice = 0;
+        stakedAmount = 0;
+        paymentToCreator = 0;
         fees = 0;
     }
 
@@ -183,16 +186,10 @@ contract LotteryPool is ReentrancyGuard, Ownable {
         require(status == LotteryStatus.OPEN, 'The lottery is not open');
         require(block.timestamp >= created + (parent.getMinDaysOpen() * 1 days), 'You must wait the minimum open days');
 
-        // Approving aWETH spending
-        address lotteryPoolStaking = parent.getLotteryPoolStaking();
-        address aWeth = ILotteryPoolStaking(lotteryPoolStaking).getAWETHAddress();
-        address wethGateway = ILotteryPoolStaking(lotteryPoolStaking).getWETHGateway();        
-        IERC20(aWeth).approve(wethGateway, type(uint256).max);
+        // Staking balance
+        _depositStaking();
 
-        // Launching Staking
-        // address lotteryPoolStaking = parent.getLotteryPoolStaking();
-        ILotteryPoolStaking(lotteryPoolStaking).depositETH{ value: address(this).balance }();
-    
+        // Changing pool status
         status = LotteryStatus.STAKING;
     }
 
@@ -204,68 +201,27 @@ contract LotteryPool is ReentrancyGuard, Ownable {
         if (lotteryPoolType == ILotteryPoolFactory.LotteryPoolType.STAKING) {
             require(status == LotteryStatus.STAKING, 'The lottery pool is not staking');
 
-            // Approving aWETH spending
-            // address lotteryPoolStaking = parent.getLotteryPoolStaking();
-            // address aWeth = ILotteryPoolStaking(lotteryPoolStaking).getAWETHAddress();
-            // address wethGateway = ILotteryPoolStaking(lotteryPoolStaking).getWETHGateway();
-            // IERC20(aWeth).approve(wethGateway, type(uint256).max);
-
             // Recovering staked amount
-            address lotteryPoolStaking = parent.getLotteryPoolStaking();            
-            //finalPrice = ILotteryPoolStaking(lotteryPoolStaking).withdrawETH(address(this));
-            (address lendingPoolAddressesProvider, 
-            address wethGateway, 
-            address aWethAddress) = ILotteryPoolStaking(lotteryPoolStaking).getAddresses();
-            (,bytes memory result) = lotteryPoolStaking.delegatecall(
-                abi.encodeWithSignature("withdrawETH(address,address,address)", 
-                lendingPoolAddressesProvider, wethGateway, aWethAddress)
-            );
-            finalPrice = abi.decode(result, (uint256));
-            // finalPrice = lotteryPoolStaking.delegatecall(abi.encodeWithSignature("withdrawETH(address)", address(this)));
-
-            // finalPrice = ILotteryPoolStaking(lotteryPoolStaking).withdrawETH(address(this));s
-            // finalPrice = _withdrawStaking();
+            _withdrawStaking();
         }
-        require(IERC721(nft.addr).getApproved(nft.index) == address(this), 'Contract is not approved to transfer NFT');        
+        require(IERC721(nft.addr).getApproved(nft.index) == address(this), 'Contract is not approved to transfer NFT');
         
         // Declaring winner
         winner = _calculateWinner();
         status = LotteryStatus.CLOSED;
 
-        if (lotteryPoolType == ILotteryPoolFactory.LotteryPoolType.DIRECT) {
-            (finalPrice, fees) = _transferDirectPayments();
+        // Transfering payment to creator
+        if (lotteryPoolType == ILotteryPoolFactory.LotteryPoolType.STAKING) {
+            (paymentToCreator, fees) = _transferStakingPayments();
+        } else {
+            (paymentToCreator, fees) = _transferDirectPayments();
         }
 
         // Transfering NFT prize to winner        
         IERC721(nft.addr).transferFrom(creator, winner, nft.index);
-        
+
         return winner;
     }
-
-    // function _withdrawStaking() private returns(uint) {
-    //     address addr = address(this);
-    //     address aWeth = address(0x030bA81f1c18d280636F32af80b9AAd02Cf0854e);
-
-    //     // address lpool = provider.getLendingPool();
-
-    //     // Approving aWETH spending
-    //     address lotteryPoolStaking = parent.getLotteryPoolStaking();
-    //     address wethGateway = ILotteryPoolStaking(lotteryPoolStaking).getWETHGateway();
-    //     IERC20(aWeth).approve(wethGateway, type(uint256).max);
-
-    //     // Recovering staked amount
-    //     uint aWethBalance = IERC20(aWeth).balanceOf(addr);
-    //     uint allowance = IERC20(aWeth).allowance(addr, wethGateway);
-
-    //     if (aWethBalance > 0 && allowance >= aWethBalance) {
-    //         IWETHGateway(wethGateway).withdrawETH(
-    //             address(0x7d2768dE32b0b80b7a3454c06BdAc94A69DDc7A9), 
-    //             aWethBalance, 
-    //             address(this));
-    //     }
-
-    //     return aWethBalance;
-    // }
 
     /// @notice Method used to cancel a lottery
     function cancelLottery() external onlyOwner {
@@ -273,10 +229,13 @@ contract LotteryPool is ReentrancyGuard, Ownable {
         require(minAmount > address(this).balance, 'Cannot cancel lottery. The minimum amount has been reached');
         require(block.timestamp >= created + (parent.getMinDaysOpen() * 1 days), 'You must wait the minimum open days');
     
-        // If staking!!!
-        // Recover balance in staking!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        // Recovering staking amount
+        if (lotteryPoolType == ILotteryPoolFactory.LotteryPoolType.STAKING) {
+            _withdrawStaking();
+            (paymentToCreator, fees) = _transferCancelPayments();
+        }
         
-        finalPrice = address(this).balance;
+        // Changing pool status
         status = LotteryStatus.CANCELLED;
     }
 
@@ -308,8 +267,14 @@ contract LotteryPool is ReentrancyGuard, Ownable {
         return allowance;
     }
 
-    function getFinalPrice() public view returns(uint) {
-        return finalPrice;
+    /// @notice Method to return payment to creator
+    function getPaymentToCreator() public view returns(uint) {
+        return paymentToCreator;
+    }
+
+    // @notice Method used to receive ETH
+    receive() external payable {
+        emit Received(msg.sender, msg.value);
     }
 
     /// @notice Calculating lottery pool winner
@@ -317,6 +282,30 @@ contract LotteryPool is ReentrancyGuard, Ownable {
     function _calculateWinner() private view returns (address) {        
         uint index = uint(keccak256(abi.encodePacked(block.timestamp, block.difficulty))) % players.length;
         return players[index];
+    }
+
+    function _depositStaking() private {
+        // Approving aWETH spending
+        address lotteryPoolStaking = parent.getLotteryPoolStaking();
+        address aWeth = ILotteryPoolStaking(lotteryPoolStaking).getAWETHAddress();
+        address wethGateway = ILotteryPoolStaking(lotteryPoolStaking).getWETHGateway();        
+        IERC20(aWeth).approve(wethGateway, type(uint256).max);
+
+        // Launching Staking
+        stakedAmount = address(this).balance;
+        ILotteryPoolStaking(lotteryPoolStaking).depositETH{ value: address(this).balance }();
+    }
+
+    /// @notice Method used to withdraw staked amount
+    function _withdrawStaking() private {
+        address lotteryPoolStaking = parent.getLotteryPoolStaking();
+        (address provider, address gateway, address aWeth) = ILotteryPoolStaking(lotteryPoolStaking).getAddresses();
+        (,bytes memory result) = lotteryPoolStaking.delegatecall(
+            abi.encodeWithSignature("withdrawETH(address,address,address)", provider, gateway, aWeth)
+        );
+        uint finalPrice = abi.decode(result, (uint256));
+
+        emit StakingWithdrawal(finalPrice);
     }
 
     /// @notice Method used to transfer fees and payment if it's a direct lottery pool
@@ -337,10 +326,41 @@ contract LotteryPool is ReentrancyGuard, Ownable {
         return (payment, fee);
     }
 
-    /**
-    */
-    receive() external payable {
-        emit Received(msg.sender, msg.value);
+    /// @notice Method used to transfer fees and payment if it's an staking lottery pool
+    /// @return Payment amount sent to creator and fees
+    function _transferStakingPayments() private returns (uint, uint) {
+        // Calculating yield
+        uint yield = address(this).balance - stakedAmount;
+
+        // Calculating payment and transfering fees
+        uint fee = yield * parent.getFeePercent() / 100;
+        uint payment = yield - fee;
+        
+        // Transfering fees to owner wallet
+        address payable wallet = payable(parent.getWallet());
+        wallet.transfer(fee);
+
+        // Transfering balance to creator
+        address payable addr = payable(creator);
+        addr.transfer(payment);
+
+        return (payment, fee);
+    }
+
+    /// @notice Method used to transfer fees after cancelling a lottery pool
+    /// @return Payment amount sent to creator and fees
+    function _transferCancelPayments() private returns (uint, uint) {
+        // Calculating yield
+        uint yield = address(this).balance - stakedAmount;
+
+        // Calculating payment and transfering fees
+        uint fee = yield * parent.getFeePercent() / 100;
+        
+        // Transfering fees to owner wallet
+        address payable wallet = payable(parent.getWallet());
+        wallet.transfer(fee);
+
+        return (0, fee);
     }
 
 }

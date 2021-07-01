@@ -497,24 +497,24 @@ describe("LotteryPoolFactory", function () {
   //     ).to.be.reverted;
   // });
 
-  // it("Should deposit balance to stake it", async function() {
-  //   // Arrange
-  //   await lotteryPoolFactory.connect(addrs[1]).createLottery(nft.address, 0, ticketPrice, LotteryPoolType.STAKING, minAmount);
-  //   let lotteries = [await _getLotteryPool(0)];
+  it("Should deposit balance to stake it", async function() {
+    // Arrange
+    await lotteryPoolFactory.connect(addrs[1]).createLottery(nft.address, 0, ticketPrice, LotteryPoolType.STAKING, minAmount);
+    let lotteries = [await _getLotteryPool(0)];
 
-  //   // Act
-  //   await lotteries[0].connect(addr1).buyTickets(2, {value: ethers.utils.parseEther('0.2')});
-  //   await lotteries[0].connect(addr2).buyTickets(1, {value: ethers.utils.parseEther('0.1')});
-  //   expect(await lotteries[0].getBalance()).to.equal(ethers.utils.parseEther('0.3'));
+    // Act
+    await lotteries[0].connect(addr1).buyTickets(2, {value: ethers.utils.parseEther('0.2')});
+    await lotteries[0].connect(addr2).buyTickets(1, {value: ethers.utils.parseEther('0.1')});
+    expect(await lotteries[0].getBalance()).to.equal(ethers.utils.parseEther('0.3'));
 
-  //   await lotteryPoolFactory.connect(addrs[1]).launchStaking(0);
+    await lotteryPoolFactory.connect(addrs[1]).launchStaking(0);
     
-  //   // Assert
-  //   expect(await lotteries[0].getBalance()).to.equal(0);
+    // Assert
+    expect(await lotteries[0].getBalance()).to.equal(0);
 
-  //   const stakingBalance = await lotteries[0].getStakingBalance();
-  //   expect(stakingBalance).to.be.equal(ethers.utils.parseEther('0.3'));
-  // });
+    const stakingBalance = await lotteries[0].getStakingBalance();
+    expect(stakingBalance).to.be.equal(ethers.utils.parseEther('0.3'));
+  });
 
   it("Should withdraw balance when closing an staking lottery", async function() {
     // Arrange
@@ -524,116 +524,29 @@ describe("LotteryPoolFactory", function () {
     // Act
     await lotteries[0].connect(addr1).buyTickets(2, {value: ethers.utils.parseEther('0.2')});
     await lotteries[0].connect(addr2).buyTickets(1, {value: ethers.utils.parseEther('0.1')});
-    await lotteryPoolFactory.connect(addrs[1]).launchStaking(0);
-    // done();
 
-    /*********************************/
+    let balance = await lotteries[0].getBalance();
+    await lotteryPoolFactory.connect(addrs[1]).launchStaking(0);
 
     let stakingBalance = await lotteries[0].getStakingBalance();
-    console.log("Staking Balance = ", stakingBalance.toString());
-
-    // allowance = await lotteries[0].getStakingAllowance();
-    // console.log("Staking Allowance = ", allowance.toString());
-
-    // const gateway = await lotteries[0].kk();
-    // console.log("Gateway = ", gateway);    
-
-    /*********************************/
+    expect(stakingBalance).to.be.at.least(balance);
 
     await lotteryPoolFactory.connect(addrs[1]).declareWinner(0);
 
-    /*********************************/
-
+    // Assert
     let allowance = await lotteries[0].getStakingAllowance();
-    console.log("Staking Allowance = ", allowance.toString());
-    
-    let finalPrice = await lotteries[0].getFinalPrice();
-    console.log("Final Price = ", finalPrice.toString());
+    expect(allowance).to.be.above(0);
 
     stakingBalance = await lotteries[0].getStakingBalance();
-    console.log("Staking Balance = ", stakingBalance.toString());
+    expect(stakingBalance).to.equal(0);
 
-    let balance = await lotteries[0].getBalance();
-    console.log("Contract Balance = ", balance.toString());
+    let paymentToCreator = await lotteries[0].getPaymentToCreator();
+    expect(paymentToCreator).to.be.above(0);
 
-    /*********************************/
-    
-    // // Assert
-    // expect(await lotteries[0].getBalance()).to.be.above(ethers.utils.parseEther('0.3'));    
-    expect(1).to.equal(1);
+    let fees = await lotteries[0].fees();
+    expect(fees).to.be.above(0);
+
   }).timeout(3000000);
-
-  // it("Aave test", async function() {
-  //   // const pool = await aaveAdapter.getProvider();    
-  //   // console.log(pool);
-
-  //   // console.log(owner.address);
-  //   const balance = await owner.getBalance();
-  //   console.log("Owner Balance = ", balance.toString());
-
-  //   // await aaveAdapter.deposit(
-  //   //   pool, 
-  //   //   "0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE", 
-  //   //   owner.address, 
-  //   //   ethers.utils.parseEther('0.1')
-  //   //   , {value: ethers.utils.parseEther('1')}
-  //   //   );
-  //   console.log("----------DEPOSIT----------");
-  //   await aaveAdapter.depositETH({value: ethers.utils.parseEther('10')});
-
-  //   // const weth = await aaveAdapter.getWETHAddress();
-  //   // console.log("WETH = ", weth);
-
-  //   const pool = await aaveAdapter.getProvider();
-  //   console.log("LendingPool = ", pool);
-
-  //   const b = await aaveAdapter.getBalance();
-  //   console.log("AaveAdapter Balance = ", b.toString());
-
-  //   const balance2 = await owner.getBalance();
-  //   console.log("Owner Balance = ", balance2.toString());
-    
-  //   [totalCollateralETH,
-  //     totalDebtETH,
-  //     availableBorrowsETH,
-  //     currentLiquidationThreshold,
-  //     ltv,
-  //     healthFactor] = await aaveAdapter.getUserAccountData();
-  //   console.log("totalCollateralETH = ", totalCollateralETH.toString());
-
-  //   console.log("----------aWETH----------");
-    
-  //   const awethBalance = await aaveAdapter.getAWETHBalance();
-  //   console.log("aWETH = ", awethBalance.toString());
-
-  //   console.log("----------WITHDRAW----------");
-  //   // //Ensure you set the relevant ERC20 allowance of aWETH, before calling this function, so the WETHGateway contract can burn the associated aWETH.
-  //   await aaveAdapter.withdrawETH(ethers.utils.parseEther('0.01'));
-
-    
-  //   const all = await aaveAdapter.getAllowance();
-  //   console.log("aWETH Allowance = ", all.toString());
-  //   const kk = await aaveAdapter.kk();
-  //   console.log("Gateway = ", kk);
-    
-    
-  //   const b3 = await owner.getBalance();
-  //   console.log("Owner Balance = ", b3.toString());
-
-  //   const baa = await aaveAdapter.getBalance();
-  //   console.log("AaveAdapter Balance = ", baa.toString());
-
-  //   [totalCollateralETH,
-  //     totalDebtETH,
-  //     availableBorrowsETH,
-  //     currentLiquidationThreshold,
-  //     ltv,
-  //     healthFactor] = await aaveAdapter.getUserAccountData();
-  //   console.log("totalCollateralETH = ", totalCollateralETH.toString());
-
-
-  //   expect(1).to.equal(1);
-  // });
 
   async function _getLotteryPool(index) {
     let lottery = await lotteryPoolFactory.lotteries(index);
