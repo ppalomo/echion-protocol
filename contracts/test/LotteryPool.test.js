@@ -66,69 +66,69 @@ describe("LotteryPoolFactory", function () {
     expect(await nft.ownerOf(1)).to.equal(addrs[2].address);
   });
 
-  // it("Should create a new lottery", async function () {
-  //   // Act
-  //   await expect(
-  //     lotteryPoolFactory.connect(addrs[1]).createLottery(nft.address, 0, ticketPrice, LotteryPoolType.DIRECT, minAmount)
-  //   ).to.emit(lotteryPoolFactory, 'LotteryCreated');
+  it("Should create a new lottery", async function () {
+    // Act
+    await expect(
+      lotteryPoolFactory.connect(addrs[1]).createLottery(nft.address, 0, ticketPrice, LotteryPoolType.DIRECT, minAmount)
+    ).to.emit(lotteryPoolFactory, 'LotteryCreated');
 
-  //   await expect(
-  //     lotteryPoolFactory.connect(addrs[2]).createLottery(nft.address, 1, ticketPrice, LotteryPoolType.DIRECT, minAmount)
-  //   ).to.emit(lotteryPoolFactory, 'LotteryCreated');
+    await expect(
+      lotteryPoolFactory.connect(addrs[2]).createLottery(nft.address, 1, ticketPrice, LotteryPoolType.DIRECT, minAmount)
+    ).to.emit(lotteryPoolFactory, 'LotteryCreated');
 
-  //   let lotteries = [await _getLotteryPool(0), await _getLotteryPool(1)];
+    let lotteries = [await _getLotteryPool(0), await _getLotteryPool(1)];
 
-  //   // Assert
-  //   expect(await lotteryPoolFactory.numberOfActiveLotteries()).to.equal(2);
-  //   expect(await lotteries[0].status()).to.equal(LotteryStatus.OPEN);
-  //   expect(await lotteries[0].creator()).to.equal(addrs[1].address);
-  //   expect(await lotteries[1].creator()).to.equal(addrs[2].address);
-  // });
+    // Assert
+    expect(await lotteryPoolFactory.numberOfActiveLotteries()).to.equal(2);
+    expect(await lotteries[0].status()).to.equal(LotteryStatus.OPEN);
+    expect(await lotteries[0].creator()).to.equal(addrs[1].address);
+    expect(await lotteries[1].creator()).to.equal(addrs[2].address);
+  });
 
-  // it("Should buy lottery tickets", async function () {
-  //   // Arrange
-  //   await lotteryPoolFactory.connect(addrs[1]).createLottery(nft.address, 0, ticketPrice, LotteryPoolType.DIRECT, minAmount);        
-  //   let lotteries = [await _getLotteryPool(0)];
+  it("Should buy lottery tickets", async function () {
+    // Arrange
+    await lotteryPoolFactory.connect(addrs[1]).createLottery(nft.address, 0, ticketPrice, LotteryPoolType.DIRECT, minAmount);        
+    let lotteries = [await _getLotteryPool(0)];
 
-  //   // Act
-  //   await expect(
-  //     lotteries[0].connect(addr1).buyTickets(2, {value: ethers.utils.parseEther('0.2')})
-  //   ).to.emit(lotteries[0], 'TicketsBought');
-  //   await lotteries[0].connect(addr2).buyTickets(1, {value: ethers.utils.parseEther('0.1')});
+    // Act
+    await expect(
+      lotteries[0].connect(addr1).buyTickets(2, {value: ethers.utils.parseEther('0.2')})
+    ).to.emit(lotteries[0], 'TicketsBought');
+    await lotteries[0].connect(addr2).buyTickets(1, {value: ethers.utils.parseEther('0.1')});
     
-  //   // Assert
-  //   expect(await lotteries[0].numberOfTickets()).to.equal(3);
-  //   expect(await lotteries[0].ticketsOf(addr1.address)).to.equal(2)
-  //   expect(await lotteries[0].ticketsOf(addr2.address)).to.equal(1)
-  //   expect(await lotteries[0].getBalance()).to.equal(ethers.utils.parseEther('0.3'));
-  // });
+    // Assert
+    expect(await lotteries[0].numberOfTickets()).to.equal(3);
+    expect(await lotteries[0].ticketsOf(addr1.address)).to.equal(2)
+    expect(await lotteries[0].ticketsOf(addr2.address)).to.equal(1)
+    expect(await lotteries[0].getBalance()).to.equal(ethers.utils.parseEther('0.3'));
+  });
 
-  // it("Shouldn't buy a ticket if the lottery is not open", async function () {    
-  //   await lotteryPoolFactory.connect(addrs[1]).createLottery(nft.address, 0, ticketPrice, LotteryPoolType.STAKING, minAmount);
-  //   await lotteryPoolFactory.connect(addrs[1]).launchStaking(0);
+  it("Shouldn't buy a ticket if the lottery is not open", async function () {    
+    await lotteryPoolFactory.connect(addrs[1]).createLottery(nft.address, 0, ticketPrice, LotteryPoolType.STAKING, minAmount);
+    await lotteryPoolFactory.connect(addrs[1]).launchStaking(0);
 
-  //   let lotteries = [await _getLotteryPool(0)];
+    let lotteries = [await _getLotteryPool(0)];
 
-  //   await expect(
-  //     lotteries[0].connect(addr1).buyTickets(1, {value: ethers.utils.parseEther('0.1')})
-  //   ).to.be.revertedWith('The lottery pool is not open');
-  // });
+    await expect(
+      lotteries[0].connect(addr1).buyTickets(1, {value: ethers.utils.parseEther('0.1')})
+    ).to.be.revertedWith('The lottery pool is not open');
+  });
 
-  // it("Should update total balance when buying tickets", async function () {
-  //   // Arrange
-  //   await lotteryPoolFactory.connect(addrs[1]).createLottery(nft.address, 0, ticketPrice, LotteryPoolType.DIRECT, minAmount);
-  //   await lotteryPoolFactory.connect(addrs[2]).createLottery(nft.address, 1, ticketPrice, LotteryPoolType.DIRECT, minAmount);
-  //   let lotteries = [await _getLotteryPool(0), await _getLotteryPool(1)];
+  it("Should update total balance when buying tickets", async function () {
+    // Arrange
+    await lotteryPoolFactory.connect(addrs[1]).createLottery(nft.address, 0, ticketPrice, LotteryPoolType.DIRECT, minAmount);
+    await lotteryPoolFactory.connect(addrs[2]).createLottery(nft.address, 1, ticketPrice, LotteryPoolType.DIRECT, minAmount);
+    let lotteries = [await _getLotteryPool(0), await _getLotteryPool(1)];
 
-  //   // Act
-  //   await lotteries[0].connect(addr1).buyTickets(2, {value: ethers.utils.parseEther('0.2')});
-  //   await lotteries[0].connect(addr2).buyTickets(1, {value: ethers.utils.parseEther('0.1')});
-  //   await lotteries[1].connect(addr1).buyTickets(3, {value: ethers.utils.parseEther('0.3')});
-  //   await lotteries[1].connect(addr2).buyTickets(2, {value: ethers.utils.parseEther('0.2')});
+    // Act
+    await lotteries[0].connect(addr1).buyTickets(2, {value: ethers.utils.parseEther('0.2')});
+    await lotteries[0].connect(addr2).buyTickets(1, {value: ethers.utils.parseEther('0.1')});
+    await lotteries[1].connect(addr1).buyTickets(3, {value: ethers.utils.parseEther('0.3')});
+    await lotteries[1].connect(addr2).buyTickets(2, {value: ethers.utils.parseEther('0.2')});
     
-  //   // Assert
-  //   expect(await lotteryPoolFactory.totalBalance()).to.equal(ethers.utils.parseEther('0.8'));
-  // });
+    // Assert
+    expect(await lotteryPoolFactory.totalBalance()).to.equal(ethers.utils.parseEther('0.8'));
+  });
 
   // it("Should cancel tickets", async function () {
   //   // Arrange
@@ -514,7 +514,7 @@ describe("LotteryPoolFactory", function () {
 
     const stakingBalance = await lotteries[0].getStakingBalance();
     expect(stakingBalance).to.be.equal(ethers.utils.parseEther('0.3'));
-  });
+  }).timeout(3000000);
 
   it("Should withdraw balance when closing an staking lottery", async function() {
     // Arrange
