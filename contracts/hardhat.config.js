@@ -27,8 +27,8 @@ task("accounts", "Prints the list of accounts", async () => {
     }
   },
   paths: {
-    //artifacts: '../src/artifacts', 
-    artifacts: './artifacts',
+    artifacts: '../src/artifacts', 
+    // artifacts: './artifacts',
   },
   networks: {
     hardhat: {

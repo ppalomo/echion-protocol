@@ -38,7 +38,7 @@ export function handleLotteryClosed(event: LotteryClosed): void {
 
   lottery.status = "CLOSED"
   lottery.winner = event.params.winner
-  lottery.finalPrice = event.params.finalPrice
+  lottery.finalPrice = event.params.paymentToCreator
   lottery.fees = event.params.fees
   lottery.save()
 }
@@ -50,6 +50,6 @@ export function handleLotteryCancelled(event: LotteryCancelled): void {
   }
 
   lottery.status = "CANCELLED"
-  lottery.finalPrice = event.params.finalPrice
+  lottery.finalPrice = event.params.paymentToCreator
   lottery.save()
 }

@@ -179,4 +179,38 @@ export class LotteryPool extends Entity {
       this.set("winner", Value.fromBytes(value as Bytes));
     }
   }
+
+  get finalPrice(): BigInt | null {
+    let value = this.get("finalPrice");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set finalPrice(value: BigInt | null) {
+    if (value === null) {
+      this.unset("finalPrice");
+    } else {
+      this.set("finalPrice", Value.fromBigInt(value as BigInt));
+    }
+  }
+
+  get fees(): BigInt | null {
+    let value = this.get("fees");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set fees(value: BigInt | null) {
+    if (value === null) {
+      this.unset("fees");
+    } else {
+      this.set("fees", Value.fromBigInt(value as BigInt));
+    }
+  }
 }

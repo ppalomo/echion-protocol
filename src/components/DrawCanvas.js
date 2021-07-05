@@ -93,6 +93,7 @@ export default function DrawCanvas () {
 
 
     async function mintNFT(iHash, mHash){
+        console.log("mint");
         const imageURI = 'https://ipfs.io/ipfs/' + iHash;
         const metadataURI = 'https://ipfs.io/ipfs/' + mHash;
         try {
@@ -101,8 +102,8 @@ export default function DrawCanvas () {
                 const result = await tx.wait();
                 //console.log(tx);
                 const index = result.events[1].args[0].toString();
-                //console.log("index = ", index.value.toString());
-                //console.log(nftContract.address);
+                console.log("index = ", index.value.toString());
+                console.log("nftContract.address = ", nftContract.address);
                 handleCreateLottery(nftContract.address, result.events[1].args[0]);
             }
         } catch (error) {
@@ -112,9 +113,13 @@ export default function DrawCanvas () {
 
     async function handleCreateLottery(nftAddress, nftIndex) {
         try {
+            console.log("handleCreateLottery");
             if(factoryContract != null) {
+                console.log("if(factoryContract != null) {");
                 const tx = await factoryContract.createLottery(nftAddress, nftIndex, ethers.utils.parseEther("0.01"), 0, 0);                
+                console.log("tx launched");
                 await tx.wait();
+                console.log("tx waited");
             }
         } catch (err) {
             console.log("Error: ", err);

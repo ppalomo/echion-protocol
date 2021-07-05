@@ -46,12 +46,12 @@ contract LotteryPool is ReentrancyGuard, Ownable {
     }
 
     // Variables
-    ILotteryPoolFactory parent;
+    ILotteryPoolFactory internal parent;
     uint public lotteryId;
     uint public ticketPrice;
     uint public minAmount;
     address public creator;
-    uint created;
+    uint internal created;
     NFT public nft;
     LotteryStatus public status;
     ILotteryPoolFactory.LotteryPoolType public lotteryPoolType;
@@ -61,14 +61,16 @@ contract LotteryPool is ReentrancyGuard, Ownable {
     address public winner;
     uint public stakedAmount;
     uint public paymentToCreator;
+    bool private paidToCreator;
     uint public fees;
 
     // Events
     event TicketsBought(uint lotteryId, address indexed buyer, uint numberOfTickets, uint amount);
     event TicketsCancelled(uint lotteryId, address indexed buyer, uint numberOfTickets, uint amount);
     event TicketsRedeemed(uint lotteryId, address indexed buyer, uint numberOfTickets, uint amount);
-    event Received(address, uint);
-    event StakingWithdrawal(uint);
+    event CreatorPaymentTransfered(address indexed creator, uint paymentToCreator);
+    event Received(address addr, uint amount);
+    event StakingWithdrawal(uint finalPrice);
 
     /// @notice Contract constructor method
     /// @param _lotteryId Lottery unique identifier
@@ -101,6 +103,7 @@ contract LotteryPool is ReentrancyGuard, Ownable {
         stakedAmount = 0;
         paymentToCreator = 0;
         fees = 0;
+        paidToCreator = false;
     }
 
     /// @notice Method used to buy a lottery ticket
@@ -132,7 +135,9 @@ contract LotteryPool is ReentrancyGuard, Ownable {
         // Tranfering amount to sender
         uint amount = ticketPrice * _numberOfTickets;
         require(address(this).balance >= amount, 'Not enough money in the balance');
-        payable(msg.sender).transfer(amount);
+
+        (bool success, ) = payable(msg.sender).call{value: amount}("");
+        require(success, "Transfer failed");
 
         tickets[msg.sender] -= _numberOfTickets;
         numberOfTickets -= _numberOfTickets;
@@ -171,14 +176,16 @@ contract LotteryPool is ReentrancyGuard, Ownable {
         parent.decreaseTotalBalance(lotteryId, amount);
 
         // Transfering amount to sender
-        payable(msg.sender).transfer(amount);
+        (bool success, ) = payable(msg.sender).call{value: amount}("");
+        require(success, "Transfer failed");
 
         // Emiting event
         emit TicketsRedeemed(lotteryId, msg.sender, numTickets, amount);
     }
 
     /// @notice Changes de lottery state to staking
-    function launchStaking() external onlyOwner {        
+    function launchStaking() external onlyOwner {
+        require(address(this).balance > 0, 'Balance must be greater than 0');    
         require(lotteryPoolType == ILotteryPoolFactory.LotteryPoolType.STAKING, 'Lottery pool type is not compatible with staking');
         require(status == LotteryStatus.OPEN, 'The lottery is not open');
         require(block.timestamp >= created + (parent.getMinDaysOpen() * 1 days), 'You must wait the minimum open days');
@@ -236,6 +243,22 @@ contract LotteryPool is ReentrancyGuard, Ownable {
         status = LotteryStatus.CANCELLED;
     }
 
+    /// @notice Method used to creator can reddem his payment
+    function redeemCreatorPayment() external nonReentrant {
+        require(status == LotteryStatus.CLOSED, 'The lottery pool is not closed');
+        require(msg.sender == winner, 'User is not the winner');
+        require(paymentToCreator > 0, 'Nothing to transfer');
+        require(!paidToCreator, 'Payment already transfered to creator');
+
+        // Transfering balance to creator
+        paidToCreator= true;
+        address payable addr = payable(creator);
+        (bool success, ) = addr.call{value: paymentToCreator}("");
+        require(success, "Transfer to creator failed");
+
+        emit CreatorPaymentTransfered(msg.sender, paymentToCreator);
+    }
+
     /// @notice Returns number of tickets for an address
     /// @param _addr Wallet address
     /// @return Number of tickets bought for an address
@@ -268,6 +291,18 @@ contract LotteryPool is ReentrancyGuard, Ownable {
     /// @notice Method to return payment to creator
     function getPaymentToCreator() public view returns(uint) {
         return paymentToCreator;
+    }
+
+    /// @notice Returns staking earned yield
+    function getStakingYield() public view returns(uint) {
+        if (lotteryPoolType == ILotteryPoolFactory.LotteryPoolType.STAKING) {
+            address lotteryPoolStaking = parent.getLotteryPoolStaking();
+            (,,address aWeth) = ILotteryPoolStaking(lotteryPoolStaking).getAddresses();
+            uint balance = IERC20(aWeth).balanceOf(address(this));
+            return balance - stakedAmount;
+        } else {
+            return 0;
+        }
     }
 
     // @notice Method used to receive ETH
@@ -314,12 +349,15 @@ contract LotteryPool is ReentrancyGuard, Ownable {
         uint payment = address(this).balance - fee;
         
         // Transfering fees to owner wallet
-        address payable wallet = payable(parent.getWallet());
-        wallet.transfer(fee);
+        _transferFees(fee);
+        // address payable wallet = payable(parent.getWallet());
+        // (bool success, ) = wallet.call{value: fee}("");
+        // require(success, "Transfer fees failed");
 
-        // Transfering balance to creator
-        address payable addr = payable(creator);
-        addr.transfer(payment);
+        // Transfering balance to creator        
+        // address payable addr = payable(creator);
+        // (success, ) = addr.call{value: payment}("");
+        // require(success, "Transfer to creator failed");
 
         return (payment, fee);
     }
@@ -335,12 +373,15 @@ contract LotteryPool is ReentrancyGuard, Ownable {
         uint payment = yield - fee;
         
         // Transfering fees to owner wallet
-        address payable wallet = payable(parent.getWallet());
-        wallet.transfer(fee);
+        _transferFees(fee);
+        // address payable wallet = payable(parent.getWallet());
+        // (bool success, ) = wallet.call{value: fee}("");
+        // require(success, "Transfer fees failed");
 
-        // Transfering balance to creator
-        address payable addr = payable(creator);
-        addr.transfer(payment);
+        // // Transfering balance to creator
+        // address payable addr = payable(creator);
+        // (success, ) = addr.call{value: payment}("");
+        // require(success, "Transfer to creator failed");
 
         return (payment, fee);
     }
@@ -355,10 +396,19 @@ contract LotteryPool is ReentrancyGuard, Ownable {
         uint fee = yield * parent.getFeePercent() / 100;
         
         // Transfering fees to owner wallet
-        address payable wallet = payable(parent.getWallet());
-        wallet.transfer(fee);
+        _transferFees(fee);
+        // address payable wallet = payable(parent.getWallet());
+        // (bool success, ) = wallet.call{value: fee}("");
+        // require(success, "Transfer fees failed");
 
         return (0, fee);
+    }
+
+    /// ????????????????????????????????
+    function _transferFees(uint fee) private {
+        address payable wallet = payable(parent.getWallet());
+        (bool success, ) = wallet.call{value: fee}("");
+        require(success, "Transfer fees failed");
     }
 
 }

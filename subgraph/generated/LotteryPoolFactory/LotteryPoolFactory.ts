@@ -44,6 +44,10 @@ export class LotteryCancelled__Params {
   get lotteryId(): BigInt {
     return this._event.parameters[0].value.toBigInt();
   }
+
+  get paymentToCreator(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
+  }
 }
 
 export class LotteryClosed extends ethereum.Event {
@@ -65,6 +69,14 @@ export class LotteryClosed__Params {
 
   get winner(): Address {
     return this._event.parameters[1].value.toAddress();
+  }
+
+  get paymentToCreator(): BigInt {
+    return this._event.parameters[2].value.toBigInt();
+  }
+
+  get fees(): BigInt {
+    return this._event.parameters[3].value.toBigInt();
   }
 }
 
@@ -136,6 +148,24 @@ export class LotteryStaked__Params {
   }
 }
 
+export class MinDaysOpenChanged extends ethereum.Event {
+  get params(): MinDaysOpenChanged__Params {
+    return new MinDaysOpenChanged__Params(this);
+  }
+}
+
+export class MinDaysOpenChanged__Params {
+  _event: MinDaysOpenChanged;
+
+  constructor(event: MinDaysOpenChanged) {
+    this._event = event;
+  }
+
+  get minDaysOpen(): BigInt {
+    return this._event.parameters[0].value.toBigInt();
+  }
+}
+
 export class OwnershipTransferred extends ethereum.Event {
   get params(): OwnershipTransferred__Params {
     return new OwnershipTransferred__Params(this);
@@ -191,6 +221,48 @@ export class LotteryPoolFactory extends ethereum.SmartContract {
     let result = super.tryCall(
       "getFeePercent",
       "getFeePercent():(uint256)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  getLotteryPoolStaking(): Address {
+    let result = super.call(
+      "getLotteryPoolStaking",
+      "getLotteryPoolStaking():(address)",
+      []
+    );
+
+    return result[0].toAddress();
+  }
+
+  try_getLotteryPoolStaking(): ethereum.CallResult<Address> {
+    let result = super.tryCall(
+      "getLotteryPoolStaking",
+      "getLotteryPoolStaking():(address)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
+  }
+
+  getMinDaysOpen(): BigInt {
+    let result = super.call("getMinDaysOpen", "getMinDaysOpen():(uint256)", []);
+
+    return result[0].toBigInt();
+  }
+
+  try_getMinDaysOpen(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall(
+      "getMinDaysOpen",
+      "getMinDaysOpen():(uint256)",
       []
     );
     if (result.reverted) {
@@ -303,6 +375,10 @@ export class ConstructorCall__Inputs {
 
   constructor(call: ConstructorCall) {
     this._call = call;
+  }
+
+  get _lotteryPoolStaking(): Address {
+    return this._call.inputValues[0].value.toAddress();
   }
 }
 
@@ -570,6 +646,36 @@ export class SetFeePercentCall__Outputs {
   _call: SetFeePercentCall;
 
   constructor(call: SetFeePercentCall) {
+    this._call = call;
+  }
+}
+
+export class SetMinDaysOpenCall extends ethereum.Call {
+  get inputs(): SetMinDaysOpenCall__Inputs {
+    return new SetMinDaysOpenCall__Inputs(this);
+  }
+
+  get outputs(): SetMinDaysOpenCall__Outputs {
+    return new SetMinDaysOpenCall__Outputs(this);
+  }
+}
+
+export class SetMinDaysOpenCall__Inputs {
+  _call: SetMinDaysOpenCall;
+
+  constructor(call: SetMinDaysOpenCall) {
+    this._call = call;
+  }
+
+  get _minDaysOpen(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+}
+
+export class SetMinDaysOpenCall__Outputs {
+  _call: SetMinDaysOpenCall;
+
+  constructor(call: SetMinDaysOpenCall) {
     this._call = call;
   }
 }
