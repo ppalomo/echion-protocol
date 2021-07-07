@@ -1,6 +1,7 @@
 const path = require("path");
 require("@nomiclabs/hardhat-waffle");
 require("@nomiclabs/hardhat-etherscan");
+require("@openzeppelin/hardhat-upgrades");
 require('dotenv').config({ path: path.resolve(__dirname, '../.env') });
 
 // This is a sample Hardhat task. To learn how to create your own go to
