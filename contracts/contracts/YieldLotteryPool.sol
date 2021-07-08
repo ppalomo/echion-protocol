@@ -1,9 +1,17 @@
 //SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.0;
 
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol"; // Borrar!!!!!!!!!!!!
+import "./interfaces/IStakingAdapter.sol";
 import "./LotteryPoolBase.sol";
 
 contract YieldLotteryPool is LotteryPoolBase {
+
+    // Variables
+    IStakingAdapter private stakingAdapter;
+    
+    // Events
+    event StakingWithdrawal(uint withdrawal);
 
     /// @notice Contract constructor method
     /// @param _lotteryId - Lottery unique identifier
@@ -30,6 +38,10 @@ contract YieldLotteryPool is LotteryPoolBase {
         _minProfit,
         _created,
         LotteryPoolType.YIELD) {
+        
+        // Initializing variables
+        address stakingAdapterAddress = parent.getStakingAdapter();
+        stakingAdapter = IStakingAdapter(stakingAdapterAddress);
     }
 
     // Public methods
@@ -59,24 +71,26 @@ contract YieldLotteryPool is LotteryPoolBase {
         // Recovering staked amount
         _withdrawStaking();
         
-        // Declaring winner
-        winner = _calculateWinner();
-        status = LotteryPoolStatus.CLOSED;
+        if (address(this).balance > 0) {
+            // Declaring winner
+            winner = _calculateWinner();
+            status = LotteryPoolStatus.CLOSED;
 
-        // Calculating payment and transfering fees
-        uint feePercent = parent.getFeePercent();
-        uint yield = address(this).balance - stakedAmount;
-        fees = (yield * feePercent / 100) + (stakedAmount - totalSupply);
-        profit = yield - (yield * feePercent / 100);
+            // Calculating payment and transfering fees
+            uint feePercent = parent.getFeePercent();
+            uint yield = address(this).balance - stakedAmount;
+            fees = (yield * feePercent / 100) + (stakedAmount - totalSupply);
+            profit = yield - (yield * feePercent / 100);
 
-        // Transfering fees to owner wallet
-        _transferFees();
+            // Transfering fees to owner wallet
+            _transferFees();
 
-        // Transfering NFT prize to winner        
-        IERC721(nft.addr).transferFrom(creator, winner, nft.index);
+            // Transfering NFT prize to winner        
+            IERC721(nft.addr).transferFrom(creator, winner, nft.index);
 
-        // Logging pool closing
-        parent.lotteryClosed(lotteryId, winner, profit, fees);
+            // Logging pool closing
+            parent.lotteryClosed(lotteryId, winner, profit, fees);
+        }        
     }
 
     /// @notice Method used to cancel a lottery
@@ -88,44 +102,44 @@ contract YieldLotteryPool is LotteryPoolBase {
         // Recovering staking amount        
         _withdrawStaking();
 
-        // Cancelling lottery
-        status = LotteryPoolStatus.CANCELLED;
+        if (address(this).balance > 0) {
+            // Cancelling lottery
+            status = LotteryPoolStatus.CANCELLED;
 
-        // Calculating payment and transfering fees
-        fees = address(this).balance - stakedAmount;
+            // Calculating payment and transfering fees
+            fees = address(this).balance - stakedAmount;
 
-        // Transfering fees to owner wallet
-        _transferFees();
-        
-        // Logging pool cancellation        
-        parent.lotteryCancelled(lotteryId, profit);
-    }
+            // Transfering fees to owner wallet
+            _transferFees();
+            
+            // Logging pool cancellation        
+            parent.lotteryCancelled(lotteryId, profit);
+        }
+    }    
 
     // Private methods
 
     /// @notice Method used to deposit staking
     function _depositStaking() private {
-
-        // // Approving aWETH spending
-        // address lotteryPoolStaking = parent.getLotteryPoolStaking();
-        // (,address wethGateway, address aWeth) = ILotteryPoolStaking(lotteryPoolStaking).getAddresses();
-        // IERC20(aWeth).approve(wethGateway, type(uint256).max);
+        // Must approve to spend tokens to be able to withdraw deposit later on
+        (address token, address spender) = stakingAdapter.getApprovalData();
+        IERC20(token).approve(spender, type(uint256).max);
 
         // Launching Staking
         stakedAmount = address(this).balance;
-        // ILotteryPoolStaking(lotteryPoolStaking).depositETH{ value: address(this).balance }();
+        stakingAdapter.deposit{ value: address(this).balance }();
     }
 
     /// @notice Method used to withdraw staked amount
     function _withdrawStaking() private {
-        // address lotteryPoolStaking = parent.getLotteryPoolStaking();
-        // (address provider, address gateway, address aWeth) = ILotteryPoolStaking(lotteryPoolStaking).getAddresses();
-        // (,bytes memory result) = lotteryPoolStaking.delegatecall(
-        //     abi.encodeWithSignature("withdrawETH(address,address,address)", provider, gateway, aWeth)
-        // );
-        // uint finalPrice = abi.decode(result, (uint256));
+        address[5] memory data = stakingAdapter.getWithdrawData();
+        (bool success, bytes memory result) = address(stakingAdapter).delegatecall(
+            abi.encodeWithSignature("withdraw(address[5])", data)
+        );
+        require(success, "Staking withdraw failed");
 
-        // emit StakingWithdrawal(finalPrice);
+        uint withdrawal = abi.decode(result, (uint256));
+        emit StakingWithdrawal(withdrawal);
     }
 
 }

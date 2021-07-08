@@ -1,0 +1,1426 @@
+{
+  "manifestVersion": "3.2",
+  "admin": {
+    "address": "0xcC0F4516622d530258f41911df257572B0d2E536",
+    "txHash": "0x3dd021b1738e8a153a06b9df7ac7b8b8f8f80a7038cd231c10467f321114a65f",
+    "deployTransaction": {
+      "hash": "0x3dd021b1738e8a153a06b9df7ac7b8b8f8f80a7038cd231c10467f321114a65f",
+      "type": 0,
+      "accessList": null,
+      "blockHash": "0x1f8107c390c2168b04e65ea7068525150da0dd574a488db77b3a167eb9d560e7",
+      "blockNumber": 12786915,
+      "transactionIndex": 0,
+      "confirmations": 1,
+      "from": "0x334826C2fD633EdfeDDBEF5714F596aCd5fd02a7",
+      "gasPrice": {
+        "type": "BigNumber",
+        "hex": "0x04a817c800"
+      },
+      "gasLimit": {
+        "type": "BigNumber",
+        "hex": "0x24d420"
+      },
+      "to": null,
+      "value": {
+        "type": "BigNumber",
+        "hex": "0x00"
+      },
+      "nonce": 3,
+      "data": "0x608060405234801561001057600080fd5b50600080546001600160a01b031916339081178255604051909182917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0908290a350610759806100616000396000f3fe60806040526004361061007b5760003560e01c80639623609d1161004e5780639623609d1461011157806399a88ec414610124578063f2fde38b14610144578063f3b7dead146101645761007b565b8063204e1c7a14610080578063715018a6146100bc5780637eff275e146100d35780638da5cb5b146100f3575b600080fd5b34801561008c57600080fd5b506100a061009b366004610515565b610184565b6040516001600160a01b03909116815260200160405180910390f35b3480156100c857600080fd5b506100d1610215565b005b3480156100df57600080fd5b506100d16100ee366004610554565b610292565b3480156100ff57600080fd5b506000546001600160a01b03166100a0565b6100d161011f36600461058c565b61031c565b34801561013057600080fd5b506100d161013f366004610554565b6103ad565b34801561015057600080fd5b506100d161015f366004610515565b610405565b34801561017057600080fd5b506100a061017f366004610515565b6104ef565b6000806000836001600160a01b03166040516101aa90635c60da1b60e01b815260040190565b600060405180830381855afa9150503d80600081146101e5576040519150601f19603f3d011682016040523d82523d6000602084013e6101ea565b606091505b5091509150816101f957600080fd5b8080602001905181019061020d9190610538565b949350505050565b6000546001600160a01b031633146102485760405162461bcd60e51b815260040161023f906106c0565b60405180910390fd5b600080546040516001600160a01b03909116907f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0908390a3600080546001600160a01b0319169055565b6000546001600160a01b031633146102bc5760405162461bcd60e51b815260040161023f906106c0565b6040516308f2839760e41b81526001600160a01b038281166004830152831690638f283970906024015b600060405180830381600087803b15801561030057600080fd5b505af1158015610314573d6000803e3d6000fd5b505050505050565b6000546001600160a01b031633146103465760405162461bcd60e51b815260040161023f906106c0565b60405163278f794360e11b81526001600160a01b03841690634f1ef286903490610376908690869060040161065d565b6000604051808303818588803b15801561038f57600080fd5b505af11580156103a3573d6000803e3d6000fd5b5050505050505050565b6000546001600160a01b031633146103d75760405162461bcd60e51b815260040161023f906106c0565b604051631b2ce7f360e11b81526001600160a01b038281166004830152831690633659cfe6906024016102e6565b6000546001600160a01b0316331461042f5760405162461bcd60e51b815260040161023f906106c0565b6001600160a01b0381166104945760405162461bcd60e51b815260206004820152602660248201527f4f776e61626c653a206e6577206f776e657220697320746865207a65726f206160448201526564647265737360d01b606482015260840161023f565b600080546040516001600160a01b03808516939216917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e091a3600080546001600160a01b0319166001600160a01b0392909216919091179055565b6000806000836001600160a01b03166040516101aa906303e1469160e61b815260040190565b600060208284031215610526578081fd5b81356105318161070b565b9392505050565b600060208284031215610549578081fd5b81516105318161070b565b60008060408385031215610566578081fd5b82356105718161070b565b915060208301356105818161070b565b809150509250929050565b6000806000606084860312156105a0578081fd5b83356105ab8161070b565b925060208401356105bb8161070b565b9150604084013567ffffffffffffffff808211156105d7578283fd5b818601915086601f8301126105ea578283fd5b8135818111156105fc576105fc6106f5565b604051601f8201601f19908116603f01168101908382118183101715610624576106246106f5565b8160405282815289602084870101111561063c578586fd5b82602086016020830137856020848301015280955050505050509250925092565b600060018060a01b038416825260206040818401528351806040850152825b818110156106985785810183015185820160600152820161067c565b818111156106a95783606083870101525b50601f01601f191692909201606001949350505050565b6020808252818101527f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e6572604082015260600190565b634e487b7160e01b600052604160045260246000fd5b6001600160a01b038116811461072057600080fd5b5056fea2646970667358221220d849f96f3086b9f82cdcf665adb8c697ace05638da1c7c16ab2d26293717af6764736f6c63430008020033",
+      "r": "0xe5d5eb7fe2f6a8ce65dcccdbaa717f8df71780366ad4149c469f5883138c64e1",
+      "s": "0x4a6d110a0767a5af3d905a7ea3796b6697369fc18eb954884e41a13f2844fb86",
+      "v": 38,
+      "creates": "0xcC0F4516622d530258f41911df257572B0d2E536",
+      "chainId": 1
+    }
+  },
+  "proxies": [
+    {
+      "address": "0xeFfC53d352093384bACb223c40E930844721D058",
+      "txHash": "0xe96dd372ae59a312f55ec422bc60f93e7256cc5ec383794cc0b02eea9ae6b570",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x14a3614e19617068a114f00872535dbb542E6D99",
+      "txHash": "0xa6a74a6d61b25c9dd80b66ba55a634066b86a08731ada45f2dde17cd1e0c82f3",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xe9E858eC68818D0fCd8B3F032875Ade6271FB3b8",
+      "txHash": "0x5e25c90cefb0492288f3bf1daf8d55eb84f0bf0b819947e736da919991e470f8",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xee259Fb930267aaeb25122Fe1756b1DFCE1fC97e",
+      "txHash": "0x62816779a80ba2be3d9ef18dffc9918915a17907ab965d85cba532ffd383966d",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x0Dd5a06Ecb87AD854Ef4C01394C980116B29F9EA",
+      "txHash": "0x9f111ba9ce209637c6fba2feb6b52252d90fc703f6d57ab7fe86aaf39e022163",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x3825611D355ecB80f104b4d6AA2C090a84637E6B",
+      "txHash": "0xbabba8bf297db5ef7ee169f99d23d694fd25f7830bf155d0b07a0076ec8cbf03",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xB533Ed909c8c0e1FdaAd00cB161248aa115b8866",
+      "txHash": "0xffb6772b5a22e9ef34c2d40bf6be7d76f1b998d5c07d4940393bacf6d3d39b93",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xE39bC0B514a9Bfd864f80AbE723B1790daa75300",
+      "txHash": "0xd214c86605379c2278d2e5b293399b8d6e41808cfb081f88297f0fd5f22258ad",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x91B383e37F7bC1d9ca88C049C3E1106f0B963F39",
+      "txHash": "0x12d81d99952fb1e8ce7d544aa3b58e0f6774caace5d1799e1346b7e1f91d3864",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x6867E10932Cb3Ae214eEb2a7F36619Cf31f013fa",
+      "txHash": "0x90bf9965467d1f1b2d603e02170dc900d2ee240eddf12648438c95082638ad2b",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x9729Cf27E51B030814746EF44126E1899120481E",
+      "txHash": "0x5bb71c905c25dfdf1629879d6f1ed392fa8bb92710ad497ab74b5b621e9c77ad",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x59AC609F3Fc99043D0C9eb3C44D9E62C210c7551",
+      "txHash": "0xed22ec5223180b617d70c232053b4090dc714c650e1bd2c0910753a0905a4f70",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xEd895fE0c1B227430873325438d4153289A4A364",
+      "txHash": "0x0346f456073d0da69985d471f1dfbeff787c68f79d024e1b301ab94f3017983a",
+      "kind": "transparent"
+    },
+    {
+      "address": "0xe0e11A1c8D8Cc320B1B0aBE79236C471EB6EE7cc",
+      "txHash": "0xc74103b2cacd9d86fe91148e92735560837c6688f6caedbd71b612590e17e476",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x953e992733fE2261D562Bd89f1059af620606E2A",
+      "txHash": "0xbceea5cf4fc9a6b7dd90173cddb9b9945dc52890415273e17740cbc5687ec5bc",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x7b5DF02A1f4bDD7d313f4E4654Adad455E294714",
+      "txHash": "0xc30b85e8424f753a58f37ed690cb5d412dcedfe8864e82a902151522d2e172db",
+      "kind": "transparent"
+    },
+    {
+      "address": "0x6991bA6c8030372510E6665F6FF17CB0D2DCFBFa",
+      "txHash": "0x5f52630395434fd16a542889c1ae89e9d7bbfe8069b325a5b1a96c25fe1a72a0",
+      "kind": "transparent"
+    }
+  ],
+  "impls": {
+    "2295d4cb2004daf28724858897325a10a0dee7d0158db30ec95921df03a9ea31": {
+      "address": "0x5970216618BEF3D4ed6065485d9A681f850B9777",
+      "txHash": "0x32aa1ec38f32e8d98fdd252d23ca3e6ad2815ba3fd2df51daf4d54e6f5cc3967",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:23"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:28"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:31"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:20"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:74"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "_status",
+            "type": "t_uint256",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:37"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:67"
+          },
+          {
+            "contract": "PausableUpgradeable",
+            "label": "_paused",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\PausableUpgradeable.sol:28"
+          },
+          {
+            "contract": "PausableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\PausableUpgradeable.sol:96"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "lotteries",
+            "type": "t_array(t_contract(ILotteryPool)4942)dyn_storage",
+            "src": "contracts\\LotteryPoolFactory.sol:16"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "numberOfActiveLotteries",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:17"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "totalSupply",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:18"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "feePercent",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:19"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "wallet",
+            "type": "t_address_payable",
+            "src": "contracts\\LotteryPoolFactory.sol:20"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "minDaysOpen",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:21"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "stakingAdapter",
+            "type": "t_address",
+            "src": "contracts\\LotteryPoolFactory.sol:22"
+          }
+        ],
+        "types": {
+          "t_array(t_contract(ILotteryPool)4942)dyn_storage": {
+            "label": "contract ILotteryPool[]"
+          },
+          "t_contract(ILotteryPool)4942": {
+            "label": "contract ILotteryPool"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_address_payable": {
+            "label": "address payable"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          }
+        }
+      }
+    },
+    "78da9e68fd94942abf7bf7d1d2b44b3d1ba8243b2b33f2b1ef256aa0c5c2f341": {
+      "address": "0xfFD6d9B7da630A626fC4B5b53d699ffDe2634EA3",
+      "txHash": "0x204c468e50eccdf2a2eacf79446344ce836e5eddb1bff2589e03fc09daa9cc22",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:23"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:28"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:31"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:20"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:74"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "_status",
+            "type": "t_uint256",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:37"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:67"
+          },
+          {
+            "contract": "PausableUpgradeable",
+            "label": "_paused",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\PausableUpgradeable.sol:28"
+          },
+          {
+            "contract": "PausableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\PausableUpgradeable.sol:96"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "lotteries",
+            "type": "t_array(t_contract(ILotteryPool)4897)dyn_storage",
+            "src": "contracts\\LotteryPoolFactory.sol:16"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "numberOfActiveLotteries",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:17"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "totalSupply",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:18"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "feePercent",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:19"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "wallet",
+            "type": "t_address_payable",
+            "src": "contracts\\LotteryPoolFactory.sol:20"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "minDaysOpen",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:21"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "stakingAdapter",
+            "type": "t_address",
+            "src": "contracts\\LotteryPoolFactory.sol:22"
+          }
+        ],
+        "types": {
+          "t_array(t_contract(ILotteryPool)4897)dyn_storage": {
+            "label": "contract ILotteryPool[]"
+          },
+          "t_contract(ILotteryPool)4897": {
+            "label": "contract ILotteryPool"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_address_payable": {
+            "label": "address payable"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          }
+        }
+      }
+    },
+    "4d8515c41f6c8d85975ddd27885b589dbf35c855cf4ba338d582567aa9cd795a": {
+      "address": "0xdee887Cb2a9f5353433B8c9b1a873Db552c20682",
+      "txHash": "0x566c112707ec6ff086df226834cac5b9c5cbd0cd5320a4381d2b28e794d1bba3",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:23"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:28"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:31"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:20"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:74"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "_status",
+            "type": "t_uint256",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:37"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:67"
+          },
+          {
+            "contract": "PausableUpgradeable",
+            "label": "_paused",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\PausableUpgradeable.sol:28"
+          },
+          {
+            "contract": "PausableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\PausableUpgradeable.sol:96"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "lotteries",
+            "type": "t_array(t_contract(ILotteryPool)4846)dyn_storage",
+            "src": "contracts\\LotteryPoolFactory.sol:16"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "numberOfActiveLotteries",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:17"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "totalSupply",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:18"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "feePercent",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:19"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "wallet",
+            "type": "t_address_payable",
+            "src": "contracts\\LotteryPoolFactory.sol:20"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "minDaysOpen",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:21"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "stakingAdapter",
+            "type": "t_address",
+            "src": "contracts\\LotteryPoolFactory.sol:22"
+          }
+        ],
+        "types": {
+          "t_array(t_contract(ILotteryPool)4846)dyn_storage": {
+            "label": "contract ILotteryPool[]"
+          },
+          "t_contract(ILotteryPool)4846": {
+            "label": "contract ILotteryPool"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_address_payable": {
+            "label": "address payable"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          }
+        }
+      }
+    },
+    "0f2ee1e05185db74e882db53c81ecefd263b81c366412125e8d021fc7cff7fa2": {
+      "address": "0x1657a3D2EeF4e18FB96f1C39fC454a4A8Eea9237",
+      "txHash": "0xe50c7ffd4ed4d3766ac4856ecd8b9fae353c6bcb4edf6712bdd49d5e484e3b24",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:23"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:28"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:31"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:20"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:74"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "_status",
+            "type": "t_uint256",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:37"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:67"
+          },
+          {
+            "contract": "PausableUpgradeable",
+            "label": "_paused",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\PausableUpgradeable.sol:28"
+          },
+          {
+            "contract": "PausableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\PausableUpgradeable.sol:96"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "lotteries",
+            "type": "t_array(t_contract(ILotteryPool)4772)dyn_storage",
+            "src": "contracts\\LotteryPoolFactory.sol:16"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "numberOfActiveLotteries",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:17"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "totalSupply",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:18"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "feePercent",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:19"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "wallet",
+            "type": "t_address_payable",
+            "src": "contracts\\LotteryPoolFactory.sol:20"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "minDaysOpen",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:21"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "stakingAdapter",
+            "type": "t_address",
+            "src": "contracts\\LotteryPoolFactory.sol:22"
+          }
+        ],
+        "types": {
+          "t_array(t_contract(ILotteryPool)4772)dyn_storage": {
+            "label": "contract ILotteryPool[]"
+          },
+          "t_contract(ILotteryPool)4772": {
+            "label": "contract ILotteryPool"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_address_payable": {
+            "label": "address payable"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          }
+        }
+      }
+    },
+    "a3d41cffc1f360651e998ab6936551be6d66f3aefdbb5a8189d92d8094c30377": {
+      "address": "0x5E532611ec892302ADEbd7665fA635aD237cfbAc",
+      "txHash": "0x1e4f2565be18dda339e60f7d02a381945fa0861741094c5bc171fb13a92244a3",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:23"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:28"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:31"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:20"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:74"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "_status",
+            "type": "t_uint256",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:37"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:67"
+          },
+          {
+            "contract": "PausableUpgradeable",
+            "label": "_paused",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\PausableUpgradeable.sol:28"
+          },
+          {
+            "contract": "PausableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\PausableUpgradeable.sol:96"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "lotteries",
+            "type": "t_array(t_contract(ILotteryPool)4782)dyn_storage",
+            "src": "contracts\\LotteryPoolFactory.sol:16"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "numberOfActiveLotteries",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:17"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "totalSupply",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:18"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "feePercent",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:19"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "wallet",
+            "type": "t_address_payable",
+            "src": "contracts\\LotteryPoolFactory.sol:20"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "minDaysOpen",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:21"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "stakingAdapter",
+            "type": "t_address",
+            "src": "contracts\\LotteryPoolFactory.sol:22"
+          }
+        ],
+        "types": {
+          "t_array(t_contract(ILotteryPool)4782)dyn_storage": {
+            "label": "contract ILotteryPool[]"
+          },
+          "t_contract(ILotteryPool)4782": {
+            "label": "contract ILotteryPool"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_address_payable": {
+            "label": "address payable"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          }
+        }
+      }
+    },
+    "61f2fd406e2264d1d7274ca41bd43fdf20856eadb2e79a6d18fc60100efefe92": {
+      "address": "0x9CE4aE073a44Bab653dc31F657799D4972A51f77",
+      "txHash": "0x05641f6cec8e229aff028a8b692b3b072b95699a31c037009a2196b2a7dff706",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:23"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:28"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:31"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:20"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:74"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "_status",
+            "type": "t_uint256",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:37"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:67"
+          },
+          {
+            "contract": "PausableUpgradeable",
+            "label": "_paused",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\PausableUpgradeable.sol:28"
+          },
+          {
+            "contract": "PausableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\PausableUpgradeable.sol:96"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "lotteries",
+            "type": "t_array(t_contract(ILotteryPool)4856)dyn_storage",
+            "src": "contracts\\LotteryPoolFactory.sol:16"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "numberOfActiveLotteries",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:17"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "totalSupply",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:18"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "feePercent",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:19"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "wallet",
+            "type": "t_address_payable",
+            "src": "contracts\\LotteryPoolFactory.sol:20"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "minDaysOpen",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:21"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "stakingAdapter",
+            "type": "t_address",
+            "src": "contracts\\LotteryPoolFactory.sol:22"
+          }
+        ],
+        "types": {
+          "t_array(t_contract(ILotteryPool)4856)dyn_storage": {
+            "label": "contract ILotteryPool[]"
+          },
+          "t_contract(ILotteryPool)4856": {
+            "label": "contract ILotteryPool"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_address_payable": {
+            "label": "address payable"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          }
+        }
+      }
+    },
+    "9ee3179b497e3ac28434006bc59f3011abfaef785e38d3ad7ad2b2ea5020d33a": {
+      "address": "0xAce35Bde85f5322dDd585E8beE22a1a2E23adf48",
+      "txHash": "0xe7c5adc574e121b9ed3749af76c11c5638f1412e998edcf6f94075fbd82d94e5",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:23"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:28"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:31"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:20"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:74"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "_status",
+            "type": "t_uint256",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:37"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:67"
+          },
+          {
+            "contract": "PausableUpgradeable",
+            "label": "_paused",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\PausableUpgradeable.sol:28"
+          },
+          {
+            "contract": "PausableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\PausableUpgradeable.sol:96"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "lotteries",
+            "type": "t_array(t_contract(ILotteryPool)4805)dyn_storage",
+            "src": "contracts\\LotteryPoolFactory.sol:16"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "numberOfActiveLotteries",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:17"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "totalSupply",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:18"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "feePercent",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:19"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "wallet",
+            "type": "t_address_payable",
+            "src": "contracts\\LotteryPoolFactory.sol:20"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "minDaysOpen",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:21"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "stakingAdapter",
+            "type": "t_address",
+            "src": "contracts\\LotteryPoolFactory.sol:22"
+          }
+        ],
+        "types": {
+          "t_array(t_contract(ILotteryPool)4805)dyn_storage": {
+            "label": "contract ILotteryPool[]"
+          },
+          "t_contract(ILotteryPool)4805": {
+            "label": "contract ILotteryPool"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_address_payable": {
+            "label": "address payable"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          }
+        }
+      }
+    },
+    "878f372e180673e66e1df12198730ba826ef57bc2e05a1d6374a53801c9c9f3c": {
+      "address": "0xAacE495B452306f6E98f596a8602FD0a0700D93d",
+      "txHash": "0xf2c9935f613b453b9ec01f8edcde6542c9af808b72de14e2bfabb20c6f45bb2d",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:23"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:28"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:31"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:20"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:74"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "_status",
+            "type": "t_uint256",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:37"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:67"
+          },
+          {
+            "contract": "PausableUpgradeable",
+            "label": "_paused",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\PausableUpgradeable.sol:28"
+          },
+          {
+            "contract": "PausableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\PausableUpgradeable.sol:96"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "lotteries",
+            "type": "t_array(t_contract(ILotteryPool)4863)dyn_storage",
+            "src": "contracts\\LotteryPoolFactory.sol:16"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "numberOfActiveLotteries",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:17"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "totalSupply",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:18"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "feePercent",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:19"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "wallet",
+            "type": "t_address_payable",
+            "src": "contracts\\LotteryPoolFactory.sol:20"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "minDaysOpen",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:21"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "stakingAdapter",
+            "type": "t_address",
+            "src": "contracts\\LotteryPoolFactory.sol:22"
+          }
+        ],
+        "types": {
+          "t_array(t_contract(ILotteryPool)4863)dyn_storage": {
+            "label": "contract ILotteryPool[]"
+          },
+          "t_contract(ILotteryPool)4863": {
+            "label": "contract ILotteryPool"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_address_payable": {
+            "label": "address payable"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          }
+        }
+      }
+    },
+    "b5d0cd2a076124079fe8d7ef0cd4c9bf467fb51c3843dc8e50625f124a72ed07": {
+      "address": "0x5A7347cEeCee60dE68e378A65b5B3ad074e711D5",
+      "txHash": "0x07ed416185fc0bc473ae2897f9df3b08153e29ec2dbe3372df221e09f1946322",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:23"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:28"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:31"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:20"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:74"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "_status",
+            "type": "t_uint256",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:37"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:67"
+          },
+          {
+            "contract": "PausableUpgradeable",
+            "label": "_paused",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\PausableUpgradeable.sol:28"
+          },
+          {
+            "contract": "PausableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\PausableUpgradeable.sol:96"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "lotteries",
+            "type": "t_array(t_contract(ILotteryPool)4940)dyn_storage",
+            "src": "contracts\\LotteryPoolFactory.sol:16"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "numberOfActiveLotteries",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:17"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "totalSupply",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:18"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "feePercent",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:19"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "wallet",
+            "type": "t_address_payable",
+            "src": "contracts\\LotteryPoolFactory.sol:20"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "minDaysOpen",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:21"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "stakingAdapter",
+            "type": "t_address",
+            "src": "contracts\\LotteryPoolFactory.sol:22"
+          }
+        ],
+        "types": {
+          "t_array(t_contract(ILotteryPool)4940)dyn_storage": {
+            "label": "contract ILotteryPool[]"
+          },
+          "t_contract(ILotteryPool)4940": {
+            "label": "contract ILotteryPool"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_address_payable": {
+            "label": "address payable"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          }
+        }
+      }
+    },
+    "0769b42094f2b9f1c99173ae43bf29b06dbcd33099f3037a030dcc650b163aec": {
+      "address": "0x77538Dc6f95eB3853A431E396cEAA58881C21D08",
+      "txHash": "0x3cd9c57eccc15a9bbf3cd15217bd176363baea6ad64b2e2440061419b0b9391d",
+      "layout": {
+        "storage": [
+          {
+            "contract": "Initializable",
+            "label": "_initialized",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:23"
+          },
+          {
+            "contract": "Initializable",
+            "label": "_initializing",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\proxy\\utils\\Initializable.sol:28"
+          },
+          {
+            "contract": "ContextUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)50_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\utils\\ContextUpgradeable.sol:31"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "_owner",
+            "type": "t_address",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:20"
+          },
+          {
+            "contract": "OwnableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\access\\OwnableUpgradeable.sol:74"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "_status",
+            "type": "t_uint256",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:37"
+          },
+          {
+            "contract": "ReentrancyGuardUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\ReentrancyGuardUpgradeable.sol:67"
+          },
+          {
+            "contract": "PausableUpgradeable",
+            "label": "_paused",
+            "type": "t_bool",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\PausableUpgradeable.sol:28"
+          },
+          {
+            "contract": "PausableUpgradeable",
+            "label": "__gap",
+            "type": "t_array(t_uint256)49_storage",
+            "src": "@openzeppelin\\contracts-upgradeable\\security\\PausableUpgradeable.sol:96"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "lotteries",
+            "type": "t_array(t_contract(ILotteryPool)4940)dyn_storage",
+            "src": "contracts\\LotteryPoolFactory.sol:16"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "numberOfActiveLotteries",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:17"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "totalSupply",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:18"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "feePercent",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:19"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "wallet",
+            "type": "t_address_payable",
+            "src": "contracts\\LotteryPoolFactory.sol:20"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "minDaysOpen",
+            "type": "t_uint256",
+            "src": "contracts\\LotteryPoolFactory.sol:21"
+          },
+          {
+            "contract": "LotteryPoolFactory",
+            "label": "stakingAdapter",
+            "type": "t_address",
+            "src": "contracts\\LotteryPoolFactory.sol:22"
+          }
+        ],
+        "types": {
+          "t_array(t_contract(ILotteryPool)4940)dyn_storage": {
+            "label": "contract ILotteryPool[]"
+          },
+          "t_contract(ILotteryPool)4940": {
+            "label": "contract ILotteryPool"
+          },
+          "t_uint256": {
+            "label": "uint256"
+          },
+          "t_address_payable": {
+            "label": "address payable"
+          },
+          "t_address": {
+            "label": "address"
+          },
+          "t_bool": {
+            "label": "bool"
+          },
+          "t_array(t_uint256)49_storage": {
+            "label": "uint256[49]"
+          },
+          "t_array(t_uint256)50_storage": {
+            "label": "uint256[50]"
+          }
+        }
+      }
+    }
+  }
+}

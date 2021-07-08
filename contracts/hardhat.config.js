@@ -18,6 +18,7 @@ task("accounts", "Prints the list of accounts", async () => {
  * @type import('hardhat/config').HardhatUserConfig
  */
  module.exports = {
+  // defaultNetwork: "rinkeby",
   solidity: {
     version: "0.8.0",
     settings: {
@@ -32,6 +33,13 @@ task("accounts", "Prints the list of accounts", async () => {
     // artifacts: './artifacts',
   },
   networks: {
+    localhost: {
+      chainId: 1337,
+      allowUnlimitedContractSize: false,
+      gasPrice: "auto",
+      timeout: 10000000,
+      gas: "auto",
+    },
     hardhat: {
       chainId: 31337,
       allowUnlimitedContractSize: false,
@@ -72,6 +80,7 @@ task("accounts", "Prints the list of accounts", async () => {
     currency: 'USD',
     enabled: true,
     coinmarketcap: `${process.env.REACT_APP_COINMARKETCAP_KEY}`
-  }
+  },
+
 };
 

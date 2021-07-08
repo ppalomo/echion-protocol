@@ -6,7 +6,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "./interfaces/ILotteryPool.sol";
-import "./StandardLotteryPool.sol";
+// import "./StandardLotteryPool.sol";
 import "./YieldLotteryPool.sol";
 import "hardhat/console.sol";
 
@@ -19,7 +19,7 @@ contract LotteryPoolFactory is OwnableUpgradeable, ReentrancyGuardUpgradeable, P
     uint feePercent;
     address payable wallet;
     uint minDaysOpen;
-    // address lotteryPoolStaking;
+    address private stakingAdapter;
 
     // Events
     event LotteryCreated(uint lotteryId, address creator, address lotteryAddress, address nftAddress, uint nftIndex, uint ticketPrice, uint created, ILotteryPool.LotteryPoolType lotteryPoolType, uint minAmount);
@@ -33,16 +33,15 @@ contract LotteryPoolFactory is OwnableUpgradeable, ReentrancyGuardUpgradeable, P
     /**
      @notice Contract initializer.
      */
-    function initialize() public initializer {
+    function initialize(address _stakingAdapter) public initializer {
         __Ownable_init();
         __ReentrancyGuard_init();
         __Pausable_init();
 
         // Initializing variables
+        stakingAdapter = _stakingAdapter;
         wallet = payable(owner());
         feePercent = 10; // %
-        // numberOfActiveLotteries = 0;
-        // totalSupply = 0;
         minDaysOpen = 7;
     }
 
@@ -63,25 +62,24 @@ contract LotteryPoolFactory is OwnableUpgradeable, ReentrancyGuardUpgradeable, P
         ) public whenNotPaused {        
         require(_nftAddress != address(0), 'A valid address is required');
         require(_ticketPrice > 0, 'A valid ticket price is required');
-        // require(IERC721(_nftAddress).isApprovedForAll(msg.sender, address(this)), 'Contract is not approved to transfer NFT');
 
         // Creating new lottery pool
         address lotteryAddress;
         uint created = block.timestamp;
 
-        if (_lotteryPoolType == ILotteryPool.LotteryPoolType.STANDARD) {
-            StandardLotteryPool lottery = new StandardLotteryPool(
-                lotteries.length,                
-                msg.sender,
-                _nftAddress, 
-                _nftIndex, 
-                _ticketPrice,
-                _minProfit,
-                created
-            );
-            lotteries.push(lottery);
-            lotteryAddress = address(lottery);
-        } else if (_lotteryPoolType == ILotteryPool.LotteryPoolType.YIELD) {
+        // if (_lotteryPoolType == ILotteryPool.LotteryPoolType.STANDARD) {
+        //     StandardLotteryPool lottery = new StandardLotteryPool(
+        //         lotteries.length,                
+        //         msg.sender,
+        //         _nftAddress, 
+        //         _nftIndex, 
+        //         _ticketPrice,
+        //         _minProfit,
+        //         created
+        //     );
+        //     lotteries.push(lottery);
+        //     lotteryAddress = address(lottery);
+        // } else if (_lotteryPoolType == ILotteryPool.LotteryPoolType.YIELD) {
             YieldLotteryPool lottery = new YieldLotteryPool(
                 lotteries.length,                
                 msg.sender,
@@ -93,7 +91,7 @@ contract LotteryPoolFactory is OwnableUpgradeable, ReentrancyGuardUpgradeable, P
             );
             lotteries.push(lottery);
             lotteryAddress = address(lottery);
-        }
+        // }
         numberOfActiveLotteries++;
 
         // Emiting event
@@ -178,6 +176,12 @@ contract LotteryPoolFactory is OwnableUpgradeable, ReentrancyGuardUpgradeable, P
     function setMinDaysOpen(uint _minDaysOpen) public onlyOwner {
         minDaysOpen = _minDaysOpen;
         emit MinDaysOpenChanged(minDaysOpen);
+    }
+
+    /// @notice Gets the current staking adapter address
+    /// @return Staking adapter address
+    function getStakingAdapter() external view returns(address) {
+        return stakingAdapter;
     }
 
     /// @notice Triggers stopped state

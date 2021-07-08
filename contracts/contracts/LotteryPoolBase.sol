@@ -38,11 +38,9 @@ abstract contract LotteryPoolBase is ILotteryPool, Ownable, ReentrancyGuard {
 
     // Events
     event TicketsBought(uint lotteryId, address indexed buyer, uint numberOfTickets, uint amount);
-    // event TicketsCancelled(uint lotteryId, address indexed buyer, uint numberOfTickets, uint amount);
     event TicketsRedeemed(uint lotteryId, address indexed buyer, uint numberOfTickets, uint amount);
     event CreatorPaymentTransfered(address indexed creator, uint paymentToCreator);
     event Received(address addr, uint amount);
-    // event StakingWithdrawal(uint finalPrice);
 
     /// @notice Contract constructor method
     /// @param _lotteryId - Lottery unique identifier
@@ -73,11 +71,6 @@ abstract contract LotteryPoolBase is ILotteryPool, Ownable, ReentrancyGuard {
         nft.index = _nftIndex;
         status = LotteryPoolStatus.OPEN;
         created = _created;
-        // numberOfTickets = 0;
-        // totalSupply = 0;
-        // stakedAmount = 0;
-        // profit = 0;
-        // fees = 0;
         paidToCreator = false;        
     }
 
@@ -169,6 +162,12 @@ abstract contract LotteryPoolBase is ILotteryPool, Ownable, ReentrancyGuard {
     /// @return Number of tickets bought for an address
     function ticketsOf(address _addr) public view returns (uint) {
         return tickets[_addr];
+    }
+
+    /// @notice Method used to return the contract balance
+    /// @return Current contract balance
+    function getBalance() public view returns (uint) {
+        return address(this).balance;
     }
 
     // @notice Method used to receive ETH

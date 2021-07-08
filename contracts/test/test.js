@@ -20,11 +20,9 @@ const LotteryPoolStatus = {
 }
 
 describe("Echion Protocol", function () {
-    let LotteryPoolFactory, EchionNFT;
-    let lotteryPoolFactory;
-    let timeout = 3000000;
-//   let LotteryPoolFactory, LotteryPool, EchionNFT, LotteryPoolStaking;
-//   let lotteryPoolFactory, nft, lotteryPoolStaking;
+    let LotteryPoolFactory, EchionNFT, AaveStakingAdapter;
+    let lotteryPoolFactory, nft, aaveStakingAdapter;
+    let timeout = 10000000;
     let ticketPrice = ethers.utils.parseEther('0.1');
     let minProfit = ethers.utils.parseEther('0.1');
     let imageURI = "https://ipfs.io/ipfs/QmWNcYhEcggdm1TFt2m6WmGqqQwfFXudr5eFzKPtm1nYwq";
@@ -41,8 +39,18 @@ describe("Echion Protocol", function () {
         nft = await EchionNFT.deploy();
         expect(nft.address).to.properAddress;
 
+        AaveStakingAdapter = await ethers.getContractFactory("AaveStakingAdapter");
+        aaveStakingAdapter = await AaveStakingAdapter.deploy(
+            "0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5", // _lendingPoolAddressesProvider
+            "0xcc9a0B7c43DC2a5F023Bb9b738E45B0Ef6B06E04",  // _wethGateway
+            "0x030bA81f1c18d280636F32af80b9AAd02Cf0854e"); // _aWethAddress
+        expect(aaveStakingAdapter.address).to.properAddress;
+
         LotteryPoolFactory = await ethers.getContractFactory("LotteryPoolFactory");
-        lotteryPoolFactory = await upgrades.deployProxy(LotteryPoolFactory, { initializer: 'initialize' });
+        lotteryPoolFactory = await upgrades.deployProxy(
+            LotteryPoolFactory, 
+            [aaveStakingAdapter.address], 
+            { initializer: 'initialize' });
         expect(lotteryPoolFactory.address).to.properAddress;
         
         await lotteryPoolFactory.setMinDaysOpen(0);    
@@ -52,11 +60,9 @@ describe("Echion Protocol", function () {
 
         // NFT approvals
         await nft.connect(addrs[1]).mint(imageURI, metadataURI);
-        // await nft.connect(addrs[1]).setApprovalForAll(lotteryPoolFactory.address, true);
         expect(await nft.ownerOf(0)).to.equal(addrs[1].address);
 
         await nft.connect(addrs[2]).mint(imageURI, metadataURI);
-        // await nft.connect(addrs[2]).setApprovalForAll(lotteryPoolFactory.address, true);
         expect(await nft.ownerOf(1)).to.equal(addrs[2].address);
     });
 
@@ -329,6 +335,57 @@ describe("Echion Protocol", function () {
                     lotteries[0].connect(addrs[1]).launchStaking()
             ).to.be.revertedWith('You must wait the minimum open days');
         }).timeout(timeout);
+
+        it("Should deposit balance to stake it", async function() {
+            // Arrange
+            await lotteryPoolFactory.setMinDaysOpen(0);
+            await lotteryPoolFactory.connect(addrs[1]).createLottery(nft.address, 0, ticketPrice, minProfit, LotteryPoolType.YIELD);
+            let lotteries = [await _getLotteryPool(0)];
+        
+            // Act
+            await lotteries[0].connect(addr1).buyTickets(2, {value: ethers.utils.parseEther('0.2')});
+            await lotteries[0].connect(addr2).buyTickets(1, {value: ethers.utils.parseEther('0.1')});
+            expect(await lotteries[0].getBalance()).to.equal(ethers.utils.parseEther('0.3'));
+        
+            await lotteries[0].connect(addrs[1]).launchStaking();
+            
+            // Assert
+            expect(await lotteries[0].getBalance()).to.equal(0);
+        
+            const stakingBalance = await aaveStakingAdapter.getStakedAmount(lotteries[0].address);
+            expect(stakingBalance).to.be.equal(ethers.utils.parseEther('0.3'));
+        }).timeout(timeout);
+
+        it("Should withdraw balance when closing an staking lottery", async function() {
+            // Arrange
+            await lotteryPoolFactory.connect(addrs[1]).createLottery(nft.address, 0, ticketPrice, minProfit, LotteryPoolType.YIELD);
+            let lotteries = [await _getLotteryPool(0)];
+
+            await nft.connect(addrs[1]).approve(lotteries[0].address, 0);
+        
+            await lotteries[0].connect(addr1).buyTickets(2, {value: ethers.utils.parseEther('0.2')});
+            await lotteries[0].connect(addr2).buyTickets(1, {value: ethers.utils.parseEther('0.1')});
+        
+            // Act
+            await lotteries[0].connect(addrs[1]).launchStaking();
+            await lotteries[0].connect(addrs[1]).declareWinner();
+
+            // Assert            
+            let allowance = await aaveStakingAdapter.getAllowance(lotteries[0].address);
+            expect(allowance).to.be.above(0);
+        
+            expect(await lotteries[0].getBalance()).to.be.above(0);
+
+            const stakingBalance = await aaveStakingAdapter.getStakedAmount(lotteries[0].address);
+            expect(stakingBalance).to.equal(0);
+        
+            let profit = await lotteries[0].profit();
+            expect(profit).to.be.above(0);
+        
+            let fees = await lotteries[0].fees();
+            expect(fees).to.be.above(0);
+
+          }).timeout(100000000);
 
     });
 
