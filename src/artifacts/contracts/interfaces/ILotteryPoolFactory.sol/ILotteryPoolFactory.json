@@ -6,19 +6,6 @@
     {
       "inputs": [
         {
-          "internalType": "uint256",
-          "name": "_lotteryId",
-          "type": "uint256"
-        }
-      ],
-      "name": "cancelLottery",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
           "internalType": "address",
           "name": "_nftAddress",
           "type": "address"
@@ -34,30 +21,17 @@
           "type": "uint256"
         },
         {
-          "internalType": "enum ILotteryPoolFactory.LotteryPoolType",
-          "name": "_lotteryPoolType",
-          "type": "uint8"
+          "internalType": "uint256",
+          "name": "_minProfit",
+          "type": "uint256"
         },
         {
-          "internalType": "uint256",
-          "name": "_minAmount",
-          "type": "uint256"
+          "internalType": "enum ILotteryPool.LotteryPoolType",
+          "name": "_lotteryPoolType",
+          "type": "uint8"
         }
       ],
       "name": "createLottery",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_lotteryId",
-          "type": "uint256"
-        }
-      ],
-      "name": "declareWinner",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -75,7 +49,7 @@
           "type": "uint256"
         }
       ],
-      "name": "decreaseTotalBalance",
+      "name": "decreaseTotalSupply",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -95,12 +69,12 @@
     },
     {
       "inputs": [],
-      "name": "getLotteryPoolStaking",
+      "name": "getMinDaysOpen",
       "outputs": [
         {
-          "internalType": "address",
+          "internalType": "uint256",
           "name": "",
-          "type": "address"
+          "type": "uint256"
         }
       ],
       "stateMutability": "view",
@@ -108,12 +82,12 @@
     },
     {
       "inputs": [],
-      "name": "getMinDaysOpen",
+      "name": "getStakingAdapter",
       "outputs": [
         {
-          "internalType": "uint256",
+          "internalType": "address",
           "name": "",
-          "type": "uint256"
+          "type": "address"
         }
       ],
       "stateMutability": "view",
@@ -145,7 +119,7 @@
           "type": "uint256"
         }
       ],
-      "name": "increaseTotalBalance",
+      "name": "increaseTotalSupply",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -156,9 +130,14 @@
           "internalType": "uint256",
           "name": "_lotteryId",
           "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_fees",
+          "type": "uint256"
         }
       ],
-      "name": "launchStaking",
+      "name": "lotteryCancelled",
       "outputs": [],
       "stateMutability": "nonpayable",
       "type": "function"
@@ -167,39 +146,59 @@
       "inputs": [
         {
           "internalType": "uint256",
-          "name": "_feePercent",
+          "name": "_lotteryId",
           "type": "uint256"
-        }
-      ],
-      "name": "setFeePercent",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
+        },
         {
-          "internalType": "uint256",
-          "name": "_minDaysOpen",
-          "type": "uint256"
-        }
-      ],
-      "name": "setMinDaysOpen",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address payable",
-          "name": "_addr",
+          "internalType": "address",
+          "name": "_winner",
           "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_profit",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_fees",
+          "type": "uint256"
         }
       ],
-      "name": "setWallet",
+      "name": "lotteryClosed",
       "outputs": [],
       "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_lotteryId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "lotteryStaked",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "paused",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
       "type": "function"
     }
   ],

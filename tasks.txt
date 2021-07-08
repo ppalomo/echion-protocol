@@ -1,11 +1,11 @@
 Contracts
 =============================================
-- Avoid multiple transfers in a single transaction. Only transfer fees. Avoid transfer payment to creator. 
-  Let's do it claimable.
+- Let's do profit it claimable.
 - Avoid code duplications in contracts.
-- Check that pool balance can receive ETH outside the deposit methods. What happen with these money?
-- Check re-entrancy
-
+- Remove pool contract imports from factory. Add interface address in constructor.
+- How to update pools code
+- How to update staking code
+- Setter for stakingAdapter
 
 Tests
 =============================================
