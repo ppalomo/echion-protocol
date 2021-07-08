@@ -99,22 +99,24 @@ contract YieldLotteryPool is LotteryPoolBase {
         require(minProfit > totalSupply, 'Cannot cancel lottery. The minimum amount has been reached');
         require(block.timestamp >= created + (parent.getMinDaysOpen() * 1 days), 'You must wait the minimum open days');
 
-        // Recovering staking amount        
-        _withdrawStaking();
+        // Cancelling lottery
+        status = LotteryPoolStatus.CANCELLED;
+
+        // Recovering staking amount
+        if (status == LotteryPoolStatus.STAKING) {
+            _withdrawStaking();
+        }
 
         if (address(this).balance > 0) {
-            // Cancelling lottery
-            status = LotteryPoolStatus.CANCELLED;
-
             // Calculating payment and transfering fees
-            fees = address(this).balance - stakedAmount;
+            fees = address(this).balance - totalSupply;
 
             // Transfering fees to owner wallet
             _transferFees();
-            
-            // Logging pool cancellation        
-            parent.lotteryCancelled(lotteryId, profit);
         }
+            
+        // Logging pool cancellation        
+        parent.lotteryCancelled(lotteryId, profit);
     }    
 
     // Private methods

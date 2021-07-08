@@ -6,7 +6,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "./interfaces/ILotteryPool.sol";
-// import "./StandardLotteryPool.sol";
+import "./StandardLotteryPool.sol";
 import "./YieldLotteryPool.sol";
 import "hardhat/console.sol";
 
@@ -67,19 +67,19 @@ contract LotteryPoolFactory is OwnableUpgradeable, ReentrancyGuardUpgradeable, P
         address lotteryAddress;
         uint created = block.timestamp;
 
-        // if (_lotteryPoolType == ILotteryPool.LotteryPoolType.STANDARD) {
-        //     StandardLotteryPool lottery = new StandardLotteryPool(
-        //         lotteries.length,                
-        //         msg.sender,
-        //         _nftAddress, 
-        //         _nftIndex, 
-        //         _ticketPrice,
-        //         _minProfit,
-        //         created
-        //     );
-        //     lotteries.push(lottery);
-        //     lotteryAddress = address(lottery);
-        // } else if (_lotteryPoolType == ILotteryPool.LotteryPoolType.YIELD) {
+        if (_lotteryPoolType == ILotteryPool.LotteryPoolType.STANDARD) {
+            StandardLotteryPool lottery = new StandardLotteryPool(
+                lotteries.length,                
+                msg.sender,
+                _nftAddress, 
+                _nftIndex, 
+                _ticketPrice,
+                _minProfit,
+                created
+            );
+            lotteries.push(lottery);
+            lotteryAddress = address(lottery);
+        } else if (_lotteryPoolType == ILotteryPool.LotteryPoolType.YIELD) {
             YieldLotteryPool lottery = new YieldLotteryPool(
                 lotteries.length,                
                 msg.sender,
@@ -91,7 +91,7 @@ contract LotteryPoolFactory is OwnableUpgradeable, ReentrancyGuardUpgradeable, P
             );
             lotteries.push(lottery);
             lotteryAddress = address(lottery);
-        // }
+        }
         numberOfActiveLotteries++;
 
         // Emiting event

@@ -241,7 +241,8 @@ describe("Echion Protocol", function () {
         it("Shouldn't be able to redeem tickets in a closed standard pool", async function() {
             // Arrange
             await lotteryPoolFactory.connect(addrs[1]).createLottery(nft.address, 0, ticketPrice, minProfit, LotteryPoolType.STANDARD);
-            let lotteries = [await _getLotteryPool(0)];
+            await lotteryPoolFactory.connect(addrs[1]).createLottery(nft.address, 0, ticketPrice, minProfit, LotteryPoolType.YIELD);
+            let lotteries = [await _getLotteryPool(0), await _getLotteryPool(1)];
 
             await nft.connect(addrs[1]).approve(lotteries[0].address, 0);
             
@@ -684,9 +685,9 @@ describe("Echion Protocol", function () {
 
         // Getting pool type
         let poolType = await contract.lotteryPoolType();
-        if(poolType == LotteryPoolType.STANDARD)
+        if(poolType == LotteryPoolType.STANDARD) {
             return contract;
-        else {
+        } else {
             YieldLotteryPool = await ethers.getContractFactory("YieldLotteryPool");
             return YieldLotteryPool.attach(lottery);
         }
