@@ -6,6 +6,12 @@ import "./LotteryPoolBase.sol";
 contract StandardLotteryPool is LotteryPoolBase {
 
     /// @notice Contract constructor method
+    constructor() LotteryPoolBase() {
+    }
+
+    // Public methods
+
+    /// @notice Contract constructor method
     /// @param _lotteryId - Lottery unique identifier
     /// @param _creator - Creator address
     /// @param _nftAddress - NFT contract's address
@@ -13,28 +19,20 @@ contract StandardLotteryPool is LotteryPoolBase {
     /// @param _ticketPrice Lottery ticket price
     /// @param _minProfit - Minimum profit amount
     /// @param _created - Creation timestamp
-    constructor(
+    /// @param _lotteryPoolType - Lottery pool type
+    function init(
+        address _parent,
         uint _lotteryId,
         address _creator, 
         address _nftAddress, 
         uint _nftIndex, 
         uint _ticketPrice,
         uint _minProfit,
-        uint _created
-    ) LotteryPoolBase(
-        _lotteryId, 
-        _creator,
-        _nftAddress,
-        _nftIndex,
-        _ticketPrice,
-        _minProfit,
-        _created,
-        LotteryPoolType.STANDARD) {
+        uint _created,
+        uint _lotteryPoolType) external {
+        
+        _init(_parent, _lotteryId, _creator, _nftAddress, _nftIndex, _ticketPrice, _minProfit, _created, _lotteryPoolType);
     }
-
-    // function declareWinner() external override onlyCreator nonReentrant {
-    //     minProfit=0;
-    // }
 
     /// @notice Declares a winner and closes the lottery
     function declareWinner() external override onlyCreator nonReentrant whenParentNotPaused {
@@ -73,6 +71,15 @@ contract StandardLotteryPool is LotteryPoolBase {
         
         // Logging pool cancellation        
         parent.lotteryCancelled(lotteryId, fees);
+    }
+
+    /// @notice Method used to redeem bought tickets once the pool is closed
+    /// @param _numberOfTickets - Number of the tickets to be cancelled
+    function redeemTickets(uint _numberOfTickets) public nonReentrant {
+        require(status == LotteryPoolStatus.OPEN, 'Cannot redeem from a standard closed pool');        
+        require(tickets[msg.sender] > 0 && tickets[msg.sender] >= _numberOfTickets, 'You do not have enough tickets');
+
+        _redeemTickets(_numberOfTickets, msg.sender);
     }
 
 }

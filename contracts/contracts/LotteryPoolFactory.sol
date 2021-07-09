@@ -6,11 +6,10 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "./interfaces/ILotteryPool.sol";
-import "./StandardLotteryPool.sol";
-import "./YieldLotteryPool.sol";
+import "./CloneFactory.sol";
 import "hardhat/console.sol";
 
-contract LotteryPoolFactory is OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableUpgradeable {
+contract LotteryPoolFactory is CloneFactory, OwnableUpgradeable, ReentrancyGuardUpgradeable, PausableUpgradeable {
 
     // Variables
     ILotteryPool[] public lotteries;
@@ -21,8 +20,11 @@ contract LotteryPoolFactory is OwnableUpgradeable, ReentrancyGuardUpgradeable, P
     uint minDaysOpen;
     address private stakingAdapter;
 
+    mapping(uint => bytes32) private lotteryPoolTypes;
+    mapping(uint => address) private masterPools;
+
     // Events
-    event LotteryCreated(uint lotteryId, address creator, address lotteryAddress, address nftAddress, uint nftIndex, uint ticketPrice, uint created, ILotteryPool.LotteryPoolType lotteryPoolType, uint minAmount);
+    event LotteryCreated(uint lotteryId, address creator, address lotteryAddress, address nftAddress, uint nftIndex, uint ticketPrice, uint created, uint lotteryPoolType, uint minAmount);
     event LotteryStaked(uint lotteryId, uint stakedAmount);
     event LotteryClosed(uint lotteryId, address winner, uint profit, uint fees);
     event LotteryCancelled(uint lotteryId, uint fees);
@@ -47,55 +49,59 @@ contract LotteryPoolFactory is OwnableUpgradeable, ReentrancyGuardUpgradeable, P
 
     // Public methods
 
+    /// @notice Adds a new master lottery pool.
+    /// @param _lotteryPoolTypeId - Lottery pool ID
+    /// @param _lotteryPoolTypeName - Lottery pool name
+    /// @param _masterPoolAddress - Master lottery pool deployed address
+    function addMasterPool(
+        uint _lotteryPoolTypeId, 
+        bytes32 _lotteryPoolTypeName, 
+        address _masterPoolAddress
+        ) external onlyOwner {
+
+        lotteryPoolTypes[_lotteryPoolTypeId] = _lotteryPoolTypeName;
+        masterPools[_lotteryPoolTypeId] = _masterPoolAddress;
+    }
+
     /// @notice Creates a new NFT lottery
     /// @param _nftAddress - NFT contract's address
     /// @param _nftIndex - NFT indentifier in its contract
     /// @param _ticketPrice - Lottery ticket price
-    /// @param _minProfit - Minium creator profit
+    /// @param _minProfit - Minimum creator profit
     /// @param _lotteryPoolType - Lottery pool type
     function createLottery(
         address _nftAddress,
         uint _nftIndex,
         uint _ticketPrice,
         uint _minProfit,
-        ILotteryPool.LotteryPoolType _lotteryPoolType
+        uint _lotteryPoolType
         ) public whenNotPaused {        
         require(_nftAddress != address(0), 'A valid address is required');
         require(_ticketPrice > 0, 'A valid ticket price is required');
 
-        // Creating new lottery pool
-        address lotteryAddress;
-        uint created = block.timestamp;
+        // Getting master contract address
+        address masterPoolAddress = masterPools[_lotteryPoolType];
+        require(masterPoolAddress != address(0), 'Master pool contract not deployed');
 
-        if (_lotteryPoolType == ILotteryPool.LotteryPoolType.STANDARD) {
-            StandardLotteryPool lottery = new StandardLotteryPool(
-                lotteries.length,                
-                msg.sender,
-                _nftAddress, 
-                _nftIndex, 
-                _ticketPrice,
-                _minProfit,
-                created
-            );
-            lotteries.push(lottery);
-            lotteryAddress = address(lottery);
-        } else if (_lotteryPoolType == ILotteryPool.LotteryPoolType.YIELD) {
-            YieldLotteryPool lottery = new YieldLotteryPool(
-                lotteries.length,                
-                msg.sender,
-                _nftAddress, 
-                _nftIndex, 
-                _ticketPrice,
-                _minProfit,
-                created
-            );
-            lotteries.push(lottery);
-            lotteryAddress = address(lottery);
-        }
+        // Cloning and deploying lottery pool
+        uint created = block.timestamp;
+        ILotteryPool lottery = ILotteryPool(createClone(masterPoolAddress));
+        lottery.init(
+            address(this),
+            lotteries.length,
+            msg.sender,
+            _nftAddress, 
+            _nftIndex, 
+            _ticketPrice,
+            _minProfit,
+            created,
+            _lotteryPoolType
+        );
+        lotteries.push(lottery);
         numberOfActiveLotteries++;
 
         // Emiting event
-        emit LotteryCreated(lotteries.length - 1, msg.sender, lotteryAddress, _nftAddress, _nftIndex, _ticketPrice, created, _lotteryPoolType, _minProfit);
+        emit LotteryCreated(lotteries.length - 1, msg.sender, address(lottery), _nftAddress, _nftIndex, _ticketPrice, created, _lotteryPoolType, _minProfit);
     }
 
     /// @notice Increases the total balance

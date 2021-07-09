@@ -4,12 +4,19 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "./interfaces/ILotteryPool.sol";
 import "./interfaces/ILotteryPoolFactory.sol";
 import "hardhat/console.sol";
 
-abstract contract LotteryPoolBase is ILotteryPool, Ownable, ReentrancyGuard {
+abstract contract LotteryPoolBase is Ownable, ReentrancyGuard {
     
+    // Enums
+    enum LotteryPoolStatus { 
+        OPEN, 
+        STAKING, 
+        CLOSED, 
+        CANCELLED 
+    }
+
     // Structs
     struct NFT {
         address addr;
@@ -18,7 +25,7 @@ abstract contract LotteryPoolBase is ILotteryPool, Ownable, ReentrancyGuard {
 
     // Variables
     ILotteryPoolFactory internal parent;
-    LotteryPoolType public lotteryPoolType;
+    uint public lotteryPoolType;
     uint public lotteryId;
     uint public ticketPrice;
     uint public minProfit;
@@ -43,36 +50,7 @@ abstract contract LotteryPoolBase is ILotteryPool, Ownable, ReentrancyGuard {
     event Received(address addr, uint amount);
 
     /// @notice Contract constructor method
-    /// @param _lotteryId - Lottery unique identifier
-    /// @param _creator - Creator address
-    /// @param _nftAddress - NFT contract's address
-    /// @param _nftIndex - NFT indentifier in its contract
-    /// @param _ticketPrice Lottery ticket price
-    /// @param _minProfit - Minimum profit amount
-    /// @param _created - Creation timestamp
-    /// @param _lotteryPoolType - Lottery pool type
-    constructor(
-        uint _lotteryId,
-        address _creator, 
-        address _nftAddress, 
-        uint _nftIndex, 
-        uint _ticketPrice,
-        uint _minProfit,
-        uint _created,
-        LotteryPoolType _lotteryPoolType) {
-
-        parent = ILotteryPoolFactory(owner());
-        lotteryId = _lotteryId;
-        lotteryPoolType = _lotteryPoolType;
-        creator = _creator;
-        ticketPrice = _ticketPrice;
-        minProfit = _minProfit;
-        nft.addr = _nftAddress;
-        nft.index = _nftIndex;
-        status = LotteryPoolStatus.OPEN;
-        created = _created;
-        paidToCreator = false;        
-    }
+    constructor() {}
 
     // Public methods
 
@@ -95,44 +73,6 @@ abstract contract LotteryPoolBase is ILotteryPool, Ownable, ReentrancyGuard {
 
         // Emiting event
         emit TicketsBought(lotteryId, msg.sender, _numberOfTickets, msg.value);
-    }
-
-    /// @notice Method used to redeem bought tickets once the pool is closed
-    /// @param _numberOfTickets - Number of the tickets to be cancelled
-    function redeemTickets(uint _numberOfTickets) public nonReentrant {
-        require(status != LotteryPoolStatus.STAKING, 'Cannot redeem tickets during staking process');
-        require(!(lotteryPoolType == LotteryPoolType.STANDARD && status == LotteryPoolStatus.CLOSED), 'Cannot redeem from a standard closed pool');
-        require(tickets[msg.sender] > 0 && tickets[msg.sender] >= _numberOfTickets, 'You do not have enough tickets');
-
-        // Calculating amount to redeem
-        uint amount = ticketPrice * _numberOfTickets;
-        require(totalSupply >= amount, 'Not enough money in the balance');
-
-        // Decreasing number of tickets
-        tickets[msg.sender] -= _numberOfTickets;
-        numberOfTickets -= _numberOfTickets;
-        totalSupply -= amount;
-
-        // Delete items from players array
-        uint deleted = 0;
-        if (status == LotteryPoolStatus.OPEN) {
-            for (uint i=0; i<players.length; i++) {
-                if( players[i] == msg.sender && deleted < _numberOfTickets) {         
-                    delete players[i];
-                    deleted += 1;
-                }
-            }
-        }
-
-        // Decreasing total factory balance
-        parent.decreaseTotalSupply(lotteryId, amount);
-
-        // Transfering amount to sender
-        (bool success, ) = payable(msg.sender).call{value: amount}("");
-        require(success, "Transfer failed");
-
-        // Emiting event
-        emit TicketsRedeemed(lotteryId, msg.sender, _numberOfTickets, amount);
     }
 
     /// @notice Method used to creator can reddem his payment
@@ -177,6 +117,38 @@ abstract contract LotteryPoolBase is ILotteryPool, Ownable, ReentrancyGuard {
 
     // Private methods
 
+    /// @notice Contract initializer method
+    /// @param _lotteryId - Lottery unique identifier
+    /// @param _creator - Creator address
+    /// @param _nftAddress - NFT contract's address
+    /// @param _nftIndex - NFT indentifier in its contract
+    /// @param _ticketPrice Lottery ticket price
+    /// @param _minProfit - Minimum profit amount
+    /// @param _created - Creation timestamp
+    /// @param _lotteryPoolType - Lottery pool type
+    function _init(
+        address _parent,
+        uint _lotteryId,
+        address _creator, 
+        address _nftAddress, 
+        uint _nftIndex, 
+        uint _ticketPrice,
+        uint _minProfit,
+        uint _created,
+        uint _lotteryPoolType) internal {
+        parent = ILotteryPoolFactory(_parent);
+        lotteryId = _lotteryId;
+        lotteryPoolType = _lotteryPoolType;
+        creator = _creator;
+        ticketPrice = _ticketPrice;
+        minProfit = _minProfit;
+        nft.addr = _nftAddress;
+        nft.index = _nftIndex;
+        status = LotteryPoolStatus.OPEN;
+        created = _created;
+        paidToCreator = false;
+    }
+
     /// @notice Calculating lottery pool winner
     /// @return Winner address  
     function _calculateWinner() internal view returns (address) {        
@@ -191,6 +163,40 @@ abstract contract LotteryPoolBase is ILotteryPool, Ownable, ReentrancyGuard {
             (bool success, ) = wallet.call{value: fees}("");
             require(success, "Transfer fees failed");
         }
+    }
+
+    /// @notice Method used to redeem bought tickets once the pool is closed
+    /// @param _numberOfTickets - Number of the tickets to be cancelled
+    function _redeemTickets(uint _numberOfTickets, address sender) internal {
+        // Calculating amount to redeem
+        uint amount = ticketPrice * _numberOfTickets;
+        require(totalSupply >= amount, 'Not enough money in the balance');
+
+        // Decreasing number of tickets
+        tickets[msg.sender] -= _numberOfTickets;
+        numberOfTickets -= _numberOfTickets;
+        totalSupply -= amount;
+
+        // Delete items from players array
+        uint deleted = 0;
+        if (status == LotteryPoolStatus.OPEN) {
+            for (uint i=0; i<players.length; i++) {
+                if( players[i] == sender && deleted < _numberOfTickets) {         
+                    delete players[i];
+                    deleted += 1;
+                }
+            }
+        }
+
+        // Decreasing total factory balance
+        parent.decreaseTotalSupply(lotteryId, amount);
+
+        // Transfering amount to sender
+        (bool success, ) = payable(sender).call{value: amount}("");
+        require(success, "Transfer failed");
+
+        // Emiting event
+        emit TicketsRedeemed(lotteryId, sender, _numberOfTickets, amount);
     }
 
     // Modifiers

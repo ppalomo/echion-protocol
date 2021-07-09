@@ -4,10 +4,12 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "hardhat/console.sol";
 
+/// @title LendingPoolAddressesProvider contract
 interface ILendingPoolAddressesProvider {
     function getLendingPool() external view returns (address);
 }
 
+/// @title Weth gateway contract
 interface IWETHGateway {
     function depositETH(address lendingPool, address onBehalfOf, uint16 referralCode) external payable;
     function withdrawETH(address lendingPool, uint256 amount, address to) external;
@@ -53,13 +55,13 @@ contract AaveStakingAdapter {
     /// @notice Approves deposit withdrawal
     /// @dev Must be called with delegatecall
     /// @return Token address and spender address
-    function getApprovalData() external returns(address, address) {
+    function getApprovalData() external view returns(address, address) {
         return (address(aWeth), address(wethGateway));
     }
 
     /// @notice Gets needed addresses to call withdraw function
     /// @return lendingPoolAddressesProvider address, wethGateway address and the sWeth token address
-    function getWithdrawData() external returns(address[5] memory) {
+    function getWithdrawData() external view returns(address[5] memory) {
         return [address(provider), address(wethGateway), address(aWeth), address(0), address(0)];
     }
 

@@ -11,5 +11,6 @@ Tests
 =============================================
 - Creator cannot redeem payment multiple times.
 - Tests methods cannot be called directly, only through the factory contract.
+- Test contract pause
 
 

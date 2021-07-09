@@ -81,6 +81,8 @@ task("accounts", "Prints the list of accounts", async () => {
     enabled: true,
     coinmarketcap: `${process.env.REACT_APP_COINMARKETCAP_KEY}`
   },
-
+  mocha: {
+    timeout: 10000000
+  }
 };
 

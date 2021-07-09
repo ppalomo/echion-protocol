@@ -206,9 +206,9 @@
       "name": "lotteryPoolType",
       "outputs": [
         {
-          "internalType": "enum ILotteryPool.LotteryPoolType",
+          "internalType": "uint256",
           "name": "",
-          "type": "uint8"
+          "type": "uint256"
         }
       ],
       "stateMutability": "view",
@@ -311,19 +311,6 @@
       "type": "function"
     },
     {
-      "inputs": [
-        {
-          "internalType": "uint256",
-          "name": "_numberOfTickets",
-          "type": "uint256"
-        }
-      ],
-      "name": "redeemTickets",
-      "outputs": [],
-      "stateMutability": "nonpayable",
-      "type": "function"
-    },
-    {
       "inputs": [],
       "name": "renounceOwnership",
       "outputs": [],
@@ -348,7 +335,7 @@
       "name": "status",
       "outputs": [
         {
-          "internalType": "enum ILotteryPool.LotteryPoolStatus",
+          "internalType": "enum LotteryPoolBase.LotteryPoolStatus",
           "name": "",
           "type": "uint8"
         }
