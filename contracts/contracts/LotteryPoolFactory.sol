@@ -19,7 +19,6 @@ contract LotteryPoolFactory is CloneFactory, OwnableUpgradeable, ReentrancyGuard
     address payable wallet;
     uint minDaysOpen;
     address private stakingAdapter;
-
     mapping(uint => bytes32) private lotteryPoolTypes;
     mapping(uint => address) private masterPools;
 
@@ -32,9 +31,7 @@ contract LotteryPoolFactory is CloneFactory, OwnableUpgradeable, ReentrancyGuard
     event WalletChanged(address indexed addr);
     event MinDaysOpenChanged(uint minDaysOpen);
 
-    /**
-     @notice Contract initializer.
-     */
+    /// @notice Contract initializer
     function initialize(address _stakingAdapter) public initializer {
         __Ownable_init();
         __ReentrancyGuard_init();
@@ -75,7 +72,8 @@ contract LotteryPoolFactory is CloneFactory, OwnableUpgradeable, ReentrancyGuard
         uint _ticketPrice,
         uint _minProfit,
         uint _lotteryPoolType
-        ) public whenNotPaused {        
+        ) public whenNotPaused {  
+
         require(_nftAddress != address(0), 'A valid address is required');
         require(_ticketPrice > 0, 'A valid ticket price is required');
 
@@ -148,12 +146,17 @@ contract LotteryPoolFactory is CloneFactory, OwnableUpgradeable, ReentrancyGuard
         emit LotteryCancelled(_lotteryId, _fees);
     }
 
-    /// @notice Returns fee percent
+    /// @notice Returns a lottery pool type name by id
+    function getLotteryPoolTypeName(uint _lotteryPoolTypeId) returns(bytes32) {
+        return lotteryPoolTypes[_lotteryPoolTypeId];
+    } 
+
+    /// @notice Returns current fee percent
     function getFeePercent() public view returns(uint) {
         return feePercent;
     }
 
-    /// @notice Sets fees percent
+    /// @notice Sets a new fees percent
     /// @param _feePercent New fee percent
     function setFeePercent(uint _feePercent) public onlyOwner {
         feePercent = _feePercent;
@@ -203,7 +206,8 @@ contract LotteryPoolFactory is CloneFactory, OwnableUpgradeable, ReentrancyGuard
     // Modifiers
 
     modifier onlyChild(uint _lotteryId) {
-        require(msg.sender == address(lotteries[_lotteryId]), 'This method must be called through a lottery child contract');
+        require(msg.sender == address(lotteries[_lotteryId]), 
+        'This method must be called through a lottery child contract');
         _;
     }
 
