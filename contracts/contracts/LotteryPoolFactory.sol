@@ -147,7 +147,7 @@ contract LotteryPoolFactory is CloneFactory, OwnableUpgradeable, ReentrancyGuard
     }
 
     /// @notice Returns a lottery pool type name by id
-    function getLotteryPoolTypeName(uint _lotteryPoolTypeId) returns(bytes32) {
+    function getLotteryPoolTypeName(uint _lotteryPoolTypeId) external view returns(bytes32) {
         return lotteryPoolTypes[_lotteryPoolTypeId];
     } 
 

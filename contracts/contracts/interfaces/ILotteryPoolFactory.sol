@@ -18,6 +18,8 @@ interface ILotteryPoolFactory {
 
     function lotteryCancelled(uint _lotteryId, uint _fees) external;
 
+    function getLotteryPoolTypeName(uint _lotteryPoolTypeId) external view returns(bytes32);
+
     function getFeePercent() external view returns(uint);
 
     function getWallet() external view returns(address);
