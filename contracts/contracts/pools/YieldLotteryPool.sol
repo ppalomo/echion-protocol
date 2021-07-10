@@ -133,11 +133,24 @@ contract YieldLotteryPool is LotteryPoolBase {
     function _depositStaking() private {
         // Must approve to spend tokens to be able to withdraw deposit later on
         (address token, address spender) = stakingAdapter.getApprovalData();
-        IERC20(token).approve(spender, type(uint256).max);
+        if (spender != address(0)){
+            IERC20(token).approve(spender, type(uint256).max);
+        }
 
         // Launching Staking
         stakedAmount = address(this).balance;
-        stakingAdapter.deposit{ value: address(this).balance }();
+        // stakingAdapter.deposit{ value: address(this).balance }();
+        
+        // (bool success, bytes memory result) = address(stakingAdapter).delegatecall(
+        //     abi.encodeWithSignature("deposit()")
+        // );
+        // require(success, "Staking deposit failed");
+
+        (bool success, bytes memory result) = 
+            (address(stakingAdapter).call{value: address(this).balance}(abi.encode(bytes4(keccak256("deposit()")))));
+        require(success, "Staking deposit failed");
+
+        /// emit StakingDeposited!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     }
 
     /// @notice Method used to withdraw staked amount

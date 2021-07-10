@@ -68,6 +68,25 @@
       "type": "function"
     },
     {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_lotteryPoolTypeId",
+          "type": "uint256"
+        }
+      ],
+      "name": "getLotteryPoolTypeName",
+      "outputs": [
+        {
+          "internalType": "bytes32",
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [],
       "name": "getMinDaysOpen",
       "outputs": [
