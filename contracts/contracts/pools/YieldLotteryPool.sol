@@ -139,16 +139,17 @@ contract YieldLotteryPool is LotteryPoolBase {
 
         // Launching Staking
         stakedAmount = address(this).balance;
-        // stakingAdapter.deposit{ value: address(this).balance }();
+        stakingAdapter.deposit{ value: address(this).balance }();
         
         // (bool success, bytes memory result) = address(stakingAdapter).delegatecall(
         //     abi.encodeWithSignature("deposit()")
         // );
         // require(success, "Staking deposit failed");
 
-        (bool success, bytes memory result) = 
-            (address(stakingAdapter).call{value: address(this).balance}(abi.encode(bytes4(keccak256("deposit()")))));
-        require(success, "Staking deposit failed");
+        // address[5] memory data = stakingAdapter.getWithdrawData();
+        // (bool success, bytes memory result) = 
+        //     (address(stakingAdapter).call{value: address(this).balance}(abi.encode(bytes4(keccak256("deposit(address[5])", data)))));
+        // require(success, "Staking deposit failed");
 
         /// emit StakingDeposited!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     }

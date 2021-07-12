@@ -49,10 +49,15 @@ describe("Echion Protocol", function () {
         //     "0x030bA81f1c18d280636F32af80b9AAd02Cf0854e"); // _aWethAddress
         // expect(stakingAdapter.address).to.properAddress;
 
+        // CompoundStakingAdapter = await ethers.getContractFactory("CompoundStakingAdapter");
+        // stakingAdapter = await CompoundStakingAdapter.deploy(
+        //     "0x4Ddc2D193948926D02f9B1fE9e1daa0718270ED5", // _cEtherGateway
+        //     "0x4Ddc2D193948926D02f9B1fE9e1daa0718270ED5");  // _cEthAddress
+        // expect(stakingAdapter.address).to.properAddress;
+
         CompoundStakingAdapter = await ethers.getContractFactory("CompoundStakingAdapter");
         stakingAdapter = await CompoundStakingAdapter.deploy(
-            "0x4Ddc2D193948926D02f9B1fE9e1daa0718270ED5", // _cEtherGateway
-            "0x4ddc2d193948926d02f9b1fe9e1daa0718270ed5");  // _cEthAddress
+            "0x4Ddc2D193948926D02f9B1fE9e1daa0718270ED5");  // _cEthAddress
         expect(stakingAdapter.address).to.properAddress;
 
         StandardLotteryPool = await ethers.getContractFactory("StandardLotteryPool");
@@ -377,6 +382,10 @@ describe("Echion Protocol", function () {
         
             const stakingBalance = await stakingAdapter.getStakedAmount(lotteries[0].address);
             console.log(stakingBalance.toString());
+
+            const b = await stakingAdapter.kk();
+            console.log(b.toString());
+
             // expect(stakingBalance).to.be.equal(ethers.utils.parseEther('0.3'));
         }).timeout(timeout);
 
@@ -394,7 +403,7 @@ describe("Echion Protocol", function () {
         //     await lotteries[0].connect(addrs[1]).launchStaking();
         //     await lotteries[0].connect(addrs[1]).declareWinner();
 
-        //     // Assert            
+        //     // Assert
         //     let allowance = await stakingAdapter.getAllowance(lotteries[0].address);
         //     expect(allowance).to.be.above(0);
         

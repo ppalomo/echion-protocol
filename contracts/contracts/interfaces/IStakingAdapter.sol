@@ -5,6 +5,7 @@ pragma solidity ^0.8.0;
 interface IStakingAdapter {
 
     function deposit() external payable;
+    // function deposit(address[5] memory _data) external payable;
 
     function withdraw(address[5] memory _data) external returns(uint);
 
