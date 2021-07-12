@@ -38,9 +38,11 @@ contract AaveStakingAdapter {
     // Public methods
 
     /// @notice Method used to deposit staking
-    function deposit() external payable {
-        address lpool = _getProvider();
-        wethGateway.depositETH{ value: msg.value }(lpool, msg.sender, 0);
+    /// @dev Must be called with delegatecall
+    /// @param _data - Needed addresses
+    function deposit(address[5] memory _data) external {
+        address pool = ILendingPoolAddressesProvider(_data[0]).getLendingPool();
+        IWETHGateway(_data[1]).depositETH{ value: address(this).balance }(pool, address(this), 0);
     }
 
     /// @notice Method used to withdraw deposited staking

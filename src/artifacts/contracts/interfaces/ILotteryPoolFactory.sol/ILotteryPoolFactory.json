@@ -228,6 +228,19 @@
       "type": "function"
     },
     {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_stakingAdapter",
+          "type": "address"
+        }
+      ],
+      "name": "setStakingAdapter",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
       "inputs": [],
       "name": "unpause",
       "outputs": [],

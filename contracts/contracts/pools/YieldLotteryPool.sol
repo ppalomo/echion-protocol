@@ -11,6 +11,7 @@ contract YieldLotteryPool is LotteryPoolBase {
     IStakingAdapter private stakingAdapter;
     
     // Events
+    event StakingDeposited(uint stakedAmount);
     event StakingWithdrawal(uint withdrawal);
 
     // Public methods
@@ -133,11 +134,19 @@ contract YieldLotteryPool is LotteryPoolBase {
     function _depositStaking() private {
         // Must approve to spend tokens to be able to withdraw deposit later on
         (address token, address spender) = stakingAdapter.getApprovalData();
-        IERC20(token).approve(spender, type(uint256).max);
+        if (spender != address(0)){
+            IERC20(token).approve(spender, type(uint256).max);
+        }
 
         // Launching Staking
         stakedAmount = address(this).balance;
-        stakingAdapter.deposit{ value: address(this).balance }();
+        address[5] memory data = stakingAdapter.getWithdrawData();
+        (bool success, bytes memory result) = address(stakingAdapter).delegatecall(
+            abi.encodeWithSignature("deposit(address[5])", data)
+        );
+        require(success, "Staking deposit failed");
+
+        emit StakingDeposited(stakedAmount);
     }
 
     /// @notice Method used to withdraw staked amount

@@ -20,6 +20,8 @@ interface ILotteryPoolFactory {
 
     function getLotteryPoolTypeName(uint _lotteryPoolTypeId) external view returns(bytes32);
 
+    function setStakingAdapter(address _stakingAdapter) external;
+
     function getFeePercent() external view returns(uint);
 
     function getWallet() external view returns(address);

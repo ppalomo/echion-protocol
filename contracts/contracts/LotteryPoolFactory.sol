@@ -32,6 +32,7 @@ contract LotteryPoolFactory is CloneFactory, OwnableUpgradeable, ReentrancyGuard
     event MinDaysOpenChanged(uint minDaysOpen);
 
     /// @notice Contract initializer
+    /// @param _stakingAdapter - Staking adapter protocol address
     function initialize(address _stakingAdapter) public initializer {
         __Ownable_init();
         __ReentrancyGuard_init();
@@ -149,7 +150,13 @@ contract LotteryPoolFactory is CloneFactory, OwnableUpgradeable, ReentrancyGuard
     /// @notice Returns a lottery pool type name by id
     function getLotteryPoolTypeName(uint _lotteryPoolTypeId) external view returns(bytes32) {
         return lotteryPoolTypes[_lotteryPoolTypeId];
-    } 
+    }
+
+    /// @notice Contract initializer
+    /// @param _stakingAdapter - Staking adapter protocol address
+    function setStakingAdapter(address _stakingAdapter) external {
+        stakingAdapter = _stakingAdapter;
+    }
 
     /// @notice Returns current fee percent
     function getFeePercent() public view returns(uint) {

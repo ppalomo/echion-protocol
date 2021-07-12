@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 /// @title LotteryPoolFactory interface
 interface IStakingAdapter {
 
-    function deposit() external payable;
+    function deposit(address[5] memory _data) external;
 
     function withdraw(address[5] memory _data) external returns(uint);
 

@@ -4,10 +4,16 @@
   "sourceName": "contracts/interfaces/IStakingAdapter.sol",
   "abi": [
     {
-      "inputs": [],
+      "inputs": [
+        {
+          "internalType": "address[5]",
+          "name": "_data",
+          "type": "address[5]"
+        }
+      ],
       "name": "deposit",
       "outputs": [],
-      "stateMutability": "payable",
+      "stateMutability": "nonpayable",
       "type": "function"
     },
     {
