@@ -72,4 +72,9 @@ contract CompoundStakingAdapter {
         return allowance;
     }
 
+    /// @notice Staking protocol name
+    function name() external pure returns(bytes32) {
+        return 'COMPOUND';
+    }
+
 }

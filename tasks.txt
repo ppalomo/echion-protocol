@@ -1,18 +1,13 @@
 Contracts
 =============================================
-- How to update pools code and staking adapters code
-- Setter for stakingAdapter
+- Get staking adapter when leuching staking insetad of when creating the lottery pool
 - Update masterPool address and use already created pool and create new pool
-- Update/Add new staking adapter
 - Staking adapters add deposit withdraw for eth and for erc20
-- Staking adapters, name deposit as supply?
-- Staking adapters. Call deposit with delegatecall as well.
-- Implement States Machine Pattern
+
 
 Tests
 =============================================
 - Creator cannot redeem payment multiple times.
 - Tests methods cannot be called directly, only through the factory contract.
-- Test contract pause
 
 

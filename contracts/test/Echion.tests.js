@@ -47,20 +47,6 @@ describe("Echion Protocol", function () {
         nft = await EchionNFT.deploy();
         expect(nft.address).to.properAddress;
 
-        // await getStakingAdapter("AAVE");
-
-        // AaveStakingAdapter = await ethers.getContractFactory("AaveStakingAdapter");
-        // stakingAdapter = await AaveStakingAdapter.deploy(
-        //     "0xB53C1a33016B2DC2fF3653530bfF1848a515c8c5", // _lendingPoolAddressesProvider
-        //     "0xcc9a0B7c43DC2a5F023Bb9b738E45B0Ef6B06E04",  // _wethGateway
-        //     "0x030bA81f1c18d280636F32af80b9AAd02Cf0854e"); // _aWethAddress
-        // expect(stakingAdapter.address).to.properAddress;
-
-        // CompoundStakingAdapter = await ethers.getContractFactory("CompoundStakingAdapter");
-        // stakingAdapter = await CompoundStakingAdapter.deploy(
-        //     "0x4Ddc2D193948926D02f9B1fE9e1daa0718270ED5");  // _cEthAddress
-        // expect(stakingAdapter.address).to.properAddress;
-
         stakingAdapter = await _getStakingAdapter(StakingProtocol.AAVE);
         expect(stakingAdapter.address).to.properAddress;
 

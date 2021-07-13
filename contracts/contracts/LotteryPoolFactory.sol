@@ -6,6 +6,7 @@ import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import "./interfaces/ILotteryPool.sol";
+import "./interfaces/IStakingAdapter.sol";
 import "./CloneFactory.sol";
 import "hardhat/console.sol";
 
@@ -23,7 +24,17 @@ contract LotteryPoolFactory is CloneFactory, OwnableUpgradeable, ReentrancyGuard
     mapping(uint => address) private masterPools;
 
     // Events
-    event LotteryCreated(uint lotteryId, address creator, address lotteryAddress, address nftAddress, uint nftIndex, uint ticketPrice, uint created, uint lotteryPoolType, uint minAmount);
+    event LotteryCreated(uint lotteryId, 
+        address creator, 
+        address lotteryAddress, 
+        address nftAddress, 
+        uint nftIndex, 
+        uint ticketPrice, 
+        uint created, 
+        uint lotteryPoolType, 
+        uint minAmount, 
+        address stakingAdapter, 
+        bytes32 stakingAdapterName);
     event LotteryStaked(uint lotteryId, uint stakedAmount);
     event LotteryClosed(uint lotteryId, address winner, uint profit, uint fees);
     event LotteryCancelled(uint lotteryId, uint fees);
@@ -99,8 +110,11 @@ contract LotteryPoolFactory is CloneFactory, OwnableUpgradeable, ReentrancyGuard
         lotteries.push(lottery);
         numberOfActiveLotteries++;
 
+        // Getting staking adapter name
+        bytes32 stakingAdapterName = IStakingAdapter(stakingAdapter).name();
+
         // Emiting event
-        emit LotteryCreated(lotteries.length - 1, msg.sender, address(lottery), _nftAddress, _nftIndex, _ticketPrice, created, _lotteryPoolType, _minProfit);
+        emit LotteryCreated(lotteries.length - 1, msg.sender, address(lottery), _nftAddress, _nftIndex, _ticketPrice, created, _lotteryPoolType, _minProfit, stakingAdapter, stakingAdapterName);
     }
 
     /// @notice Increases the total balance

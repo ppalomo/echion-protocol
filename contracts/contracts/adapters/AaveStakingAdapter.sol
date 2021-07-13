@@ -81,6 +81,11 @@ contract AaveStakingAdapter {
         return allowance;
     }
 
+    /// @notice Staking protocol name
+    function name() external pure returns(bytes32) {
+        return 'AAVE';
+    }
+
     // Private methods
 
     /// @notice Gets provider contract address

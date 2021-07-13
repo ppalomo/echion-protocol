@@ -15,5 +15,7 @@ interface IStakingAdapter {
     function getStakedAmount(address _addr) external view returns (uint);
 
     function getAllowance(address _addr) external view returns (uint);
+
+    function name() external pure returns(bytes32);
     
 }

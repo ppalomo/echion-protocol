@@ -45,7 +45,7 @@ export class LotteryCancelled__Params {
     return this._event.parameters[0].value.toBigInt();
   }
 
-  get paymentToCreator(): BigInt {
+  get fees(): BigInt {
     return this._event.parameters[1].value.toBigInt();
   }
 }
@@ -71,7 +71,7 @@ export class LotteryClosed__Params {
     return this._event.parameters[1].value.toAddress();
   }
 
-  get paymentToCreator(): BigInt {
+  get profit(): BigInt {
     return this._event.parameters[2].value.toBigInt();
   }
 
@@ -121,8 +121,8 @@ export class LotteryCreated__Params {
     return this._event.parameters[6].value.toBigInt();
   }
 
-  get lotteryPoolType(): i32 {
-    return this._event.parameters[7].value.toI32();
+  get lotteryPoolType(): BigInt {
+    return this._event.parameters[7].value.toBigInt();
   }
 
   get minAmount(): BigInt {
@@ -145,6 +145,10 @@ export class LotteryStaked__Params {
 
   get lotteryId(): BigInt {
     return this._event.parameters[0].value.toBigInt();
+  }
+
+  get stakedAmount(): BigInt {
+    return this._event.parameters[1].value.toBigInt();
   }
 }
 
@@ -185,6 +189,42 @@ export class OwnershipTransferred__Params {
 
   get newOwner(): Address {
     return this._event.parameters[1].value.toAddress();
+  }
+}
+
+export class Paused extends ethereum.Event {
+  get params(): Paused__Params {
+    return new Paused__Params(this);
+  }
+}
+
+export class Paused__Params {
+  _event: Paused;
+
+  constructor(event: Paused) {
+    this._event = event;
+  }
+
+  get account(): Address {
+    return this._event.parameters[0].value.toAddress();
+  }
+}
+
+export class Unpaused extends ethereum.Event {
+  get params(): Unpaused__Params {
+    return new Unpaused__Params(this);
+  }
+}
+
+export class Unpaused__Params {
+  _event: Unpaused;
+
+  constructor(event: Unpaused) {
+    this._event = event;
+  }
+
+  get account(): Address {
+    return this._event.parameters[0].value.toAddress();
   }
 }
 
@@ -230,27 +270,29 @@ export class LotteryPoolFactory extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toBigInt());
   }
 
-  getLotteryPoolStaking(): Address {
+  getLotteryPoolTypeName(_lotteryPoolTypeId: BigInt): Bytes {
     let result = super.call(
-      "getLotteryPoolStaking",
-      "getLotteryPoolStaking():(address)",
-      []
+      "getLotteryPoolTypeName",
+      "getLotteryPoolTypeName(uint256):(bytes32)",
+      [ethereum.Value.fromUnsignedBigInt(_lotteryPoolTypeId)]
     );
 
-    return result[0].toAddress();
+    return result[0].toBytes();
   }
 
-  try_getLotteryPoolStaking(): ethereum.CallResult<Address> {
+  try_getLotteryPoolTypeName(
+    _lotteryPoolTypeId: BigInt
+  ): ethereum.CallResult<Bytes> {
     let result = super.tryCall(
-      "getLotteryPoolStaking",
-      "getLotteryPoolStaking():(address)",
-      []
+      "getLotteryPoolTypeName",
+      "getLotteryPoolTypeName(uint256):(bytes32)",
+      [ethereum.Value.fromUnsignedBigInt(_lotteryPoolTypeId)]
     );
     if (result.reverted) {
       return new ethereum.CallResult();
     }
     let value = result.value;
-    return ethereum.CallResult.fromValue(value[0].toAddress());
+    return ethereum.CallResult.fromValue(value[0].toBytes());
   }
 
   getMinDaysOpen(): BigInt {
@@ -270,6 +312,29 @@ export class LotteryPoolFactory extends ethereum.SmartContract {
     }
     let value = result.value;
     return ethereum.CallResult.fromValue(value[0].toBigInt());
+  }
+
+  getStakingAdapter(): Address {
+    let result = super.call(
+      "getStakingAdapter",
+      "getStakingAdapter():(address)",
+      []
+    );
+
+    return result[0].toAddress();
+  }
+
+  try_getStakingAdapter(): ethereum.CallResult<Address> {
+    let result = super.tryCall(
+      "getStakingAdapter",
+      "getStakingAdapter():(address)",
+      []
+    );
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
   getWallet(): Address {
@@ -344,14 +409,29 @@ export class LotteryPoolFactory extends ethereum.SmartContract {
     return ethereum.CallResult.fromValue(value[0].toAddress());
   }
 
-  totalBalance(): BigInt {
-    let result = super.call("totalBalance", "totalBalance():(uint256)", []);
+  paused(): boolean {
+    let result = super.call("paused", "paused():(bool)", []);
+
+    return result[0].toBoolean();
+  }
+
+  try_paused(): ethereum.CallResult<boolean> {
+    let result = super.tryCall("paused", "paused():(bool)", []);
+    if (result.reverted) {
+      return new ethereum.CallResult();
+    }
+    let value = result.value;
+    return ethereum.CallResult.fromValue(value[0].toBoolean());
+  }
+
+  totalSupply(): BigInt {
+    let result = super.call("totalSupply", "totalSupply():(uint256)", []);
 
     return result[0].toBigInt();
   }
 
-  try_totalBalance(): ethereum.CallResult<BigInt> {
-    let result = super.tryCall("totalBalance", "totalBalance():(uint256)", []);
+  try_totalSupply(): ethereum.CallResult<BigInt> {
+    let result = super.tryCall("totalSupply", "totalSupply():(uint256)", []);
     if (result.reverted) {
       return new ethereum.CallResult();
     }
@@ -360,62 +440,40 @@ export class LotteryPoolFactory extends ethereum.SmartContract {
   }
 }
 
-export class ConstructorCall extends ethereum.Call {
-  get inputs(): ConstructorCall__Inputs {
-    return new ConstructorCall__Inputs(this);
+export class AddMasterPoolCall extends ethereum.Call {
+  get inputs(): AddMasterPoolCall__Inputs {
+    return new AddMasterPoolCall__Inputs(this);
   }
 
-  get outputs(): ConstructorCall__Outputs {
-    return new ConstructorCall__Outputs(this);
+  get outputs(): AddMasterPoolCall__Outputs {
+    return new AddMasterPoolCall__Outputs(this);
   }
 }
 
-export class ConstructorCall__Inputs {
-  _call: ConstructorCall;
+export class AddMasterPoolCall__Inputs {
+  _call: AddMasterPoolCall;
 
-  constructor(call: ConstructorCall) {
+  constructor(call: AddMasterPoolCall) {
     this._call = call;
   }
 
-  get _lotteryPoolStaking(): Address {
-    return this._call.inputValues[0].value.toAddress();
-  }
-}
-
-export class ConstructorCall__Outputs {
-  _call: ConstructorCall;
-
-  constructor(call: ConstructorCall) {
-    this._call = call;
-  }
-}
-
-export class CancelLotteryCall extends ethereum.Call {
-  get inputs(): CancelLotteryCall__Inputs {
-    return new CancelLotteryCall__Inputs(this);
-  }
-
-  get outputs(): CancelLotteryCall__Outputs {
-    return new CancelLotteryCall__Outputs(this);
-  }
-}
-
-export class CancelLotteryCall__Inputs {
-  _call: CancelLotteryCall;
-
-  constructor(call: CancelLotteryCall) {
-    this._call = call;
-  }
-
-  get _lotteryId(): BigInt {
+  get _lotteryPoolTypeId(): BigInt {
     return this._call.inputValues[0].value.toBigInt();
   }
+
+  get _lotteryPoolTypeName(): Bytes {
+    return this._call.inputValues[1].value.toBytes();
+  }
+
+  get _masterPoolAddress(): Address {
+    return this._call.inputValues[2].value.toAddress();
+  }
 }
 
-export class CancelLotteryCall__Outputs {
-  _call: CancelLotteryCall;
+export class AddMasterPoolCall__Outputs {
+  _call: AddMasterPoolCall;
 
-  constructor(call: CancelLotteryCall) {
+  constructor(call: AddMasterPoolCall) {
     this._call = call;
   }
 }
@@ -449,11 +507,11 @@ export class CreateLotteryCall__Inputs {
     return this._call.inputValues[2].value.toBigInt();
   }
 
-  get _lotteryPoolType(): i32 {
-    return this._call.inputValues[3].value.toI32();
+  get _minProfit(): BigInt {
+    return this._call.inputValues[3].value.toBigInt();
   }
 
-  get _minAmount(): BigInt {
+  get _lotteryPoolType(): BigInt {
     return this._call.inputValues[4].value.toBigInt();
   }
 }
@@ -466,50 +524,20 @@ export class CreateLotteryCall__Outputs {
   }
 }
 
-export class DeclareWinnerCall extends ethereum.Call {
-  get inputs(): DeclareWinnerCall__Inputs {
-    return new DeclareWinnerCall__Inputs(this);
+export class DecreaseTotalSupplyCall extends ethereum.Call {
+  get inputs(): DecreaseTotalSupplyCall__Inputs {
+    return new DecreaseTotalSupplyCall__Inputs(this);
   }
 
-  get outputs(): DeclareWinnerCall__Outputs {
-    return new DeclareWinnerCall__Outputs(this);
-  }
-}
-
-export class DeclareWinnerCall__Inputs {
-  _call: DeclareWinnerCall;
-
-  constructor(call: DeclareWinnerCall) {
-    this._call = call;
-  }
-
-  get _lotteryId(): BigInt {
-    return this._call.inputValues[0].value.toBigInt();
+  get outputs(): DecreaseTotalSupplyCall__Outputs {
+    return new DecreaseTotalSupplyCall__Outputs(this);
   }
 }
 
-export class DeclareWinnerCall__Outputs {
-  _call: DeclareWinnerCall;
+export class DecreaseTotalSupplyCall__Inputs {
+  _call: DecreaseTotalSupplyCall;
 
-  constructor(call: DeclareWinnerCall) {
-    this._call = call;
-  }
-}
-
-export class DecreaseTotalBalanceCall extends ethereum.Call {
-  get inputs(): DecreaseTotalBalanceCall__Inputs {
-    return new DecreaseTotalBalanceCall__Inputs(this);
-  }
-
-  get outputs(): DecreaseTotalBalanceCall__Outputs {
-    return new DecreaseTotalBalanceCall__Outputs(this);
-  }
-}
-
-export class DecreaseTotalBalanceCall__Inputs {
-  _call: DecreaseTotalBalanceCall;
-
-  constructor(call: DecreaseTotalBalanceCall) {
+  constructor(call: DecreaseTotalSupplyCall) {
     this._call = call;
   }
 
@@ -522,28 +550,28 @@ export class DecreaseTotalBalanceCall__Inputs {
   }
 }
 
-export class DecreaseTotalBalanceCall__Outputs {
-  _call: DecreaseTotalBalanceCall;
+export class DecreaseTotalSupplyCall__Outputs {
+  _call: DecreaseTotalSupplyCall;
 
-  constructor(call: DecreaseTotalBalanceCall) {
+  constructor(call: DecreaseTotalSupplyCall) {
     this._call = call;
   }
 }
 
-export class IncreaseTotalBalanceCall extends ethereum.Call {
-  get inputs(): IncreaseTotalBalanceCall__Inputs {
-    return new IncreaseTotalBalanceCall__Inputs(this);
+export class IncreaseTotalSupplyCall extends ethereum.Call {
+  get inputs(): IncreaseTotalSupplyCall__Inputs {
+    return new IncreaseTotalSupplyCall__Inputs(this);
   }
 
-  get outputs(): IncreaseTotalBalanceCall__Outputs {
-    return new IncreaseTotalBalanceCall__Outputs(this);
+  get outputs(): IncreaseTotalSupplyCall__Outputs {
+    return new IncreaseTotalSupplyCall__Outputs(this);
   }
 }
 
-export class IncreaseTotalBalanceCall__Inputs {
-  _call: IncreaseTotalBalanceCall;
+export class IncreaseTotalSupplyCall__Inputs {
+  _call: IncreaseTotalSupplyCall;
 
-  constructor(call: IncreaseTotalBalanceCall) {
+  constructor(call: IncreaseTotalSupplyCall) {
     this._call = call;
   }
 
@@ -556,40 +584,176 @@ export class IncreaseTotalBalanceCall__Inputs {
   }
 }
 
-export class IncreaseTotalBalanceCall__Outputs {
-  _call: IncreaseTotalBalanceCall;
+export class IncreaseTotalSupplyCall__Outputs {
+  _call: IncreaseTotalSupplyCall;
 
-  constructor(call: IncreaseTotalBalanceCall) {
+  constructor(call: IncreaseTotalSupplyCall) {
     this._call = call;
   }
 }
 
-export class LaunchStakingCall extends ethereum.Call {
-  get inputs(): LaunchStakingCall__Inputs {
-    return new LaunchStakingCall__Inputs(this);
+export class InitializeCall extends ethereum.Call {
+  get inputs(): InitializeCall__Inputs {
+    return new InitializeCall__Inputs(this);
   }
 
-  get outputs(): LaunchStakingCall__Outputs {
-    return new LaunchStakingCall__Outputs(this);
+  get outputs(): InitializeCall__Outputs {
+    return new InitializeCall__Outputs(this);
   }
 }
 
-export class LaunchStakingCall__Inputs {
-  _call: LaunchStakingCall;
+export class InitializeCall__Inputs {
+  _call: InitializeCall;
 
-  constructor(call: LaunchStakingCall) {
+  constructor(call: InitializeCall) {
+    this._call = call;
+  }
+
+  get _stakingAdapter(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+}
+
+export class InitializeCall__Outputs {
+  _call: InitializeCall;
+
+  constructor(call: InitializeCall) {
+    this._call = call;
+  }
+}
+
+export class LotteryCancelledCall extends ethereum.Call {
+  get inputs(): LotteryCancelledCall__Inputs {
+    return new LotteryCancelledCall__Inputs(this);
+  }
+
+  get outputs(): LotteryCancelledCall__Outputs {
+    return new LotteryCancelledCall__Outputs(this);
+  }
+}
+
+export class LotteryCancelledCall__Inputs {
+  _call: LotteryCancelledCall;
+
+  constructor(call: LotteryCancelledCall) {
     this._call = call;
   }
 
   get _lotteryId(): BigInt {
     return this._call.inputValues[0].value.toBigInt();
   }
+
+  get _fees(): BigInt {
+    return this._call.inputValues[1].value.toBigInt();
+  }
 }
 
-export class LaunchStakingCall__Outputs {
-  _call: LaunchStakingCall;
+export class LotteryCancelledCall__Outputs {
+  _call: LotteryCancelledCall;
 
-  constructor(call: LaunchStakingCall) {
+  constructor(call: LotteryCancelledCall) {
+    this._call = call;
+  }
+}
+
+export class LotteryClosedCall extends ethereum.Call {
+  get inputs(): LotteryClosedCall__Inputs {
+    return new LotteryClosedCall__Inputs(this);
+  }
+
+  get outputs(): LotteryClosedCall__Outputs {
+    return new LotteryClosedCall__Outputs(this);
+  }
+}
+
+export class LotteryClosedCall__Inputs {
+  _call: LotteryClosedCall;
+
+  constructor(call: LotteryClosedCall) {
+    this._call = call;
+  }
+
+  get _lotteryId(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+
+  get _winner(): Address {
+    return this._call.inputValues[1].value.toAddress();
+  }
+
+  get _profit(): BigInt {
+    return this._call.inputValues[2].value.toBigInt();
+  }
+
+  get _fees(): BigInt {
+    return this._call.inputValues[3].value.toBigInt();
+  }
+}
+
+export class LotteryClosedCall__Outputs {
+  _call: LotteryClosedCall;
+
+  constructor(call: LotteryClosedCall) {
+    this._call = call;
+  }
+}
+
+export class LotteryStakedCall extends ethereum.Call {
+  get inputs(): LotteryStakedCall__Inputs {
+    return new LotteryStakedCall__Inputs(this);
+  }
+
+  get outputs(): LotteryStakedCall__Outputs {
+    return new LotteryStakedCall__Outputs(this);
+  }
+}
+
+export class LotteryStakedCall__Inputs {
+  _call: LotteryStakedCall;
+
+  constructor(call: LotteryStakedCall) {
+    this._call = call;
+  }
+
+  get _lotteryId(): BigInt {
+    return this._call.inputValues[0].value.toBigInt();
+  }
+
+  get _stakedAmount(): BigInt {
+    return this._call.inputValues[1].value.toBigInt();
+  }
+}
+
+export class LotteryStakedCall__Outputs {
+  _call: LotteryStakedCall;
+
+  constructor(call: LotteryStakedCall) {
+    this._call = call;
+  }
+}
+
+export class PauseCall extends ethereum.Call {
+  get inputs(): PauseCall__Inputs {
+    return new PauseCall__Inputs(this);
+  }
+
+  get outputs(): PauseCall__Outputs {
+    return new PauseCall__Outputs(this);
+  }
+}
+
+export class PauseCall__Inputs {
+  _call: PauseCall;
+
+  constructor(call: PauseCall) {
+    this._call = call;
+  }
+}
+
+export class PauseCall__Outputs {
+  _call: PauseCall;
+
+  constructor(call: PauseCall) {
     this._call = call;
   }
 }
@@ -680,6 +844,36 @@ export class SetMinDaysOpenCall__Outputs {
   }
 }
 
+export class SetStakingAdapterCall extends ethereum.Call {
+  get inputs(): SetStakingAdapterCall__Inputs {
+    return new SetStakingAdapterCall__Inputs(this);
+  }
+
+  get outputs(): SetStakingAdapterCall__Outputs {
+    return new SetStakingAdapterCall__Outputs(this);
+  }
+}
+
+export class SetStakingAdapterCall__Inputs {
+  _call: SetStakingAdapterCall;
+
+  constructor(call: SetStakingAdapterCall) {
+    this._call = call;
+  }
+
+  get _stakingAdapter(): Address {
+    return this._call.inputValues[0].value.toAddress();
+  }
+}
+
+export class SetStakingAdapterCall__Outputs {
+  _call: SetStakingAdapterCall;
+
+  constructor(call: SetStakingAdapterCall) {
+    this._call = call;
+  }
+}
+
 export class SetWalletCall extends ethereum.Call {
   get inputs(): SetWalletCall__Inputs {
     return new SetWalletCall__Inputs(this);
@@ -736,6 +930,32 @@ export class TransferOwnershipCall__Outputs {
   _call: TransferOwnershipCall;
 
   constructor(call: TransferOwnershipCall) {
+    this._call = call;
+  }
+}
+
+export class UnpauseCall extends ethereum.Call {
+  get inputs(): UnpauseCall__Inputs {
+    return new UnpauseCall__Inputs(this);
+  }
+
+  get outputs(): UnpauseCall__Outputs {
+    return new UnpauseCall__Outputs(this);
+  }
+}
+
+export class UnpauseCall__Inputs {
+  _call: UnpauseCall;
+
+  constructor(call: UnpauseCall) {
+    this._call = call;
+  }
+}
+
+export class UnpauseCall__Outputs {
+  _call: UnpauseCall;
+
+  constructor(call: UnpauseCall) {
     this._call = call;
   }
 }

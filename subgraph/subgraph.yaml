@@ -6,7 +6,7 @@ dataSources:
     name: LotteryPoolFactory
     network: mumbai
     source:
-      address: "0x447e50Aab46B4f24FB766315903bd10fc7EE316A"
+      address: "0xA3af5E427b4BEBb533C3148CB3B6a43D2DDa3E33"
       abi: LotteryPoolFactory
     mapping:
       kind: ethereum/events
@@ -18,9 +18,9 @@ dataSources:
         - name: LotteryPoolFactory
           file: ./abis/LotteryPoolFactory.json
       eventHandlers:
-        - event: LotteryCreated(uint256,address,address,address,uint256,uint256,uint256,uint8,uint256)
+        - event: LotteryCreated(uint256,address,address,address,uint256,uint256,uint256,uint256,uint256)
           handler: handleLotteryCreated
-        - event: LotteryStaked(uint256)
+        - event: LotteryStaked(uint256,uint256)
           handler: handleLotteryStaked
         - event: LotteryClosed(uint256,address,uint256,uint256)
           handler: handleLotteryClosed

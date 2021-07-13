@@ -6,8 +6,8 @@ enum LotteryStatus {
 }
 
 enum LotteryPoolType {
-  DIRECT
-  STAKING
+  STANDARD
+  YIELD
 }
 
 type LotteryPool @entity {
