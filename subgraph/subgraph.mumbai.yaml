@@ -4,23 +4,23 @@ schema:
 dataSources:
   - kind: ethereum/contract
     name: LotteryPoolFactory
-    network: rinkeby
+    network: mumbai
     source:
-      address: "0x072132FEC25fD856d6CF272C9F421a761fCA3ef0"
+      address: "0x4CfCa6c4049311D51aE0474e5113Fce373Ef3481"
       abi: LotteryPoolFactory
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.4
       language: wasm/assemblyscript
       entities:
-        - Lottery
+        - LotteryPool
       abis:
         - name: LotteryPoolFactory
           file: ./abis/LotteryPoolFactory.json
       eventHandlers:
-        - event: LotteryCreated(uint256,address,address,address,uint256,uint256,uint256,uint8,uint256)
+        - event: LotteryCreated(uint256,address,address,address,uint256,uint256,uint256,uint256,uint256,address,bytes32)
           handler: handleLotteryCreated
-        - event: LotteryStaked(uint256)
+        - event: LotteryStaked(uint256,uint256)
           handler: handleLotteryStaked
         - event: LotteryClosed(uint256,address,uint256,uint256)
           handler: handleLotteryClosed

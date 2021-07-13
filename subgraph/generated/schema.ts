@@ -129,8 +129,8 @@ export class LotteryPool extends Entity {
     }
   }
 
-  get minAmount(): BigInt | null {
-    let value = this.get("minAmount");
+  get minProfit(): BigInt | null {
+    let value = this.get("minProfit");
     if (value === null || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -138,11 +138,11 @@ export class LotteryPool extends Entity {
     }
   }
 
-  set minAmount(value: BigInt | null) {
+  set minProfit(value: BigInt | null) {
     if (value === null) {
-      this.unset("minAmount");
+      this.unset("minProfit");
     } else {
-      this.set("minAmount", Value.fromBigInt(value as BigInt));
+      this.set("minProfit", Value.fromBigInt(value as BigInt));
     }
   }
 
@@ -163,6 +163,23 @@ export class LotteryPool extends Entity {
     }
   }
 
+  get stakedAmount(): BigInt | null {
+    let value = this.get("stakedAmount");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBigInt();
+    }
+  }
+
+  set stakedAmount(value: BigInt | null) {
+    if (value === null) {
+      this.unset("stakedAmount");
+    } else {
+      this.set("stakedAmount", Value.fromBigInt(value as BigInt));
+    }
+  }
+
   get winner(): Bytes | null {
     let value = this.get("winner");
     if (value === null || value.kind == ValueKind.NULL) {
@@ -180,8 +197,8 @@ export class LotteryPool extends Entity {
     }
   }
 
-  get finalPrice(): BigInt | null {
-    let value = this.get("finalPrice");
+  get profit(): BigInt | null {
+    let value = this.get("profit");
     if (value === null || value.kind == ValueKind.NULL) {
       return null;
     } else {
@@ -189,11 +206,11 @@ export class LotteryPool extends Entity {
     }
   }
 
-  set finalPrice(value: BigInt | null) {
+  set profit(value: BigInt | null) {
     if (value === null) {
-      this.unset("finalPrice");
+      this.unset("profit");
     } else {
-      this.set("finalPrice", Value.fromBigInt(value as BigInt));
+      this.set("profit", Value.fromBigInt(value as BigInt));
     }
   }
 
@@ -211,6 +228,40 @@ export class LotteryPool extends Entity {
       this.unset("fees");
     } else {
       this.set("fees", Value.fromBigInt(value as BigInt));
+    }
+  }
+
+  get stakingAdapter(): Bytes | null {
+    let value = this.get("stakingAdapter");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toBytes();
+    }
+  }
+
+  set stakingAdapter(value: Bytes | null) {
+    if (value === null) {
+      this.unset("stakingAdapter");
+    } else {
+      this.set("stakingAdapter", Value.fromBytes(value as Bytes));
+    }
+  }
+
+  get stakingAdapterName(): string | null {
+    let value = this.get("stakingAdapterName");
+    if (value === null || value.kind == ValueKind.NULL) {
+      return null;
+    } else {
+      return value.toString();
+    }
+  }
+
+  set stakingAdapterName(value: string | null) {
+    if (value === null) {
+      this.unset("stakingAdapterName");
+    } else {
+      this.set("stakingAdapterName", Value.fromString(value as string));
     }
   }
 }

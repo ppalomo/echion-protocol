@@ -89,9 +89,12 @@ export default function NewLottery () {
     }
 
     async function handleCreateLottery() {
+        console.log("1 - handleCreateLottery");
         try {
             if(factoryContract != null) {
-                const tx = await factoryContract.createLottery(nftAddress, nftIndex, ethers.utils.parseEther(ticketPrice.toString()), 0, 0);
+                console.log("2 - factoryContract != null");
+                const tx = await factoryContract.createLottery(
+                    nftAddress, nftIndex, ethers.utils.parseEther(ticketPrice.toString()), 0, 0);
                 await tx.wait();
             }
         } catch (err) {

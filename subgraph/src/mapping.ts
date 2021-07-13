@@ -11,12 +11,15 @@ export function handleLotteryCreated(event: LotteryCreated): void {
   lottery.address = event.params.lotteryAddress
   lottery.creator = event.params.creator
   lottery.status = "OPEN"
-  lottery.lotteryPoolType = event.params.lotteryPoolType==0 ? "DIRECT" : "STAKING"
+  lottery.lotteryPoolType = event.params.lotteryPoolType == new BigInt(0) ? "STANDARD" : "YIELD"
   lottery.nftAddress = event.params.nftAddress
   lottery.nftIndex = event.params.nftIndex
   lottery.ticketPrice = event.params.ticketPrice
-  lottery.minAmount = event.params.minAmount
+  lottery.minProfit = event.params.minAmount
   lottery.created = event.params.created
+  lottery.stakingAdapter = event.params.stakingAdapter
+  lottery.stakingAdapterName = event.params.stakingAdapterName.toString()
+
   lottery.save()
 }
 
@@ -27,6 +30,7 @@ export function handleLotteryStaked(event: LotteryStaked): void {
   }
 
   lottery.status = "STAKING"
+  lottery.stakedAmount = event.params.stakedAmount
   lottery.save()
 }
 
@@ -38,7 +42,7 @@ export function handleLotteryClosed(event: LotteryClosed): void {
 
   lottery.status = "CLOSED"
   lottery.winner = event.params.winner
-  lottery.finalPrice = event.params.paymentToCreator
+  lottery.profit = event.params.profit
   lottery.fees = event.params.fees
   lottery.save()
 }
@@ -50,6 +54,6 @@ export function handleLotteryCancelled(event: LotteryCancelled): void {
   }
 
   lottery.status = "CANCELLED"
-  lottery.finalPrice = event.params.paymentToCreator
+  lottery.fees = event.params.fees
   lottery.save()
 }

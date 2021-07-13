@@ -58,6 +58,10 @@ task("accounts", "Prints the list of accounts", async () => {
       url: `https://rinkeby.infura.io/v3/${process.env.REACT_APP_INFURA_API_KEY}`,
       accounts: [`0x${process.env.REACT_APP_DEPLOYER_PRIVATE_KEY}`]
     },
+    kovan: {
+      url: `https://kovan.infura.io/v3/${process.env.REACT_APP_INFURA_API_KEY}`,
+      accounts: [`0x${process.env.REACT_APP_DEPLOYER_PRIVATE_KEY}`]
+    },
     ropsten: {
       url: `https://ropsten.infura.io/v3/${process.env.INFURA_API_KEY}`,
       accounts: [`0x${process.env.REACT_APP_DEPLOYER_PRIVATE_KEY}`],

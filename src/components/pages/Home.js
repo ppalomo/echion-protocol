@@ -55,7 +55,7 @@ export default function Home (props) {
             if(factoryAdminContract != null) {
                 const [actives, tbal, lot] = await Promise.all([
                     factoryAdminContract.numberOfActiveLotteries(),
-                    factoryAdminContract.totalBalance(),
+                    factoryAdminContract.totalSupply(),
                     getLotteries()
                 ]);
                 setNumberOfActiveLotteries(actives.toString());
@@ -84,9 +84,14 @@ export default function Home (props) {
                         nftAddress
                         nftIndex
                         ticketPrice
-                        minAmount
+                        minProfit
                         created
+                        stakedAmount
                         winner
+                        profit
+                        fees
+                        stakingAdapter
+                        stakingAdapterName
                     }
                 }
             `

@@ -1,4 +1,4 @@
-enum LotteryStatus {
+enum LotteryPoolStatus {
   OPEN
   STAKING
   CLOSED
@@ -14,14 +14,17 @@ type LotteryPool @entity {
   id: ID!
   address: Bytes!
   creator: Bytes!
-  status: LotteryStatus!
+  status: LotteryPoolStatus!
   lotteryPoolType: LotteryPoolType!
   nftAddress: Bytes
   nftIndex: BigInt
   ticketPrice: BigInt
-  minAmount: BigInt
+  minProfit: BigInt
   created: BigInt
+  stakedAmount: BigInt
   winner: Bytes
-  finalPrice: BigInt
+  profit: BigInt
   fees: BigInt
+  stakingAdapter: Bytes
+  stakingAdapterName: String
 }

@@ -37,7 +37,7 @@ export const networks = [
         "rpcUrl": "https://rinkeby.infura.io/v3/[INFURA_KEY]",
         "symbol": "ETH",
         "explorerUrl": "https://rinkeby.etherscan.io",
-        "enabled": true,
+        "enabled": false,
     },
     {
         "chainId": 3,
@@ -58,6 +58,16 @@ export const networks = [
         "symbol": "ETH",
         "explorerUrl": "https://goerli.etherscan.io",
         "enabled": false,
+    },
+    {
+        "chainId": 42,
+        "code": "kovan",
+        "name": "Kovan",
+        "icon": "eth-icon.svg",
+        "rpcUrl": "https://kovan.infura.io/v3/[INFURA_KEY]",
+        "symbol": "ETH",
+        "explorerUrl": "https://kovan.etherscan.io",
+        "enabled": true,
     },
     {
         "chainId": 80001,

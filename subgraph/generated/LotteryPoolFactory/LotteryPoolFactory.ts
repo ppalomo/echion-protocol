@@ -128,6 +128,14 @@ export class LotteryCreated__Params {
   get minAmount(): BigInt {
     return this._event.parameters[8].value.toBigInt();
   }
+
+  get stakingAdapter(): Address {
+    return this._event.parameters[9].value.toAddress();
+  }
+
+  get stakingAdapterName(): Bytes {
+    return this._event.parameters[10].value.toBytes();
+  }
 }
 
 export class LotteryStaked extends ethereum.Event {

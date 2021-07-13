@@ -36,13 +36,13 @@ import ERC721JSON from '../abis/ERC721.json';
 export default function LotteryItem({lottery}) {
     const buttonColor = useColorModeValue("gray.300", "gray.700");
     const { isWalletConnected, wallet, network, coin, setTotalBalance, provider } = useStore();
-    const lotteryContract = useContractByAddress("LotteryPool", lottery.address);
+    const lotteryContract = useContractByAddress("pools", "StandardLotteryPool", lottery.address);
     const factoryContract = useContract("LotteryPoolFactory");
     const factoryAdminContract = useAdminContract("LotteryPoolFactory");
     const lotteryAdminContract = useAdminContractByAddress("LotteryPool", lottery.address);
     const [numTickets, setNumTickets] = useState(1);
     const [isDepositOpen, setIsDepositOpen] = useState(false);
-    const [isCancelTicketOpen, setIsCancelTicketOpen] = useState(false);    
+    const [isRedeemOpen, setIsRedeemOpen] = useState(false);    
     const [balance, setBalance] = useState(0);
     const [tickets, setTickets] = useState(0);
     const [totalTickets, setTotalTickets] = useState(0);
@@ -67,7 +67,7 @@ export default function LotteryItem({lottery}) {
                     console.log("error");
                 }
                 const [tbal, bal, ttick] = await Promise.all([
-                    factoryAdminContract.totalBalance(),
+                    factoryAdminContract.totalSupply(),
                     lotteryAdminContract.getBalance(),
                     lotteryAdminContract.numberOfTickets()
                 ]);
@@ -88,6 +88,7 @@ export default function LotteryItem({lottery}) {
 
     const getLotteryOnChainData = async (addr, index) => {
         try {
+            console.log(addr);
             const wallet = new Wallet(process.env.REACT_APP_DEPLOYER_PRIVATE_KEY, provider);
             const contract = new ethers.Contract(addr, ERC721JSON.abi, wallet);
 
@@ -124,17 +125,22 @@ export default function LotteryItem({lottery}) {
             setIsDepositOpen(true);
     }
 
-    function handleOpenCancelTicket() {
+    function handleOpenRedeem() {
         if (isWalletConnected)
-            setIsCancelTicketOpen(true);
+            setIsRedeemOpen(true);
     }
 
     async function handleDeposit(e) {
+        console.log("0000000000");
         try {
-            if(lotteryContract != null) {                
+            if(lotteryContract != null) {  
+                console.log("1111111111");
                 const amount = lottery.ticketPrice * numTickets;
+                console.log("22222 - ", amount.toString());             
                 const tx = await lotteryContract.buyTickets(numTickets, {value: amount.toString()});
+                console.log("3333333");                
                 await tx.wait();
+                console.log("44444444");
                 fetchData();
             }
         } catch (err) {
@@ -143,17 +149,17 @@ export default function LotteryItem({lottery}) {
         setIsDepositOpen(false);
     }
 
-    async function handleCancelTickets(e) {
+    async function handleRedeem(e) {
         try {
             if(lotteryContract != null) {
-                const tx = await lotteryContract.cancelTickets(numTickets);
+                const tx = await lotteryContract.redeemTickets(numTickets);
                 await tx.wait();
                 fetchData();
             }
         } catch (err) {
             console.log("Error: ", err);
         }
-        setIsCancelTicketOpen(false);
+        setIsRedeemOpen(false);
     }
 
     function handleNumTicketsChange(e) {
@@ -310,9 +316,9 @@ export default function LotteryItem({lottery}) {
                             <VStack w="100%">
                                 <Text fontSize="0.9rem" fontWeight="500" color="primary.500">Pool Type</Text>
                                 <HStack>
-                                    <FaCircle fontSize="15px" color={lottery.lotteryPoolType == "DIRECT" ? "#00C48E" : "#1A94DA" } />
+                                    <FaCircle fontSize="15px" color={lottery.lotteryPoolType == "STANDARD" ? "#00C48E" : "#1A94DA" } />
                                     <Text fontSize="0.9rem" fontWeight="500" color="white.100">
-                                        { lottery.lotteryPoolType == "DIRECT" ? "Direct" : "Staking" }
+                                        { lottery.lotteryPoolType == "STANDARD" ? "STD" : "YLD" }
                                     </Text>
                                 </HStack>
                             </VStack>
@@ -332,7 +338,7 @@ export default function LotteryItem({lottery}) {
                                         fontSize="0.9rem" 
                                         fontWeight="500" 
                                         color={lottery.status == "CLOSED" ? "#00C48E" : "white.100" }>
-                                        { capitalize(lottery.status, true) }
+                                        { lottery.status }
                                     </Text>
                                 </HStack>
                             </VStack>
@@ -355,7 +361,7 @@ export default function LotteryItem({lottery}) {
                                 variant="outline">
                                 Deposit
                             </Button>
-                            <Button
+                            {/* <Button
                                 isDisabled={!isWalletConnected || tickets == 0}
                                 onClick={() => handleOpenCancelTicket()}
                                 w="33%"
@@ -363,8 +369,9 @@ export default function LotteryItem({lottery}) {
                                 bgColor={buttonColor}
                                 variant="outline">
                                 Withdraw
-                            </Button>
+                            </Button> */}
                             <Button
+                                onClick={() => handleOpenRedeem()}
                                 isDisabled={true}
                                 w="33%"
                                 fontSize={14}
@@ -442,12 +449,12 @@ export default function LotteryItem({lottery}) {
             </Modal>
 
             <Modal
-                isOpen={isCancelTicketOpen}
-                onClose={() => setIsCancelTicketOpen(false)}
+                isOpen={isRedeemOpen}
+                onClose={() => setIsRedeemOpen(false)}
                 isCentered>
                 <ModalOverlay />
                 <ModalContent>
-                <ModalHeader>Cancel bought tickets</ModalHeader>
+                <ModalHeader>Redeem tickets</ModalHeader>
                 <ModalBody pb={6}>
                     <FormControl>
                         <FormLabel>Tickets amount:</FormLabel>
@@ -456,11 +463,11 @@ export default function LotteryItem({lottery}) {
                 </ModalBody>
                 <ModalFooter>
                     <Button 
-                        onClick={handleCancelTickets}
+                        onClick={handleRedeem}
                         colorScheme="blue" mr={3}>
                         Deposit
                     </Button>
-                    <Button onClick={() => setIsCancelTicketOpen(false)}>Cancel</Button>
+                    <Button onClick={() => setIsRedeemOpen(false)}>Cancel</Button>
                 </ModalFooter>
                 </ModalContent>
             </Modal>

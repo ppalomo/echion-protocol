@@ -24,13 +24,15 @@ export const useContract = (contractName) => {
         return null;
 }
 
-export const useContractByAddress = (contractName, address) => {
+export const useContractByAddress = (directory, contractName, address) => {
     const { isWalletConnected, network, signer } = useStore();
 
     if (isWalletConnected) {
         try {
             // Getting contract's abi
-            var json = require(`../artifacts/contracts/${contractName}.sol/${contractName}.json`);
+            if (directory != "")
+                directory = "/" + directory;
+            var json = require(`../artifacts/contracts${directory}/${contractName}.sol/${contractName}.json`);
             
             // Creating contract's instance
             const instance = new ethers.Contract(address, json.abi, signer);

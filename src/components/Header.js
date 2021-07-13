@@ -63,17 +63,14 @@ export default function Header (props) {
                 borderColor={borderColor}>
 
                 <Link to="/">
-                    <Text
-                        bgGradient="linear(to-l, #7928CA,#FF0080)"
-                        bgClip="text"
-                        fontSize={{
-                            "base": "2xl",
-                            "md": "4xl",
-                            "xl": "4xl"
-                        }}
-                        fontWeight="extrabold">
-                        Echion Protocol
-                    </Text>
+                    <Image
+                        src={useColorModeValue("images/logo-light.png", "images/logo-dark.png")} 
+                        w={{
+                            base: "10rem", // 0-48em
+                            md: "12rem", // 48em-80em,
+                            xl: "12rem", // 80em+
+                        }} 
+                        objectFit="cover" />
                 </Link>
 
                 <ButtonGroup variant="ghost" color="gray.600" mr="1rem">
@@ -152,11 +149,11 @@ export default function Header (props) {
                     <></>
                     }
 
-                    <IconButton
+                    {/* <IconButton
                         variant="ghost"
                         onClick={toggleColorMode}
                         aria-label="toggle theme"
-                        icon={colorMode === 'dark' ? <FaSun /> : <FaMoon />} />
+                        icon={colorMode === 'dark' ? <FaSun /> : <FaMoon />} /> */}
 
                     <IconButton
                         as="a"
@@ -232,9 +229,9 @@ export default function Header (props) {
                             </MenuItem>
                         ))}
                         <MenuDivider />
-                        <MenuItem onClick={toggleColorMode}>
+                        {/* <MenuItem onClick={toggleColorMode}>
                             {colorMode === 'dark' ? "Light Mode" : "Dark Mode"}
-                        </MenuItem>
+                        </MenuItem> */}
                     </MenuList>
                 </Menu>
 
