@@ -2,7 +2,7 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-![alt text](https://github.com/ppalomo/echion-protocol/blob/master/screenshot01.jpg?raw=true)
+![alt text](https://github.com/ppalomo/echion-protocol/blob/develop/screenshot01.jpg?raw=true)
 
 ## Available Scripts
 
