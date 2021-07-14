@@ -111,7 +111,7 @@ export default function DrawCanvas () {
     async function handleCreateLottery(nftAddress, nftIndex) {
         try {
             if(factoryContract != null) {
-                const tx = await factoryContract.createLottery(nftAddress, nftIndex, ethers.utils.parseEther("0.001"), 0, 0);
+                const tx = await factoryContract.createLottery(nftAddress, nftIndex, ethers.utils.parseEther("0.001"), 0, 1);
                 await tx.wait();
             }
         } catch (err) {

@@ -75,6 +75,14 @@ task("accounts", "Prints the list of accounts", async () => {
       url: "https://rpc-mainnet.maticvigil.com",
       accounts: [`0x${process.env.REACT_APP_DEPLOYER_PRIVATE_KEY}`]
     },
+    optimistic_kovan: { //69
+      url: "https://kovan.optimism.io",
+      accounts: [`0x${process.env.REACT_APP_DEPLOYER_PRIVATE_KEY}`]
+    },
+    optimistic: { //10
+      url: "https://mainnet.optimism.io",
+      accounts: [`0x${process.env.REACT_APP_DEPLOYER_PRIVATE_KEY}`]
+    }
   },
   etherscan: {
     apiKey: process.env.REACT_APP_ETHERSCAN_API_KEY

@@ -31,7 +31,6 @@ export default function Home (props) {
     const history = useHistory();
     const { isWalletConnected, wallet, network, coin, setPageSelected, numberOfActiveLotteries, totalBalance, setNumberOfActiveLotteries, setTotalBalance } = useStore();
     
-    
     // const [numberOfActiveLotteries, setNumberOfActiveLotteries] = useState("0");
     // const [totalBalance, setTotalBalance] = useState("0");
 
@@ -41,10 +40,9 @@ export default function Home (props) {
     }, [factoryAdminContract]);
 
     useEffect(async () => {
-        console.log("home - useEffect")
-        if (factoryAdminContract)
-            await fetchData();
-        else {
+        if (factoryAdminContract){
+            await fetchData();            
+        } else {
             setNumberOfActiveLotteries("0");
             setTotalBalance("0");
         }
@@ -61,12 +59,9 @@ export default function Home (props) {
                 setNumberOfActiveLotteries(actives.toString());
                 const tbalFormatted = Math.round(utils.formatEther(tbal) * 1e3) / 1e3;
                 setTotalBalance(tbalFormatted);
-
-                // const kk = await factoryAdminContract.lotteries(0);
-                // console.log(kk);
             }
         } catch (err) { 
-            console.log("Error: ", err);
+            //console.log("Error: ", err);
         }
     }
 

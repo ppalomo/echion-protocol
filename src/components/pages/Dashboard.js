@@ -86,9 +86,14 @@ export default function Home (props) {
                         nftAddress
                         nftIndex
                         ticketPrice
-                        minAmount
+                        minProfit
                         created
+                        stakedAmount
                         winner
+                        profit
+                        fees
+                        stakingAdapter
+                        stakingAdapterName
                     }
                 }
             `

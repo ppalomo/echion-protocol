@@ -35,11 +35,11 @@ import ERC721JSON from '../abis/ERC721.json';
 
 export default function LotteryItem({lottery}) {
     const buttonColor = useColorModeValue("gray.300", "gray.700");
-    const { isWalletConnected, wallet, network, coin, setTotalBalance, provider } = useStore();
-    const lotteryContract = useContractByAddress("pools", "StandardLotteryPool", lottery.address);
+    const { isWalletConnected, wallet, network, coin, setTotalBalance, provider, signer } = useStore();
+    const lotteryContract = useContractByAddress("pools", lottery.lotteryPoolType == "STANDARD" ? "StandardLotteryPool" : "YieldLotteryPool", lottery.address);
+    const lotteryAdminContract = useAdminContractByAddress("pools", lottery.lotteryPoolType == "STANDARD" ? "StandardLotteryPool" : "YieldLotteryPool", lottery.address);
     const factoryContract = useContract("LotteryPoolFactory");
-    const factoryAdminContract = useAdminContract("LotteryPoolFactory");
-    const lotteryAdminContract = useAdminContractByAddress("LotteryPool", lottery.address);
+    const factoryAdminContract = useAdminContract("LotteryPoolFactory");            
     const [numTickets, setNumTickets] = useState(1);
     const [isDepositOpen, setIsDepositOpen] = useState(false);
     const [isRedeemOpen, setIsRedeemOpen] = useState(false);    
@@ -50,6 +50,7 @@ export default function LotteryItem({lottery}) {
     const [imageURI, setImageURI] = useState(null);
     const [name, setName] = useState(null);
     const [contractName, setContractName] = useState(null);
+    const [winner, setWinner] = useState(null);
 
     useEffect(async () => {
             await fetchData();
@@ -66,19 +67,22 @@ export default function LotteryItem({lottery}) {
                 } else {
                     console.log("error");
                 }
-                const [tbal, bal, ttick] = await Promise.all([
+                const [tbal, bal, ttick, win] = await Promise.all([
                     factoryAdminContract.totalSupply(),
-                    lotteryAdminContract.getBalance(),
-                    lotteryAdminContract.numberOfTickets()
+                    lottery.status == "STAKING" ? lotteryAdminContract.stakedAmount() : lotteryAdminContract.getBalance(),
+                    lotteryAdminContract.numberOfTickets(),
+                    lotteryAdminContract.winner()
                 ]);
                 setTotalBalance(Math.round(utils.formatEther(tbal) * 1e3) / 1e3);
                 setBalance(Math.round(utils.formatEther(bal) * 1e3) / 1e3);
                 setTotalTickets(ttick);
+                setWinner(win);
 
                 if (isWalletConnected)
                 {
                     const tick = await lotteryAdminContract.ticketsOf(wallet);
                     setTickets(tick);
+                    setNumTickets(tick);
                 }
             }
         } catch (error) {
@@ -88,7 +92,6 @@ export default function LotteryItem({lottery}) {
 
     const getLotteryOnChainData = async (addr, index) => {
         try {
-            console.log(addr);
             const wallet = new Wallet(process.env.REACT_APP_DEPLOYER_PRIVATE_KEY, provider);
             const contract = new ethers.Contract(addr, ERC721JSON.abi, wallet);
 
@@ -115,7 +118,7 @@ export default function LotteryItem({lottery}) {
             return response;
 
         } catch (error) {
-            console.log("error getLotteryOnChainData: ", error);
+            // console.log("error getLotteryOnChainData: ", error);
             return null;
         }
     }
@@ -131,16 +134,11 @@ export default function LotteryItem({lottery}) {
     }
 
     async function handleDeposit(e) {
-        console.log("0000000000");
         try {
             if(lotteryContract != null) {  
-                console.log("1111111111");
-                const amount = lottery.ticketPrice * numTickets;
-                console.log("22222 - ", amount.toString());             
-                const tx = await lotteryContract.buyTickets(numTickets, {value: amount.toString()});
-                console.log("3333333");                
+                const amount = lottery.ticketPrice * numTickets;             
+                const tx = await lotteryContract.buyTickets(numTickets, {value: amount.toString()});               
                 await tx.wait();
-                console.log("44444444");
                 fetchData();
             }
         } catch (err) {
@@ -166,10 +164,27 @@ export default function LotteryItem({lottery}) {
         setNumTickets(e.target.value);
     }
 
+    async function handleStakeLottery() {
+        try {
+            if(lotteryContract != null) {
+                const tx = await lotteryContract.launchStaking();
+                await tx.wait();
+                fetchData();
+            }
+        } catch (err) {
+            console.log("Error: ", err);
+        }
+    }
+
     async function handleCloseLottery() {
         try {
-            if(factoryContract != null) {
-                const tx = await factoryContract.declareWinner(lottery.id);
+            if(lotteryContract != null) {
+                // const wallet = new Wallet(process.env.REACT_APP_DEPLOYER_PRIVATE_KEY, provider);
+                const nft = new ethers.Contract(lottery.nftAddress, ERC721JSON.abi, signer);
+                let tx = await nft.approve(lottery.address, lottery.nftIndex);
+                await tx.wait();
+
+                tx = await lotteryContract.declareWinner();
                 await tx.wait();
                 fetchData();
             }
@@ -180,8 +195,20 @@ export default function LotteryItem({lottery}) {
 
     async function handleCancelLottery() {
         try {
-            if(factoryContract != null) {
-                const tx = await factoryContract.cancelLottery(lottery.id);
+            if(lotteryContract != null) {
+                const tx = await lotteryContract.cancelLottery();
+                await tx.wait();
+                fetchData();
+            }
+        } catch (err) {
+            console.log("Error: ", err);
+        }
+    }
+
+    async function handleGetProfit() {
+        try {
+            if(lotteryContract != null) {
+                const tx = await lotteryContract.redeemProfit();
                 await tx.wait();
                 fetchData();
             }
@@ -225,7 +252,7 @@ export default function LotteryItem({lottery}) {
                             {name ? truncateRight(name ? name: "",28) : "No title"}
                         </Heading>
                     </Tooltip>
-                    <Link href={network ? `${network.explorerUrl}/address/${lottery.address}` : ""} isExternal>
+                    <Link href={network ? `${network.explorerUrl}/address/${lottery.nftAddress}` : ""} isExternal>
                         <Text color={'gray.500'}>{contractName ? contractName : "No contract name"}</Text>
                     </Link>
                 </Box>
@@ -316,10 +343,12 @@ export default function LotteryItem({lottery}) {
                             <VStack w="100%">
                                 <Text fontSize="0.9rem" fontWeight="500" color="primary.500">Pool Type</Text>
                                 <HStack>
-                                    <FaCircle fontSize="15px" color={lottery.lotteryPoolType == "STANDARD" ? "#00C48E" : "#1A94DA" } />
-                                    <Text fontSize="0.9rem" fontWeight="500" color="white.100">
-                                        { lottery.lotteryPoolType == "STANDARD" ? "STD" : "YLD" }
-                                    </Text>
+                                    <FaCircle fontSize="15px" color={lottery.lotteryPoolType == "STANDARD" ? "#00C48E" : "#AA00FF" } />
+                                    {/* <Tooltip label={`Protocol: ${lottery.stakingAdapterName}`} fontSize="0.8em" hasArrow bg="gray.300" color="black"> */}
+                                        <Text fontSize="0.9rem" fontWeight="500" color="white.100">
+                                            { lottery.lotteryPoolType == "STANDARD" ? "STD" : "YLD" }
+                                        </Text>
+                                    {/* </Tooltip> */}
                                 </HStack>
                             </VStack>
                         </WrapItem>
@@ -335,9 +364,9 @@ export default function LotteryItem({lottery}) {
                                         color={lottery.status == "CLOSED" ? "#00C48E" : "white.100" } />
                                     }
                                     <Text 
-                                        fontSize="0.9rem" 
+                                        fontSize="0.8rem" 
                                         fontWeight="500" 
-                                        color={lottery.status == "CLOSED" ? "#00C48E" : "white.100" }>
+                                        color={lottery.status == "CLOSED" ? "#00C48E" : lottery.status == "STAKING" ? "#EEA431" : "white.100" }>
                                         { lottery.status }
                                     </Text>
                                 </HStack>
@@ -353,8 +382,8 @@ export default function LotteryItem({lottery}) {
                         {window.location.pathname == "/" ?
                             <>
                             <Button
-                                isDisabled={!isWalletConnected}
-                                onClick={() => handleOpenDeposit()}
+                                isDisabled={!isWalletConnected || lottery.status != "OPEN"}
+                                onClick={() => handleOpenDeposit() }
                                 w="33%"
                                 fontSize={14}
                                 bgColor={buttonColor}
@@ -372,7 +401,7 @@ export default function LotteryItem({lottery}) {
                             </Button> */}
                             <Button
                                 onClick={() => handleOpenRedeem()}
-                                isDisabled={true}
+                                isDisabled={!isWalletConnected || tickets == 0 || lottery.status == "STAKING"}
                                 w="33%"
                                 fontSize={14}
                                 bgColor={buttonColor}
@@ -382,37 +411,97 @@ export default function LotteryItem({lottery}) {
                             </>
                         :
                             <>
-                            <Button
-                                isDisabled={true}
-                                w="33%"
-                                fontSize={14}
-                                bgColor={buttonColor}
-                                variant="outline">
-                                Stake
-                            </Button>
-                            <Button
-                                onClick={() => handleCloseLottery()}
-                                isDisabled={!isWalletConnected}
-                                w="33%"
-                                fontSize={14}
-                                bgColor={buttonColor}
-                                variant="outline">
-                                Close
-                            </Button>
-                            <Button
-                                onClick={() => handleCancelLottery()}
-                                isDisabled={!isWalletConnected}
-                                w="33%"
-                                fontSize={14}
-                                bgColor={buttonColor}
-                                variant="outline">
-                                Cancel
-                            </Button>
+                            {lottery.lotteryPoolType == "YIELD" && lottery.status == "OPEN" ? 
+                                <Button
+                                    visibility="collapse"
+                                    onClick={() => handleStakeLottery()}
+                                    isDisabled={!isWalletConnected || lottery.status != "OPEN"}
+                                    w="33%"
+                                    fontSize={14}
+                                    bgColor={buttonColor}
+                                    variant="outline">
+                                    Stake
+                                </Button>
+                            : ""}
+                            {lottery.status == "STAKING" || (lottery.lotteryPoolType == "STANDARD" && lottery.status == "OPEN") ? 
+                                <Button
+                                    onClick={() => handleCloseLottery()}
+                                    isDisabled={!isWalletConnected || ( lottery.lotteryPoolType == "YIELD" && lottery.status != "STAKING") }
+                                    w="33%"
+                                    fontSize={14}
+                                    bgColor={buttonColor}
+                                    variant="outline">
+                                    Close
+                                </Button>
+                            : ""}
+                            {lottery.status != "CLOSED" ? 
+                                <Button
+                                    onClick={() => handleCancelLottery()}
+                                    isDisabled={!isWalletConnected}
+                                    w="33%"
+                                    fontSize={14}
+                                    bgColor={buttonColor}
+                                    variant="outline">
+                                    Cancel
+                                </Button>
+                            : ""}
+                            {lottery.status == "CLOSED" ? 
+                                <Button
+                                    onClick={() => handleGetProfit()}
+                                    isDisabled={!isWalletConnected}
+                                    w="33%"
+                                    fontSize={14}
+                                    bgColor={buttonColor}
+                                    variant="outline">
+                                    Get Profit
+                                </Button>
+                            : ""}
                             </>
                         }
 
                     </ButtonGroup>
                 </Center>
+
+                {/* <Center>
+                    <VStack pt={2}>
+                        <Text 
+                            fontSize="0.9rem" 
+                            fontWeight="500" 
+                            color={lottery.status == "CLOSED" ? "#00C48E" : "white.100" }>
+                                {"Lottery: " + lottery.address}
+                            </Text>
+                        <Text 
+                            fontSize="0.9rem" 
+                            fontWeight="500" 
+                            color={lottery.status == "CLOSED" ? "#00C48E" : "white.100" }>
+                                {"Winner: " + truncateMiddle(winner, 11, '...')}
+                            </Text>
+                        <Text 
+                            fontSize="0.9rem" 
+                            fontWeight="500" 
+                            color={lottery.status == "CLOSED" ? "#00C48E" : "white.100" }>
+                                {"Protocol: " + lottery.stakingAdapterName}
+                            </Text>
+                        <Text 
+                            fontSize="0.9rem" 
+                            fontWeight="500" 
+                            color={lottery.status == "CLOSED" ? "#00C48E" : "white.100" }>
+                                {"@Protocol: " + lottery.stakingAdapter}
+                            </Text>
+                        <Text 
+                            fontSize="0.9rem" 
+                            fontWeight="500" 
+                            color={lottery.status == "CLOSED" ? "#00C48E" : "white.100" }>
+                                {"Profit: " + lottery.profit}
+                            </Text>
+                        <Text 
+                            fontSize="0.9rem" 
+                            fontWeight="500" 
+                            color={lottery.status == "CLOSED" ? "#00C48E" : "white.100" }>
+                                {"Fees: " + lottery.fees}
+                            </Text>
+                    </VStack>
+                </Center> */}
 
             </Flex>
 

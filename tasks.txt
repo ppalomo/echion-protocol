@@ -9,4 +9,10 @@ Tests
 - Creator cannot redeem payment multiple times.
 - Tests methods cannot be called directly, only through the factory contract.
 
+Pending
+=============================================
+- What if the creator don't close the lottery? Admin can close it?
+- What if the creator revoke nft transfer approval?
+
+
 

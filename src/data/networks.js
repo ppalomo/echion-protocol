@@ -60,6 +60,16 @@ export const networks = [
         "enabled": false,
     },
     {
+        "chainId": 10,
+        "code": "optimistic-ethereum",
+        "name": "Optimistic Ethereum",
+        "icon": "eth-icon.svg",
+        "rpcUrl": "https://optimism-mainnet.infura.io/v3/[INFURA_KEY]",
+        "symbol": "ETH",
+        "explorerUrl": "https://optimistic.etherscan.io",
+        "enabled": true,
+    },
+    {
         "chainId": 42,
         "code": "kovan",
         "name": "Kovan",
@@ -67,6 +77,16 @@ export const networks = [
         "rpcUrl": "https://kovan.infura.io/v3/[INFURA_KEY]",
         "symbol": "ETH",
         "explorerUrl": "https://kovan.etherscan.io",
+        "enabled": true,
+    },
+    {
+        "chainId": 10,
+        "code": "optimistic-kovan",
+        "name": "Optimistic Kovan",
+        "icon": "eth-icon.svg",
+        "rpcUrl": "https://optimism-kovan.infura.io/v3/[INFURA_KEY]",
+        "symbol": "ETH",
+        "explorerUrl": "https://kovan-optimistic.etherscan.io",
         "enabled": true,
     },
     {

@@ -37,6 +37,7 @@ import useStore from '../../store';
 import ERC721JSON from '../../abis/ERC721.json';
 import { useContract, useAdminContract } from '../../hooks/contractHooks';
 import DrawCanvas from '../DrawCanvas';
+import ImportNFT from '../ImportNFT';
 
 export default function NewLottery () {
     const history = useHistory();
@@ -48,71 +49,71 @@ export default function NewLottery () {
     const [nftImage, setNFTImage] = useState(null);
     const [page, setPage] = useState(0)
 
-    async function handleValidateNFT() {
-        const response = await getERC721ImageURL(nftAddress, nftIndex);
-        if (response && response.success) {
-            setNFTImage(response.data);
-        } else {
-            setNFTImage(null);
-        }
-    }
+    // async function handleValidateNFT() {
+    //     const response = await getERC721ImageURL(nftAddress, nftIndex);
+    //     if (response && response.success) {
+    //         setNFTImage(response.data);
+    //     } else {
+    //         setNFTImage(null);
+    //     }
+    // }
 
-    const getERC721ImageURL = async (addr, index) => {
-        try {
-            //const p = new ethers.providers.JsonRpcProvider(network.rpcUrl);
-            const wallet = new Wallet(process.env.REACT_APP_DEPLOYER_PRIVATE_KEY, provider);
-            const contract = new ethers.Contract(addr, ERC721JSON.abi, wallet);
-            const tokenURI = await contract.tokenURI(index);
-            console.log(tokenURI);
+    // const getERC721ImageURL = async (addr, index) => {
+    //     try {
+    //         //const p = new ethers.providers.JsonRpcProvider(network.rpcUrl);
+    //         const wallet = new Wallet(process.env.REACT_APP_DEPLOYER_PRIVATE_KEY, provider);
+    //         const contract = new ethers.Contract(addr, ERC721JSON.abi, wallet);
+    //         const tokenURI = await contract.tokenURI(index);
+    //         console.log(tokenURI);
 
-            var response = fetch(tokenURI)
-                .then(response => {
-                    return response.json();
-                    // return response.text();
-                })
-                .then((jsonData) => {
-                    return { success: true, data:  jsonData.image}
-                })
-                .catch((error) => {
-                    console.log("catch")
-                    console.log(error)
-                    console.warn('fetch error:', error);
-                    return { success: false, data: error };
-                });
-            console.log("fin")
-            return response;
+    //         var response = fetch(tokenURI)
+    //             .then(response => {
+    //                 return response.json();
+    //                 // return response.text();
+    //             })
+    //             .then((jsonData) => {
+    //                 return { success: true, data:  jsonData.image}
+    //             })
+    //             .catch((error) => {
+    //                 console.log("catch")
+    //                 console.log(error)
+    //                 console.warn('fetch error:', error);
+    //                 return { success: false, data: error };
+    //             });
+    //         console.log("fin")
+    //         return response;
 
-        } catch (error) {
-            console.log(error);
-            return null;
-        }
-    }
+    //     } catch (error) {
+    //         console.log(error);
+    //         return null;
+    //     }
+    // }
 
-    async function handleCreateLottery() {
-        console.log("1 - handleCreateLottery");
-        try {
-            if(factoryContract != null) {
-                console.log("2 - factoryContract != null");
-                const tx = await factoryContract.createLottery(
-                    nftAddress, nftIndex, ethers.utils.parseEther(ticketPrice.toString()), 0, 0);
-                await tx.wait();
-            }
-        } catch (err) {
-            console.log("Error: ", err);
-        }
-    }
+    // async function handleCreateLottery() {
+    //     console.log("1 - handleCreateLottery");
+    //     try {
+    //         if(factoryContract != null) {
+    //             console.log("2 - factoryContract != null");
+    //             const tx = await factoryContract.createLottery(
+    //                 nftAddress, nftIndex, ethers.utils.parseEther(ticketPrice.toString()), 0, 0);
+    //             await tx.wait();
+    //         }
+    //     } catch (err) {
+    //         console.log("Error: ", err);
+    //     }
+    // }
 
-    function handleNFTAddressChange(e) {
-        setNFTAddress(e.target.value);
-    }
+    // function handleNFTAddressChange(e) {
+    //     setNFTAddress(e.target.value);
+    // }
 
-    function handleNFTIndexChange(e) {
-        setNFTIndex(e.target.value);
-    }
+    // function handleNFTIndexChange(e) {
+    //     setNFTIndex(e.target.value);
+    // }
 
-    function handleTicketPriceChange(e) {
-        setTicketPrice(e.target.value);
-    }
+    // function handleTicketPriceChange(e) {
+    //     setTicketPrice(e.target.value);
+    // }
 
     function handleCreateButtonClick(){
         history.push('/new');
@@ -194,6 +195,21 @@ export default function NewLottery () {
                 </Route>
 
                 <Route path="/import">
+                    <Center 
+                        w="100%"
+                        mt={3}
+                        p={{
+                            base: "2",
+                            md: "4",
+                            xl: "4"
+                        }}
+                        bgColor={useColorModeValue("bg.100", "bg.900")}
+                        borderWidth="1px"
+                        borderColor={useColorModeValue("gray.200", "gray.700")}
+                        rounded="xl"
+                        position="relative">
+                        <ImportNFT />
+                    </Center>
                     <h1>Import</h1>
                 </Route>
 
