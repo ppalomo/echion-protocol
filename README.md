@@ -1,6 +1,6 @@
 # Echion Protocol
 
-![alt text](https://github.com/ppalomo/echion-protocol/blob/develop/logo-echion.png?raw=true)
+![alt text](https://github.com/ppalomo/echion-protocol/blob/develop/logo-echion-v1.png?raw=true)
 
 This project was created with [Create React App](https://github.com/facebook/create-react-app).
 
